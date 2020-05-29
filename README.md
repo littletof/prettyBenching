@@ -1,6 +1,6 @@
 # prettyBenching
 
-A simple Deno library, that gives you pretty benchmarking progress and results
+A simple Deno library, that gives you pretty benchmarking progress and results in the commandline
 
 **⚠ The lib is in a very early stage and needs not yet published features of Deno ⚠**
 
