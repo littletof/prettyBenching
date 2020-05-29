@@ -20,6 +20,24 @@ import { prettyBenchmarkResult, prettyBenchmartProgress } from 'https://raw.gith
 
 ##
 
+# prettyBenchmarkProgress
+
+Prints the Deno `runBenchmarks()` methods `progressCb` callback values in a nicely readable format.
+
+### Usage
+
+Simply add it to `runBenchmarks()` like below and you are good to go. Using `silent: true` is encouraged, so it doesnt interfere
+
+```ts
+await runBenchmarks({ silent: true }, prettyBenchmarkProgress())
+```
+
+The output would look something like this during running:
+![running](https://raw.githubusercontent.com/littletof/prettyBenching/master/docs/imgs/prettyBenchingProgress_example_running.png)
+
+End when finished:
+![finished](https://raw.githubusercontent.com/littletof/prettyBenching/master/docs/imgs/prettyBenchingProgress_example_finished.png)
+
 # prettyBenchmarkResults
 
 Prints the Deno `runBenchmarks()` methods result in a nicely readable format.
@@ -55,17 +73,6 @@ runBenchmarks({silent: true})
 ```
 
 The output would look something like this:
-![example](https://raw.githubusercontent.com/littletof/prettyBenching/master/docs/imgs/prettyBenchingResult_example.png?token=AHUHUPXFBMXDGIBPEPRCMBS63JMA2)
+![example](https://raw.githubusercontent.com/littletof/prettyBenching/master/docs/imgs/prettyBenchingResult_example.png)
 
-
-# prettyBenchmarkProgress
-
-Prints the Deno `runBenchmarks()` methods `progressCb` callback values in a nicely readable format.
-
-### Usage
-```ts
-
-```
-
-The output would look something like this:
 
