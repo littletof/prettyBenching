@@ -10,12 +10,12 @@ Add the following to your `deps.ts`
 export {
   prettyBenchmarkResult,
   prettyBenchmartProgress
-} from 'https://raw.githubusercontent.com/littletof/prettyBenching/master/mod.ts';
+} from 'https://deno.land/x/pretty_benching@v0.0.1/mod.ts';
 ```
 
 or just simply
 ```ts
-import { prettyBenchmarkResult, prettyBenchmartProgress } from 'https://raw.githubusercontent.com/littletof/prettyBenching/master/mod.ts';
+import { prettyBenchmarkResult, prettyBenchmartProgress } from 'https://deno.land/x/pretty_benching@v0.0.1/mod.ts';
 ```
 
 ##
