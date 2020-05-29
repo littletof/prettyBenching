@@ -6,13 +6,14 @@ A simple Deno library, that gives you pretty benchmarking progress and results
 Add the following to your `deps.ts`
 ```ts 
 export {
-  
-} from 'https://raw.githubusercontent.com/littletof/';
+  prettyBenchmarkResult,
+  prettyBenchmartProgress
+} from 'https://raw.githubusercontent.com/littletof/prettyBenching/master/mod.ts';
 ```
 
 or just simply
 ```ts
-import {  } from 'https://raw.githubusercontent.com/littletof/';
+import { prettyBenchmarkResult, prettyBenchmartProgress } from 'https://raw.githubusercontent.com/littletof/prettyBenching/master/mod.ts';
 ```
 
 ##
