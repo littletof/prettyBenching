@@ -38,6 +38,21 @@ The output would look something like this during running:
 End when finished:
 ![finished](https://raw.githubusercontent.com/littletof/prettyBenching/master/docs/imgs/prettyBenchingProgress_example_finished.png)
 
+### Thresholds
+
+You can define thresholds to specific benchmarks and than the times of the runs will be colored respectively
+
+```ts
+runBenchmarks({ silent: true }, prettyBenchmarkProgress({threshold: {
+  "for100ForIncrementX1e6": {green: 0.85, yellow: 1},
+  "for100ForIncrementX1e8": {green: 84, yellow: 93},
+  "forIncrementX1e9": {green: 900, yellow: 800},
+  "forIncrementX1e9x2": {green: 15000, yellow: 18000},
+}}))
+```
+
+![threshold](https://raw.githubusercontent.com/littletof/prettyBenching/master/docs/imgs/prettyBenchingProgress_example_threshold.png)
+
 # prettyBenchmarkResults
 
 Prints the Deno `runBenchmarks()` methods result in a nicely readable format.
