@@ -5,6 +5,8 @@ import {
   cyan,
   green,
   yellow,
+  gray,
+  dim
 } from "./deps.ts";
 
 export function prettyBenchmarkResult(
@@ -130,55 +132,128 @@ function padLength() {
   return prettyBenchmarkSeparator().length - 2;
 }
 
-export function prettyBenchmartProgress(
-  progress: any, /*BenchmarkRunProgress*/
+export function prettyBenchmarkProgress() {
+  return (progress: any /* BenchmarkRunProgress */) =>
+    _prettyBenchmarkProgress(progress);
+}
+
+function _prettyBenchmarkProgress(
+  progress: any, /* BenchmarkRunProgress */
 ) {
   // Finished benching
-  if (!progress.queued) {
-    console.log("Finished running");
+  if (isFinishedBenchmarking(progress)) {
+    const headerPadding = `${cyan('▒▒▒▒▒▒▒▒')}`;
+    console.log(`\n${headerPadding} Benchmarking finished\n`);
     return;
   }
 
   // Started benching
-  if (progress.queued && progress.results.length == 0 && !progress.running) {
-    console.log(
-      `Starting benchmarks. Queued: ${progress.queued.length} Filtered: ${progress.filtered}`,
-    );
+  if (isStartedBenchmarking(progress)) {
+    const line = startBenchingLine(progress);
+    console.log(line);
     return;
   }
 
   // Starting bench run
-  if (progress.running && progress.running.measuredRunsMs.length == 0) {
-    console.log(
-      `Start running ${progress.running.name} a total of ${progress.running.runsCount} times`,
-    );
+  if (isStartedBenchRun(progress)) {
+    const line = startingBenchmarkLine(progress);
+    Deno.stdout.writeSync(new TextEncoder().encode(`${line}\r`));
     return;
   }
 
   // Multiple run bench partial result
-  if (progress.running) {
-    console.log(
-      `${progress.running.name} run of ${progress.running.measuredRunsMs.length}/${progress.running.runsCount} resulted in: ${
-        progress.running
-          .measuredRunsMs[progress.running.measuredRunsMs.length - 1]
-      } ms`,
-    );
+  if (isPartialBenchRunResult(progress)) {
+    const line = runningBenchmarkLine(progress);
+    Deno.stdout.writeSync(new TextEncoder().encode(`${line}\r`));
     return;
   }
 
   // Bench run result
-  if (
-    progress.queued.length != 0 && !progress.running &&
-    progress.results.length != 0
-  ) {
-    const result = [...progress.results].reverse()[0];
-    console.log(
-      `Finished running ${result.name} with runCount: ${result.runsCount ||
-        1}, a total of ${result.totalMs} ms` +
-        (!!result.measuredRunsAvgMs
-          ? ` and average run of ${result.measuredRunsAvgMs} ms`
-          : ""),
-    );
+  if (isBenchRunResult(progress)) {
+    const line = finishedBenchmarkLine(progress);
+    console.log(line.padEnd(200));
     return;
   }
 }
+
+function startingBenchmarkLine(progress: any): string {
+  const fullName = `[${cyan(progress.running.name.padEnd(40, "-"))}]`;
+  const fullTimes = `[${
+    yellow(progress.running.runsCount.toString().padStart(5))
+  }]`;
+
+  return ` Running ${fullName} a total of ${fullTimes} times`;
+}
+
+function runningBenchmarkLine(progress: any): string {
+  const percent = Math.round(
+    progress.running.measuredRunsMs.length / progress.running.runsCount * 100,
+  );
+
+  const fullName = `[${cyan(progress.running.name.padEnd(40, "-"))}]`;
+
+  const fullPercent = `[${percent.toString().padStart(3)}%]`;
+
+  const progressBar = Array(Math.ceil(percent / 2)).fill("=").join("").padEnd(
+    50,
+  );
+  const fullProgressBar = `${yellow("[")}${green(progressBar)}${yellow("]")}`;
+
+  const progressCount = `[${
+    progress.running.measuredRunsMs.length.toString().padStart(5)
+  }/${progress.running.runsCount.toString().padStart(5)}]`;
+
+  return ` Running ${fullName} ${fullPercent} ${progressCount} ${fullProgressBar}`;
+}
+
+function finishedBenchmarkLine(progress: any): string {
+  const result = [...progress.results].reverse()[0];
+
+  const fullName = `[${cyan(result.name.padEnd(40, "-"))}]`;
+
+  const fullCount = `Runs: [${
+    yellow((result.runsCount || 1).toString().padStart(6))
+  }]`;
+
+  const fullTotalTime = `Total time: [${
+    yellow(result.totalMs.toString().padStart(7))
+  } ${gray("ms")}]`;
+
+  const avgTime = !!result.measuredRunsAvgMs
+    ? result.measuredRunsAvgMs
+    : result.totalMs;
+
+  const fullAverage = `Avg: [${yellow(avgTime.toString().padStart(7))} ${
+    gray("ms")
+  }]`;
+
+  return `Benched ${fullName} ${fullCount} ${fullTotalTime} ${fullAverage}`;
+}
+
+function startBenchingLine(progress: any): string {
+    const headerPadding = `${cyan('▒▒▒▒▒▒▒▒')}`;
+    const fullQueued = `Bechmarks queued: [${yellow(progress.queued.length.toString().padStart(5))}]`;
+    const fullFiltered = gray(` filtered: [${progress.filtered.toString().padStart(5)}]`);
+
+    return `
+${headerPadding} Starting benchmarking
+${headerPadding} ${fullQueued} ${fullFiltered}
+    `;
+}
+
+const isStartedBenchmarking: (progress: any) => boolean = (
+  progress: any,
+) => (progress.queued && progress.results.length == 0 && !progress.running);
+const isStartedBenchRun: (progress: any) => boolean = (
+  progress: any,
+) => (progress.running && progress.running.measuredRunsMs.length == 0);
+const isPartialBenchRunResult: (progress: any) => boolean = (
+  progress: any,
+) => (progress.running);
+const isBenchRunResult: (progress: any) => boolean = (
+  progress: any,
+) => (progress.queued.length != 0 && !progress.running &&
+  progress.results.length != 0);
+const isFinishedBenchmarking: (progress: any) => boolean = (
+  progress: any,
+) => (!progress.queued);

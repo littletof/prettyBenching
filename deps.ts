@@ -7,6 +7,8 @@ export {
   cyan,
   green,
   yellow,
+  gray,
+  dim
 } from "https://deno.land/std@0.53.0/fmt/colors.ts";
 
 export const test = Deno.test;

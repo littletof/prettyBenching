@@ -1,1 +1,1 @@
-export { prettyBenchmarkResult, prettyBenchmartProgress } from "./lib.ts";
+export { prettyBenchmarkResult, prettyBenchmarkProgress } from "./lib.ts";

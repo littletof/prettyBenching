@@ -6,7 +6,7 @@ test({
   fn() {
     assert(mod != null);
     assertEquals(typeof mod.prettyBenchmarkResult, "function");
-    assertEquals(typeof mod.prettyBenchmartProgress, "function");
+    assertEquals(typeof mod.prettyBenchmarkProgress, "function");
     // assertEquals(typeof mod.TestCase, "symbol");
     /* assertEquals(typeof mod.httpErrors, "object");
       assertEquals(typeof mod.REDIRECT_BACK, "symbol"); */
