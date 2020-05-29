@@ -7,7 +7,17 @@ import {
   yellow,
 } from "./deps.ts";
 
-export function prettyBenchmarkResult(results: BenchmarkRunResult) {
+export function prettyBenchmarkResult(
+  { precision = 10 }: { precision?: number } = {},
+) {
+  return (result: BenchmarkRunResult) =>
+    _prettyBenchmarkResult(result, precision);
+}
+
+function _prettyBenchmarkResult(
+  results: BenchmarkRunResult,
+  precision: number,
+) {
   results.results.forEach((r) => {
     prettyBenchmarkHeader(r.name);
 
@@ -15,7 +25,7 @@ export function prettyBenchmarkResult(results: BenchmarkRunResult) {
       prettyBenchmarkSingleRunMetrics(r);
     } else {
       prettyBenchmarkMultipleRunMetrics(r);
-      prettyBenchmarkMultipleRunBody(r);
+      prettyBenchmarkMultipleRunBody(r, precision);
     }
   });
 }
@@ -63,17 +73,19 @@ function prettyBenchmarkMultipleRunMetrics(result: BenchmarkResult) {
   console.log(green(prettyBenchmarkSeparator()));
 }
 
-function prettyBenchmarkMultipleRunBody(result: BenchmarkResult) {
-  const sampleRate = 10;
+function prettyBenchmarkMultipleRunBody(
+  result: BenchmarkResult,
+  precision: number,
+) {
   const max = Math.max(...result.measuredRunsMs!);
   const min = Math.min(...result.measuredRunsMs!);
-  const unit = (max - min) / sampleRate;
+  const unit = (max - min) / precision;
   let r = result.measuredRunsMs!.reduce((prev, runMs, i, a) => {
     // console.log(min, max, unit, runMs, ((runMs-min)/unit), ((runMs-min)/unit)*10, Math.ceil(((runMs-min)/unit)));
-    prev[Math.min(Math.ceil(((runMs - min) / unit)), sampleRate - 1)]++;
+    prev[Math.min(Math.ceil(((runMs - min) / unit)), precision - 1)]++;
 
     return prev;
-  }, new Array(sampleRate).fill(0));
+  }, new Array(precision).fill(0));
 
   // console.log(min, max, unit, r);
 

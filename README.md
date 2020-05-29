@@ -26,13 +26,28 @@ Prints the Deno `runBenchmarks()` methods result in a nicely readable format.
 
 ### Usage
 
-Use the `silent: true` flag, if you dont want to see the default output
+Simply call `prettyBenchmarkResult` with the desired settings.
+
+With `precision` you can define, into how many groups should the results be grouped when displaying a multiple run benchmark result
+
+Use the `silent: true` flag in `runBenchmarks`, if you dont want to see the default output
 
 ```ts
 // ...add benches...
 
+runBenchmarks()
+.then(prettyBenchmarkResult())
+.catch((e: any) => {
+  console.log(red(e.benchmarkName))
+  console.error(red(e.stack));
+});
+```
+or 
+```ts
+// ...add benches...
+
 runBenchmarks({silent: true})
-.then(prettyBenchmarkResult)
+.then(prettyBenchmarkResult({precision: 5}))
 .catch((e: any) => {
   console.log(red(e.benchmarkName))
   console.error(red(e.stack));
