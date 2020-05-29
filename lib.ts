@@ -51,7 +51,7 @@ function prettyBenchmarkMultipleRunMetrics(result: BenchmarkResult) {
     `${yellow(result.totalMs.toString())} ms`.padEnd(10 + 3 + 10)
   }`;
   const avgRun = `Average run time: ${
-    `${yellow(result.runsAvgMs!.toString())} ms`.padEnd(8 + 3 + 10)
+    `${yellow(result.measuredRunsAvgMs!.toString())} ms`.padEnd(8 + 3 + 10)
   }`;
   const metrics = `${totalRuns}${green("|")}  ${totalMS}${
     green("|")
@@ -65,10 +65,10 @@ function prettyBenchmarkMultipleRunMetrics(result: BenchmarkResult) {
 
 function prettyBenchmarkMultipleRunBody(result: BenchmarkResult) {
   const sampleRate = 10;
-  const max = Math.max(...result.runsMs!);
-  const min = Math.min(...result.runsMs!);
+  const max = Math.max(...result.measuredRunsMs!);
+  const min = Math.min(...result.measuredRunsMs!);
   const unit = (max - min) / sampleRate;
-  let r = result.runsMs!.reduce((prev, runMs, i, a) => {
+  let r = result.measuredRunsMs!.reduce((prev, runMs, i, a) => {
     // console.log(min, max, unit, runMs, ((runMs-min)/unit), ((runMs-min)/unit)*10, Math.ceil(((runMs-min)/unit)));
     prev[Math.min(Math.ceil(((runMs - min) / unit)), sampleRate - 1)]++;
 
@@ -84,7 +84,7 @@ function prettyBenchmarkMultipleRunBody(result: BenchmarkResult) {
     console.log(r, result.runsCount);*/
 
   const rMax = Math.max(...r);
-  r.forEach((r, i) => {
+  r.forEach((r: number, i: number) => {
     let rc = r;
     const rp = Math.round(r / result.runsCount! * 100);
     if (rMax > 72) {
@@ -104,6 +104,8 @@ function prettyBenchmarkMultipleRunBody(result: BenchmarkResult) {
   });
 
   console.log(`${cyan("|")}${"".padEnd(padLength())}${cyan("|")}`);
+  console.log(`${cyan(prettyBenchmarkSeparator())}`);
+  console.log();
 }
 
 function prettyBenchmarkSeparator() {
@@ -114,7 +116,9 @@ function padLength() {
   return prettyBenchmarkSeparator().length - 2;
 }
 
-export function prettyBenchmartProgress(progress: any /*BenchmarkRunProgress*/) {
+export function prettyBenchmartProgress(
+  progress: any, /*BenchmarkRunProgress*/
+) {
   // Finished benching
   if (!progress.queued) {
     console.log("Finished running");
@@ -130,7 +134,7 @@ export function prettyBenchmartProgress(progress: any /*BenchmarkRunProgress*/) 
   }
 
   // Starting bench run
-  if (progress.running && progress.running.runsMs.length == 0) {
+  if (progress.running && progress.running.measuredRunsMs.length == 0) {
     console.log(
       `Start running ${progress.running.name} a total of ${progress.running.runsCount} times`,
     );
@@ -140,9 +144,9 @@ export function prettyBenchmartProgress(progress: any /*BenchmarkRunProgress*/) 
   // Multiple run bench partial result
   if (progress.running) {
     console.log(
-      `${progress.running.name} run of ${progress.running.runsMs.length}/${progress.running.runsCount} resulted in: ${
+      `${progress.running.name} run of ${progress.running.measuredRunsMs.length}/${progress.running.runsCount} resulted in: ${
         progress.running
-          .runsMs[progress.running.runsMs.length - 1]
+          .measuredRunsMs[progress.running.measuredRunsMs.length - 1]
       } ms`,
     );
     return;
@@ -157,8 +161,8 @@ export function prettyBenchmartProgress(progress: any /*BenchmarkRunProgress*/) 
     console.log(
       `Finished running ${result.name} with runCount: ${result.runsCount ||
         1}, a total of ${result.totalMs} ms` +
-        (!!result.runsAvgMs
-          ? ` and average run of ${result.runsAvgMs} ms`
+        (!!result.measuredRunsAvgMs
+          ? ` and average run of ${result.measuredRunsAvgMs} ms`
           : ""),
     );
     return;
