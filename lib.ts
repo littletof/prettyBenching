@@ -10,15 +10,15 @@ import {
 } from "./deps.ts";
 
 export function prettyBenchmarkResult(
-  { precision = 10 }: { precision?: number } = {},
+  { precision = 10, threshold }: { precision?: number; threshold?: any } = {},
 ) {
   return (result: BenchmarkRunResult) =>
-    _prettyBenchmarkResult(result, precision);
+    _prettyBenchmarkResult(result, { precision, threshold });
 }
 
 function _prettyBenchmarkResult(
   results: BenchmarkRunResult,
-  precision: number,
+  options: any,
 ): BenchmarkRunResult {
   results.results.forEach((r) => {
     prettyBenchmarkHeader(r.name);
@@ -27,7 +27,7 @@ function _prettyBenchmarkResult(
       prettyBenchmarkSingleRunMetrics(r);
     } else {
       prettyBenchmarkMultipleRunMetrics(r);
-      prettyBenchmarkMultipleRunBody(r, precision);
+      prettyBenchmarkMultipleRunBody(r, options);
     }
   });
 
@@ -79,17 +79,17 @@ function prettyBenchmarkMultipleRunMetrics(result: BenchmarkResult) {
 
 function prettyBenchmarkMultipleRunBody(
   result: BenchmarkResult,
-  precision: number,
+  options?: any,
 ) {
   const max = Math.max(...result.measuredRunsMs!);
   const min = Math.min(...result.measuredRunsMs!);
-  const unit = (max - min) / precision;
+  const unit = (max - min) / options.precision;
   let r = result.measuredRunsMs!.reduce((prev, runMs, i, a) => {
     // console.log(min, max, unit, runMs, ((runMs-min)/unit), ((runMs-min)/unit)*10, Math.ceil(((runMs-min)/unit)));
-    prev[Math.min(Math.ceil(((runMs - min) / unit)), precision - 1)]++;
+    prev[Math.min(Math.ceil(((runMs - min) / unit)), options.precision - 1)]++;
 
     return prev;
-  }, new Array(precision).fill(0));
+  }, new Array(options.precision).fill(0));
 
   // console.log(min, max, unit, r);
 
@@ -106,16 +106,21 @@ function prettyBenchmarkMultipleRunBody(
     if (rMax > 72) {
       rc = Math.ceil(rp / 100 * 72);
     }
+
+    const groupHead = Math.trunc(min + i * unit);
     const bar = Array(rc).fill("=").join("").padEnd(padLength() - 26);
+    
+    const colorFn = getTimeColor(result.name, groupHead, options.threshold);
+
+    const fullBar = colorFn(bar);
+
     const count = r.toString().padStart(5);
     const percent = rp.toString().padStart(3) + "%";
 
     console.log(
       `${cyan("|")} ${
-        `${Math.trunc(min + i * unit).toString()} ms`.padEnd(
-          Math.max(max.toString().length, 5 + 3),
-        )
-      } [${count}][${percent}] ${cyan("|")} ${bar}${cyan("|")}`,
+        `${groupHead} ms`.padEnd(Math.max(max.toString().length, 5 + 3))
+      } [${count}][${percent}] ${cyan("|")} ${fullBar}${cyan("|")}`,
     );
   });
 
@@ -250,20 +255,20 @@ function finishedBenchmarkLine(
   return `Benched ${fullName} ${fullCount} ${fullTotalTime} ${fullAverage}`;
 }
 
-function getTimeColor(name: string, time: number, options: any) {
-  const threshold = options.threshold && options.threshold[name];
+function getTimeColor(name: string, time: number, threshold?: any) {
+  const th = threshold && threshold[name];
   // console.log(threshold, options, name);
-  if (!!threshold) {
-    if (time <= threshold.green) return green;
-    if (time <= threshold.yellow) return yellow;
-    if (threshold.yellow < time) return red;
+  if (!!th) {
+    if (time <= th.green) return green;
+    if (time <= th.yellow) return yellow;
+    if (th.yellow < time) return red;
   }
   return cyan;
 }
 
 function startBenchingLine(progress: any): string {
   const headerPadding = `${cyan("▒▒▒▒▒▒▒▒")}`;
-  const fullQueued = `Bechmarks queued: [${
+  const fullQueued = `Benchmarks queued: [${
     yellow(progress.queued.length.toString().padStart(5))
   }]`;
   const fullFiltered = gray(
