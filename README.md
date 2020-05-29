@@ -26,7 +26,7 @@ Prints the Deno `runBenchmarks()` methods `progressCb` callback values in a nice
 
 ### Usage
 
-Simply add it to `runBenchmarks()` like below and you are good to go. Using `silent: true` is encouraged, so it doesnt interfere
+Simply add it to `runBenchmarks()` like below and you are good to go. Using `silent: true` is encouraged, so the default logs don't interfere
 
 ```ts
 await runBenchmarks({ silent: true }, prettyBenchmarkProgress())
