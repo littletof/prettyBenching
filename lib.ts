@@ -109,7 +109,7 @@ function prettyBenchmarkMultipleRunBody(
 
     const groupHead = Math.trunc(min + i * unit);
     const bar = Array(rc).fill("=").join("").padEnd(padLength() - 26);
-    
+
     const colorFn = getTimeColor(result.name, groupHead, options.threshold);
 
     const fullBar = colorFn(bar);
