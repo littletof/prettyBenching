@@ -6,7 +6,7 @@ import {
   green,
   yellow,
   gray,
-  dim
+  red,
 } from "./deps.ts";
 
 export function prettyBenchmarkResult(
@@ -132,17 +132,28 @@ function padLength() {
   return prettyBenchmarkSeparator().length - 2;
 }
 
-export function prettyBenchmarkProgress() {
+export function prettyBenchmarkProgress(
+  options: {
+    threshold?: {
+      [key: string]: { green: number; yellow: number };
+    };
+  } = {},
+) {
   return (progress: any /* BenchmarkRunProgress */) =>
-    _prettyBenchmarkProgress(progress);
+    _prettyBenchmarkProgress(progress, options);
 }
 
 function _prettyBenchmarkProgress(
   progress: any, /* BenchmarkRunProgress */
+  options: {
+    threshold?: {
+      [key: string]: { green: number; yellow: number };
+    };
+  },
 ) {
   // Finished benching
   if (isFinishedBenchmarking(progress)) {
-    const headerPadding = `${cyan('▒▒▒▒▒▒▒▒')}`;
+    const headerPadding = `${cyan("▒▒▒▒▒▒▒▒")}`;
     console.log(`\n${headerPadding} Benchmarking finished\n`);
     return;
   }
@@ -170,7 +181,7 @@ function _prettyBenchmarkProgress(
 
   // Bench run result
   if (isBenchRunResult(progress)) {
-    const line = finishedBenchmarkLine(progress);
+    const line = finishedBenchmarkLine(progress, options);
     console.log(line.padEnd(200));
     return;
   }
@@ -206,7 +217,14 @@ function runningBenchmarkLine(progress: any): string {
   return ` Running ${fullName} ${fullPercent} ${progressCount} ${fullProgressBar}`;
 }
 
-function finishedBenchmarkLine(progress: any): string {
+function finishedBenchmarkLine(
+  progress: any,
+  options?: {
+    threshold?: {
+      [key: string]: { green: number; yellow: number };
+    };
+  },
+): string {
   const result = [...progress.results].reverse()[0];
 
   const fullName = `[${cyan(result.name.padEnd(40, "-"))}]`;
@@ -223,19 +241,36 @@ function finishedBenchmarkLine(progress: any): string {
     ? result.measuredRunsAvgMs
     : result.totalMs;
 
-  const fullAverage = `Avg: [${yellow(avgTime.toString().padStart(7))} ${
+  const colorFn = getTimeColor(result.name, avgTime, options);
+
+  const fullAverage = `Avg: [${colorFn(avgTime.toString().padStart(7))} ${
     gray("ms")
   }]`;
 
   return `Benched ${fullName} ${fullCount} ${fullTotalTime} ${fullAverage}`;
 }
 
-function startBenchingLine(progress: any): string {
-    const headerPadding = `${cyan('▒▒▒▒▒▒▒▒')}`;
-    const fullQueued = `Bechmarks queued: [${yellow(progress.queued.length.toString().padStart(5))}]`;
-    const fullFiltered = gray(` filtered: [${progress.filtered.toString().padStart(5)}]`);
+function getTimeColor(name: string, time: number, options: any) {
+  const threshold = options.threshold && options.threshold[name];
+  // console.log(threshold, options, name);
+  if (!!threshold) {
+    if (time <= threshold.green) return green;
+    if (time <= threshold.yellow) return yellow;
+    if (threshold.yellow < time) return red;
+  }
+  return cyan;
+}
 
-    return `
+function startBenchingLine(progress: any): string {
+  const headerPadding = `${cyan("▒▒▒▒▒▒▒▒")}`;
+  const fullQueued = `Bechmarks queued: [${
+    yellow(progress.queued.length.toString().padStart(5))
+  }]`;
+  const fullFiltered = gray(
+    ` filtered: [${progress.filtered.toString().padStart(5)}]`,
+  );
+
+  return `
 ${headerPadding} Starting benchmarking
 ${headerPadding} ${fullQueued} ${fullFiltered}
     `;
