@@ -43,12 +43,14 @@ End when finished:
 You can define thresholds to specific benchmarks and than the times of the runs will be colored respectively
 
 ```ts
-runBenchmarks({ silent: true }, prettyBenchmarkProgress({threshold: {
+const threshold = {
   "for100ForIncrementX1e6": {green: 0.85, yellow: 1},
   "for100ForIncrementX1e8": {green: 84, yellow: 93},
   "forIncrementX1e9": {green: 900, yellow: 800},
   "forIncrementX1e9x2": {green: 15000, yellow: 18000},
-}}))
+}
+
+runBenchmarks({ silent: true }, prettyBenchmarkProgress({threshold}))
 ```
 
 ![threshold](https://raw.githubusercontent.com/littletof/prettyBenching/master/docs/imgs/prettyBenchingProgress_example_threshold.png)
@@ -90,4 +92,25 @@ runBenchmarks({silent: true})
 The output would look something like this:
 ![example](https://raw.githubusercontent.com/littletof/prettyBenching/master/docs/imgs/prettyBenchingResult_example.png)
 
+### Thresholds
+
+You can define thresholds to specific benchmarks and than the times of the runs will be colored respectively
+
+```ts
+const thresholds = {
+  "for100ForIncrementX1e6": {green: 0.85, yellow: 1},
+  "for100ForIncrementX1e8": {green: 84, yellow: 93},
+  "forIncrementX1e9": {green: 900, yellow: 800},
+  "forIncrementX1e9x2": {green: 15000, yellow: 18000},
+}
+
+runBenchmarks().then(prettyBenchmarkResult({ precision: 5, threshold }))
+.catch((e: any) => {
+    console.log(red(e.benchmarkName));
+    console.error(red(e.stack));
+  },
+);
+```
+
+![threshold](https://raw.githubusercontent.com/littletof/prettyBenching/master/docs/imgs/prettyBenchingResult_example_threshold.png)
 
