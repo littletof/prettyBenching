@@ -17,7 +17,7 @@ export function prettyBenchmarkResult(
 function _prettyBenchmarkResult(
   results: BenchmarkRunResult,
   precision: number,
-) {
+): BenchmarkRunResult {
   results.results.forEach((r) => {
     prettyBenchmarkHeader(r.name);
 
@@ -28,6 +28,8 @@ function _prettyBenchmarkResult(
       prettyBenchmarkMultipleRunBody(r, precision);
     }
   });
+
+  return results;
 }
 
 function prettyBenchmarkHeader(name: string) {
