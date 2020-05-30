@@ -219,7 +219,7 @@ function runningBenchmarkLine(progress: any): string {
     progress.running.measuredRunsMs.length.toString().padStart(5)
   }/${progress.running.runsCount.toString().padStart(5)}]`;
 
-  return ` Running ${fullName} ${fullPercent} ${progressCount} ${fullProgressBar}`;
+  return ` Running ${fullName} ${progressCount} ${fullPercent} ${fullProgressBar}`;
 }
 
 function finishedBenchmarkLine(
@@ -246,7 +246,7 @@ function finishedBenchmarkLine(
     ? result.measuredRunsAvgMs
     : result.totalMs;
 
-  const colorFn = getTimeColor(result.name, avgTime, options);
+  const colorFn = getTimeColor(result.name, avgTime, options?.threshold);
 
   const fullAverage = `Avg: [${colorFn(avgTime.toString().padStart(7))} ${
     gray("ms")
@@ -257,7 +257,6 @@ function finishedBenchmarkLine(
 
 function getTimeColor(name: string, time: number, threshold?: any) {
   const th = threshold && threshold[name];
-  // console.log(threshold, options, name);
   if (!!th) {
     if (time <= th.green) return green;
     if (time <= th.yellow) return yellow;
@@ -292,7 +291,7 @@ const isPartialBenchRunResult: (progress: any) => boolean = (
 ) => (progress.running);
 const isBenchRunResult: (progress: any) => boolean = (
   progress: any,
-) => (progress.queued.length != 0 && !progress.running &&
+) => (!!progress.queued && !progress.running &&
   progress.results.length != 0);
 const isFinishedBenchmarking: (progress: any) => boolean = (
   progress: any,
