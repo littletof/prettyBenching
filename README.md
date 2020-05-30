@@ -9,13 +9,13 @@ Add the following to your `deps.ts`
 ```ts 
 export {
   prettyBenchmarkResult,
-  prettyBenchmartProgress
+  prettyBenchmarkProgress
 } from 'https://deno.land/x/pretty_benching@v0.0.1/mod.ts';
 ```
 
 or just simply
 ```ts
-import { prettyBenchmarkResult, prettyBenchmartProgress } from 'https://deno.land/x/pretty_benching@v0.0.1/mod.ts';
+import { prettyBenchmarkResult, prettyBenchmarkProgress } from 'https://deno.land/x/pretty_benching@v0.0.1/mod.ts';
 ```
 
 ##
