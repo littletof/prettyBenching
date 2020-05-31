@@ -4,7 +4,7 @@ A simple Deno library, that gives you pretty benchmarking progress and results i
 **⚠ The lib is in a very early stage and needs not yet published features of Deno ⚠**
 
 [![deno version](https://img.shields.io/badge/deno-1.0.3-success)](https://github.com/denoland/deno)
-[![deno version](https://img.shields.io/badge/deno/std-0.54.0-success)](https://deno.land/std@0.54.0)
+[![deno/std version](https://img.shields.io/badge/deno/std-0.54.0-success)](https://deno.land/std@0.54.0)
 
 [![Build Status](https://github.com/littletof/prettyBenching/workflows/CI/badge.svg)](https://github.com/littletof/prettyBenching/actions?query=workflow%3ACI)
 ![](https://img.shields.io/maintenance/yes/2021)
@@ -27,9 +27,12 @@ import { prettyBenchmarkResult, prettyBenchmarkProgress } from 'https://deno.lan
 ##
 
 # prettyBenchmarkProgress
-[![deno version](https://img.shields.io/badge/%E2%9A%A0-Not%20in%20yet-red)](https://github.com/denoland/deno)
+[![](https://img.shields.io/badge/%E2%9A%A0-Not%20in%20yet-red)](https://github.com/denoland/deno)
 [![deno version](https://img.shields.io/badge/deno-1.0.X-red)](https://github.com/denoland/deno)
-[![deno version](https://img.shields.io/badge/deno/std-0.5X.X-red)](https://github.com/denoland/deno)
+[![deno/std version](https://img.shields.io/badge/deno/std-0.5X.X-red)](https://github.com/denoland/deno)
+[![PR](https://img.shields.io/badge/PR-5941-blue)](https://github.com/denoland/deno/pull/5941)
+
+
 
 Prints the Deno `runBenchmarks()` methods `progressCb` callback values in a nicely readable format.
 
