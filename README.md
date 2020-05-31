@@ -1,8 +1,14 @@
 # prettyBenching
-
 A simple Deno library, that gives you pretty benchmarking progress and results in the commandline
 
 **⚠ The lib is in a very early stage and needs not yet published features of Deno ⚠**
+
+[![deno version](https://img.shields.io/badge/deno-1.0.3-success)](https://github.com/denoland/deno)
+[![deno version](https://img.shields.io/badge/deno/std-0.54.0-success)](https://deno.land/std@0.54.0)
+
+[![Build Status](https://github.com/littletof/prettyBenching/workflows/CI/badge.svg)](https://github.com/littletof/prettyBenching/actions?query=workflow%3ACI)
+![](https://img.shields.io/maintenance/yes/2021)
+[![documentation](https://img.shields.io/badge/docs-latest-blue.svg)](https://doc.deno.land/https/deno.land/x/pretty_benching/mod.ts)
 
 ## Getting started
 Add the following to your `deps.ts`
@@ -21,6 +27,9 @@ import { prettyBenchmarkResult, prettyBenchmarkProgress } from 'https://deno.lan
 ##
 
 # prettyBenchmarkProgress
+[![deno version](https://img.shields.io/badge/%E2%9A%A0-Not%20in%20yet-red)](https://github.com/denoland/deno)
+[![deno version](https://img.shields.io/badge/deno-1.0.X-red)](https://github.com/denoland/deno)
+[![deno version](https://img.shields.io/badge/deno/std-0.5X.X-red)](https://github.com/denoland/deno)
 
 Prints the Deno `runBenchmarks()` methods `progressCb` callback values in a nicely readable format.
 
@@ -56,6 +65,8 @@ runBenchmarks({ silent: true }, prettyBenchmarkProgress({threshold}))
 ![threshold](https://raw.githubusercontent.com/littletof/prettyBenching/master/docs/imgs/prettyBenchingProgress_example_threshold.png)
 
 # prettyBenchmarkResults
+[![deno version](https://img.shields.io/badge/deno-1.0.3-success)](https://github.com/denoland/deno)
+[![deno version](https://img.shields.io/badge/deno/std-0.54.0-success)](https://deno.land/std@0.54.0)
 
 Prints the Deno `runBenchmarks()` methods result in a nicely readable format.
 
