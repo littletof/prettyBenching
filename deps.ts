@@ -1,7 +1,11 @@
 export {
   BenchmarkRunResult,
   BenchmarkResult,
-} from "https://raw.githubusercontent.com/denoland/deno/master/std/testing/bench.ts"; // TODO fix
+  BenchmarkRunProgress,
+  ProgressState,
+  runBenchmarks,
+  bench,
+} from "https://deno.land/std@0.56.0/testing/bench.ts";
 
 export {
   cyan,
@@ -9,6 +13,6 @@ export {
   yellow,
   gray,
   red,
-} from "https://deno.land/std@0.53.0/fmt/colors.ts";
+} from "https://deno.land/std@0.56.0/fmt/colors.ts";
 
 export const test = Deno.test;
