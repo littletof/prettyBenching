@@ -1,7 +1,7 @@
 # prettyBenching
 A simple Deno library, that gives you pretty benchmarking progress and results in the commandline
 
-**⚠ The lib is in a very early stage of developement. Appeareance may change at any point until v1.0.0 of this lib ⚠**
+**⚠ The lib is in a very early stage of developement. Appeareance is likely to change at any point until v1.0.0 of this lib ⚠**
 
 [![deno version](https://img.shields.io/badge/deno-1.0.5-success)](https://github.com/denoland/deno)
 [![deno/std version](https://img.shields.io/badge/deno/std-0.56.0-success)](https://deno.land/std@0.56.0)

@@ -59,8 +59,8 @@ const threshold = {
 test({
   name: "commandlineBenching",
   fn: async function (): Promise<void> {
-    runBenchmarks({ silent: true }, prettyBenchmarkProgress({ threshold }))
-      /*.then(prettyBenchmarkResult({ precision: 5, threshold })).catch(
+    runBenchmarks({ silent: true }, prettyBenchmarkProgress({ threshold }));
+    /*.then(prettyBenchmarkResult({ precision: 5, threshold })).catch(
         (e: any) => {
           console.log(red(e.benchmarkName));
           console.error(red(e.stack));

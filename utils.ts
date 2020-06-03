@@ -11,14 +11,14 @@ export function getTimeColor(name: string, time: number, threshold?: any) {
 }
 
 export function getTimePadSize() {
-    return 8 + getTimePrecision();
+  return 8 + getTimePrecision();
 }
 
 export function getTimePrecision() {
-    return usingHrTime()? 4 : 0;
+  return usingHrTime() ? 4 : 0;
 }
 
 export function usingHrTime(): boolean {
-    // would need unstable for Deno.permissions.query({name: "hrtime"});
-    return performance.now()%1 !== 0;
+  // would need unstable for Deno.permissions.query({name: "hrtime"});
+  return performance.now() % 1 !== 0;
 }

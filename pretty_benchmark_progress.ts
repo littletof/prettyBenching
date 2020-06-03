@@ -9,9 +9,14 @@ import {
   BenchmarkRunResult,
 } from "./deps.ts";
 
-import { getTimeColor, getTimePadSize, getTimePrecision, usingHrTime } from "./utils.ts";
+import {
+  getTimeColor,
+  getTimePadSize,
+  getTimePrecision,
+  usingHrTime,
+} from "./utils.ts";
 
-const headerPadding = '▒▒▒▒▒▒▒▒';
+const headerPadding = "▒▒▒▒▒▒▒▒";
 
 export function prettyBenchmarkProgress(
   options: {
@@ -57,13 +62,15 @@ function _prettyBenchmarkProgress(
   if (progress.state === ProgressState.BenchResult) {
     const line = finishedBenchmarkLine(progress, options);
     // console.log(line);
-    Deno.stdout.writeSync(new TextEncoder().encode(`\r\r${line.padEnd(200)}\n`));
+    Deno.stdout.writeSync(
+      new TextEncoder().encode(`\r\r${line.padEnd(200)}\n`),
+    );
     return;
   }
 
   // Finished benching
   if (progress.state === ProgressState.BenchmarkingEnd) {
-    console.log('\n');
+    console.log("\n");
     considerPrecise(progress);
     const cyanHeader = `${cyan(headerPadding)}`;
     console.log(`${cyanHeader} Benchmarking finished\n`);
@@ -72,10 +79,16 @@ function _prettyBenchmarkProgress(
 }
 
 function considerPrecise(result: BenchmarkRunResult) {
-    if(!usingHrTime() && !!result.results.find(({totalMs, runsCount}) =>  (totalMs / runsCount!)< 10)){
-        const yellowHeader = `${yellow(headerPadding)}`;
-        console.log(`${yellowHeader} Consider running benchmarks with --allow-hrtime for a more precise measurement`)
-    }
+  if (
+    !usingHrTime() && !!result.results.find(({ totalMs, runsCount }) =>
+      (totalMs / runsCount!) < 10
+    )
+  ) {
+    const yellowHeader = `${yellow(headerPadding)}`;
+    console.log(
+      `${yellowHeader} Consider running benchmarks with --allow-hrtime for a more precise measurement`,
+    );
+  }
 }
 
 function startingBenchmarkLine(progress: any): string {
@@ -101,7 +114,9 @@ function runningBenchmarkLine(progress: any): string {
   );
   const fullProgressBar = `${yellow("[")}${green(progressBar)}${yellow("]")}`;
 
-  const progressDone = `${progress.running.measuredRunsMs.length.toString().padStart(5)}`;
+  const progressDone = `${
+    progress.running.measuredRunsMs.length.toString().padStart(5)
+  }`;
   const progressTotal = `${progress.running.runsCount.toString().padStart(5)}`;
   const progressCount = `[${green(progressDone)}/${yellow(progressTotal)}]`;
 
@@ -125,7 +140,9 @@ function finishedBenchmarkLine(
   }]`;
 
   const fullTotalTime = `Total time: [${
-    yellow(result.totalMs.toFixed(getTimePrecision()).padStart(getTimePadSize()))
+    yellow(
+      result.totalMs.toFixed(getTimePrecision()).padStart(getTimePadSize()),
+    )
   }${gray("ms")}]`;
 
   const avgTime = !!result.measuredRunsAvgMs
@@ -133,9 +150,9 @@ function finishedBenchmarkLine(
     : result.totalMs;
 
   const colorFn = getTimeColor(result.name, avgTime, options?.threshold);
-  const fullAverage = `Avg: [${colorFn(avgTime.toFixed(getTimePrecision()).padStart(getTimePadSize()))}${
-    gray("ms")
-  }]`;
+  const fullAverage = `Avg: [${
+    colorFn(avgTime.toFixed(getTimePrecision()).padStart(getTimePadSize()))
+  }${gray("ms")}]`;
 
   return `Benched ${fullName} ${fullCount} ${fullTotalTime} ${fullAverage}`;
 }
