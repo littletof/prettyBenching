@@ -80,7 +80,8 @@ function _prettyBenchmarkProgress(
 
 function considerPrecise(result: BenchmarkRunResult) {
   if (
-    !usingHrTime() && !!result.results.find(({ totalMs, runsCount }) =>
+    !usingHrTime() &&
+    !!result.results.find(({ totalMs, runsCount }) =>
       (totalMs / runsCount!) < 10
     )
   ) {
