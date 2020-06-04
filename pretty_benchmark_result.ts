@@ -23,8 +23,7 @@ function _prettyBenchmarkResult(
 ): BenchmarkRunResult {
   results.results.forEach((r) => {
     prettyBenchmarkHeader(r.name);
-
-    if (!r.runsCount) {
+    if (r.runsCount === 1) {
       prettyBenchmarkSingleRunMetrics(r);
     } else {
       prettyBenchmarkMultipleRunMetrics(r);

@@ -25,7 +25,7 @@ export function prettyBenchmarkProgress(
     };
   } = {},
 ) {
-  return (progress: any /* BenchmarkRunProgress */) =>
+  return (progress: BenchmarkRunProgress) =>
     _prettyBenchmarkProgress(progress, options);
 }
 
@@ -47,30 +47,29 @@ function _prettyBenchmarkProgress(
   // Starting bench run
   if (progress.state === ProgressState.BenchStart) {
     const line = startingBenchmarkLine(progress);
-    Deno.stdout.writeSync(new TextEncoder().encode(`\r${line}`));
+    Deno.stdout.writeSync(new TextEncoder().encode(`\r${line}\t`));
     return;
   }
 
   // Multiple run bench partial result
   if (progress.state === ProgressState.BenchPartialResult) {
     const line = runningBenchmarkLine(progress);
-    Deno.stdout.writeSync(new TextEncoder().encode(`\r${line}`));
+    Deno.stdout.writeSync(new TextEncoder().encode(`\r${line}\t`));
     return;
   }
 
   // Bench run result
   if (progress.state === ProgressState.BenchResult) {
     const line = finishedBenchmarkLine(progress, options);
-    // console.log(line);
     Deno.stdout.writeSync(
-      new TextEncoder().encode(`\r\r${line.padEnd(200)}\n`),
+      new TextEncoder().encode(`\r${line.padEnd(200)}\n`),
     );
     return;
   }
 
   // Finished benching
   if (progress.state === ProgressState.BenchmarkingEnd) {
-    console.log("\n");
+    console.log(); // Empty line
     considerPrecise(progress);
     const cyanHeader = `${cyan(headerPadding)}`;
     console.log(`${cyanHeader} Benchmarking finished\n`);
@@ -82,8 +81,9 @@ function considerPrecise(result: BenchmarkRunResult) {
   if (
     !usingHrTime() &&
     !!result.results.find(({ totalMs, runsCount }) =>
-      (totalMs / runsCount!) < 10
+      totalMs / (runsCount || 1) < 10
     )
+    //!!result.results.find(({ measuredRunsAvgMs }) => measuredRunsAvgMs < 10) TODO in 0.57.0
   ) {
     const yellowHeader = `${yellow(headerPadding)}`;
     console.log(
