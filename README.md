@@ -26,7 +26,7 @@ import { prettyBenchmarkResult, prettyBenchmarkProgress } from 'https://deno.lan
 
 ## Note
 
-Using Deno's `--allow-hrtime` flag when running your code, will result in a more precise benchmarking, because than float milliseconds will be used for measurement instead of integer.
+Using Deno's `--allow-hrtime` flag when running your code will result in a more precise benchmarking, because than float milliseconds will be used for measurement instead of integer.
 
 # prettyBenchmarkProgress
 [![deno version](https://img.shields.io/badge/deno-1.0.5-success)](https://github.com/denoland/deno)

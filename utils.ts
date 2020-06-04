@@ -7,7 +7,7 @@ export function getTimeColor(name: string, time: number, threshold?: any) {
     if (time <= th.yellow) return yellow;
     if (th.yellow < time) return red;
   }
-  return cyan;
+  return yellow; // TODO make default color an option
 }
 
 export function getTimePadSize() {
