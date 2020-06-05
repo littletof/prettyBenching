@@ -1,7 +1,7 @@
 import {
   BenchmarkRunResult,
   BenchmarkResult,
-colors
+  colors,
 } from "./deps.ts";
 const { cyan, green, yellow, gray, red } = colors;
 
@@ -20,7 +20,8 @@ interface ResultOptions {
 }
 
 export function prettyBenchmarkResult(
-  { precision = 10, threshold, outputFn = console.log}: prettyBenchmarkResultOptions = { precision: 10, outputFn: console.log },
+  { precision = 10, threshold, outputFn = console.log }:
+    prettyBenchmarkResultOptions = { precision: 10, outputFn: console.log },
 ) {
   return (result: BenchmarkRunResult) =>
     _prettyBenchmarkResult(result, { precision, threshold, outputFn });
@@ -53,7 +54,10 @@ function prettyBenchmarkHeader(name: string, options: ResultOptions) {
   options.outputFn(green(prettyBenchmarkSeparator()));
 }
 
-function prettyBenchmarkSingleRunMetrics(result: BenchmarkResult, options: ResultOptions) {
+function prettyBenchmarkSingleRunMetrics(
+  result: BenchmarkResult,
+  options: ResultOptions,
+) {
   const totalRuns = `Total runs: ${yellow("1".padEnd(7))}`;
   const totalMS = `Total run time: ${
     `${yellow(result.totalMs.toFixed(4))} ms`.padEnd(10 + 3 + 10)
@@ -66,7 +70,10 @@ function prettyBenchmarkSingleRunMetrics(result: BenchmarkResult, options: Resul
   options.outputFn(green(prettyBenchmarkSeparator()));
 }
 
-function prettyBenchmarkMultipleRunMetrics(result: BenchmarkResult, options: ResultOptions) {
+function prettyBenchmarkMultipleRunMetrics(
+  result: BenchmarkResult,
+  options: ResultOptions,
+) {
   const totalRuns = `Total runs: ${
     // yellow(result.runsCount.toString().padEnd(7)) TODO in later std versions
     yellow((result.runsCount || 1).toString().padEnd(7))
@@ -89,7 +96,7 @@ function prettyBenchmarkMultipleRunMetrics(result: BenchmarkResult, options: Res
 
 function prettyBenchmarkMultipleRunBody(
   result: BenchmarkResult,
-  options: ResultOptions
+  options: ResultOptions,
 ) {
   const max = Math.max(...result.measuredRunsMs!);
   const min = Math.min(...result.measuredRunsMs!);
