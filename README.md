@@ -3,12 +3,12 @@ A simple Deno library, that gives you pretty benchmarking progress and results i
 
 **⚠ The lib is in a very early stage of developement. Appeareance is likely to change until v1.0.0 of this lib ⚠**
 
-[![deno version](https://img.shields.io/badge/deno-1.0.5-success)](https://github.com/denoland/deno)
-[![deno/std version](https://img.shields.io/badge/deno/std-0.56.0-success)](https://deno.land/std@0.56.0)
+[![deno version](https://img.shields.io/badge/deno-1.0.5-success?logo=deno)](https://github.com/denoland/deno)
+[![deno/std version](https://img.shields.io/badge/deno/std-0.56.0-success?logo=deno)](https://deno.land/std@0.56.0)
 
 [![Build Status](https://github.com/littletof/prettyBenching/workflows/CI/badge.svg)](https://github.com/littletof/prettyBenching/actions?query=workflow%3ACI)
 ![](https://img.shields.io/maintenance/yes/2021)
-[![documentation](https://img.shields.io/badge/docs-latest-blue.svg)](https://doc.deno.land/https/deno.land/x/pretty_benching/mod.ts)
+[![documentation](https://img.shields.io/badge/%E2%80%8E-docs-blue.svg?logo=deno)](https://doc.deno.land/https/deno.land/x/pretty_benching/mod.ts)
 
 ## Getting started
 Add the following to your `deps.ts`
@@ -29,8 +29,8 @@ import { prettyBenchmarkResult, prettyBenchmarkProgress } from 'https://deno.lan
 Using Deno's `--allow-hrtime` flag when running your code will result in a more precise benchmarking, because than float milliseconds will be used for measurement instead of integer.
 
 # prettyBenchmarkProgress
-[![deno version](https://img.shields.io/badge/deno-1.0.5-success)](https://github.com/denoland/deno)
-[![deno/std version](https://img.shields.io/badge/deno/std-0.56.0-success)](https://github.com/denoland/deno)
+[![deno version](https://img.shields.io/badge/deno-1.0.5-success?logo=deno)](https://github.com/denoland/deno)
+[![deno/std version](https://img.shields.io/badge/deno/std-0.56.0-success?logo=deno)](https://github.com/denoland/deno)
 
 Prints the Deno `runBenchmarks()` methods `progressCb` callback values in a nicely readable format.
 
@@ -66,8 +66,8 @@ runBenchmarks({ silent: true }, prettyBenchmarkProgress({threshold}))
 ![threshold](https://raw.githubusercontent.com/littletof/prettyBenching/master/docs/imgs/prettyBenchingProgress_example_threshold.png)
 
 # prettyBenchmarkResults
-[![deno version](https://img.shields.io/badge/deno-1.0.3-success)](https://github.com/denoland/deno)
-[![deno version](https://img.shields.io/badge/deno/std-0.54.0-success)](https://deno.land/std@0.54.0)
+[![deno version](https://img.shields.io/badge/deno-1.0.3-success?logo=deno)](https://github.com/denoland/deno)
+[![deno version](https://img.shields.io/badge/deno/std-0.54.0-success?logo=deno)](https://deno.land/std@0.54.0)
 
 Prints the Deno `runBenchmarks()` methods result in a nicely readable format.
 
