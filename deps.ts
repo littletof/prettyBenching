@@ -7,12 +7,6 @@ export {
   bench,
 } from "https://deno.land/std@0.56.0/testing/bench.ts";
 
-export {
-  cyan,
-  green,
-  yellow,
-  gray,
-  red,
-} from "https://deno.land/std@0.56.0/fmt/colors.ts";
+export * as colors from "https://deno.land/std@0.56.0/fmt/colors.ts";
 
 export const test = Deno.test;

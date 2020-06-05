@@ -1,13 +1,11 @@
 import {
   BenchmarkRunProgress,
   ProgressState,
-  cyan,
-  green,
-  yellow,
-  gray,
-  red,
   BenchmarkRunResult,
 } from "./deps.ts";
+
+import  { colors } from "./deps.ts";
+const { cyan, green, yellow, gray, red } = colors;
 
 import {
   getTimeColor,

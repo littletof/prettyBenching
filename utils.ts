@@ -1,4 +1,5 @@
-import { cyan, green, yellow, gray, red } from "./deps.ts";
+import  { colors } from "./deps.ts";
+const { cyan, green, yellow, gray, red } = colors;
 
 export function getTimeColor(name: string, time: number, threshold?: any) {
   const th = threshold && threshold[name];
