@@ -1,5 +1,5 @@
 import { prettyBenchmarkProgress, prettyBenchmarkResult } from "./mod.ts";
-import { red, bench, runBenchmarks } from "./deps.ts";
+import { bench, runBenchmarks, colors } from "./deps.ts";
 import { test, assert } from "./test_deps.ts";
 
 bench({
@@ -63,7 +63,7 @@ test({
       .then(prettyBenchmarkResult({ precision: 5, threshold })).catch(
         (e: any) => {
           // console.log(red(e.benchmarkName));
-          console.error(red(e.stack));
+          console.error(colors.red(e.stack));
         },
       );
     assert(true);
