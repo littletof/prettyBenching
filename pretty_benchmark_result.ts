@@ -24,22 +24,24 @@ interface ResultOptions {
   precision: number;
   threshold?: any;
   outputFn: (log?: string) => any;
+  nocolor: boolean;
 }
 
 export function prettyBenchmarkResult(
-  { precision = 10, threshold, outputFn = console.log, nocolor }:
+  { precision = 10, threshold, outputFn = console.log, nocolor = false }:
     prettyBenchmarkResultOptions = { precision: 10, outputFn: console.log },
 ) {
-  // if(nocolor) { setColorEnabled(false); } // TODO will have to turn back after finished
-
   return (result: BenchmarkRunResult) =>
-    _prettyBenchmarkResult(result, { precision, threshold, outputFn });
+    _prettyBenchmarkResult(result, { precision, threshold, outputFn, nocolor });
 }
 
 function _prettyBenchmarkResult(
   results: BenchmarkRunResult,
   options: ResultOptions,
 ): BenchmarkRunResult {
+
+  if(options.nocolor) { setColorEnabled(false); } // TODO maybe use own color stripping
+
   results.results.forEach((r) => {
     prettyBenchmarkHeader(r.name, options);
     if (r.runsCount == 1 || !r.runsCount) { // TODO runsCount will be always present
@@ -49,6 +51,8 @@ function _prettyBenchmarkResult(
       prettyBenchmarkMultipleRunBody(r, options);
     }
   });
+
+  if(options.nocolor) { setColorEnabled(true); } // TODO own color stripping
 
   return results;
 }

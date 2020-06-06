@@ -5,7 +5,7 @@ import {
 } from "./deps.ts";
 
 import { colors } from "./deps.ts";
-const { cyan, green, yellow, gray, red } = colors;
+const { cyan, green, yellow, gray, red, white } = colors;
 
 import {
   getTimeColor,
@@ -13,19 +13,20 @@ import {
   getTimePrecision,
   usingHrTime,
   padEndVisible,
+  num,
 } from "./utils.ts";
 
 const headerPadding = "▒▒▒▒▒▒▒▒";
 
 export interface prettyBenchmarkProgressOptions {
   threshold?: { [key: string]: { green: number; yellow: number } };
-  indicators?: {benches: RegExp, colorFn: (str: string) => string}[]// TODO rename
+  indicators?: {benches: RegExp, modFn: (str: string) => string}[]// TODO rename
   nocolor?: boolean;
 }
 
 interface ProgressOptions {
   threshold?: { [key: string]: { green: number; yellow: number } };
-  indicators?: {benches: RegExp, colorFn: (str: string) => string}[]// TODO rename
+  indicators?: {benches: RegExp, modFn: (str: string) => string}[]// TODO rename
 }
 
 export function prettyBenchmarkProgress(
@@ -51,6 +52,7 @@ function _prettyBenchmarkProgress(
   // Starting bench run
   if (progress.state === ProgressState.BenchStart) {
     const line = startingBenchmarkLine(progress, options);
+    // const line = runningBenchmarkLine(progress, options);
     Deno.stdout.writeSync(new TextEncoder().encode(`\r${line}\t`));
     return;
   }
@@ -112,18 +114,25 @@ function runningBenchmarkLine(progress: any, options: ProgressOptions): string {
 
   const fullPercent = `[${percent.toString().padStart(3)}%]`;
 
-  const progressBar = Array(Math.ceil(percent / 2)).fill("=").join("").padEnd(
-    50,
+  const maxBarLength = 48;
+  const progressBar = Array(Math.ceil(percent / 100 * maxBarLength)).fill("=").join("").padEnd(
+    maxBarLength,
   );
-  const fullProgressBar = `${yellow("[")}${green(progressBar)}${yellow("]")}`;
+
+  // TODO test if substrings are correct
+  const inserted = progressBar.substr(0, 22) + white(`${percent.toString().padEnd(2)}${percent == 100? "": green(progressBar.substr(24,1))}%`) + progressBar.substr(26);
+
+ // const fullProgressBar = `${yellow("[")}${green(progressBar)}${yellow("]")}`;
+ const fullProgressBar = `${yellow("[")}${green(inserted)}${yellow("]")}`;
 
   const progressDone = `${
-    progress.running.measuredRunsMs.length.toString().padStart(5)
+    progress.running.measuredRunsMs.length.toString().padStart(6)
   }`;
-  const progressTotal = `${progress.running.runsCount.toString().padStart(5)}`;
+  const progressTotal = `${progress.running.runsCount.toString().padStart(6)}`;
   const progressCount = `[${green(progressDone)}/${yellow(progressTotal)}]`;
 
-  return `Running ${fullName}  ${progressCount} ${fullPercent} ${fullProgressBar}`;
+  return `Running ${fullName} ${progressCount} ${fullProgressBar}`;
+  // return `Running ${fullName} ${progressCount} ${fullPercent} ${fullProgressBar}`;
 }
 
 function finishedBenchmarkLine(
@@ -134,13 +143,13 @@ function finishedBenchmarkLine(
 
   const fullName = benchNameFormatted(result.name, options);
 
-  const fullCount = `Runs: [${
+  const fullCount = ` Runs: [${
     yellow((result.runsCount || 1).toString().padStart(6))
   }]`;
 
   const fullTotalTime = `Total time: [${
     yellow(
-      result.totalMs.toFixed(getTimePrecision()).padStart(getTimePadSize()),
+      num(result.totalMs).padStart(getTimePadSize()),
     )
   }${gray("ms")}]`;
 
@@ -150,7 +159,7 @@ function finishedBenchmarkLine(
 
   const colorFn = getTimeColor(result.name, avgTime, options?.threshold);
   const fullAverage = `Avg: [${
-    colorFn(avgTime.toFixed(getTimePrecision()).padStart(getTimePadSize()))
+    colorFn(num(avgTime).padStart(getTimePadSize()))
   }${gray("ms")}]`;
 
   return padEndVisible(`Benched ${fullName} ${fullCount} ${fullTotalTime} ${fullAverage}`, 130);
@@ -176,7 +185,7 @@ function getBenchIndicator(name: string, options: ProgressOptions) {
   if(options.indicators && options.indicators.length > 0) {
     const indChar = "▒";//"#"; // TODO should be ▒ but doesnt work with stdout https://github.com/denoland/deno/issues/6001
     const indicator = options.indicators.find(({benches}) => benches.test(name));
-    return !!indicator ? indicator.colorFn(indChar) : indChar;
+    return !!indicator ? indicator.modFn(indChar) : indChar;
   }
 
   return "";

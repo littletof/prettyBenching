@@ -12,7 +12,8 @@ export function getTimeColor(name: string, time: number, threshold?: any) {
 }
 
 export function getTimePadSize() {
-  return 8 + getTimePrecision();
+  return 12; // TODO
+  // return 8 + getTimePrecision();
 }
 
 export function getTimePrecision() {
