@@ -12,6 +12,7 @@ import {
   getTimePadSize,
   getTimePrecision,
   usingHrTime,
+  padEndVisible,
 } from "./utils.ts";
 
 const headerPadding = "▒▒▒▒▒▒▒▒";
@@ -91,7 +92,7 @@ function considerPrecise(result: BenchmarkRunResult) {
 }
 
 function startingBenchmarkLine(progress: any): string {
-  const fullName = `[${cyan(progress.running.name.padEnd(40, "-"))}]`;
+  const fullName = benchNameFormatted(progress.running.name);
   const fullTimes = `[${
     yellow(progress.running.runsCount.toString().padStart(5))
   }]`;
@@ -104,7 +105,7 @@ function runningBenchmarkLine(progress: any): string {
     progress.running.measuredRunsMs.length / progress.running.runsCount * 100,
   );
 
-  const fullName = `[${cyan(progress.running.name.padEnd(40, "-"))}]`;
+  const fullName = benchNameFormatted(progress.running.name);
 
   const fullPercent = `[${percent.toString().padStart(3)}%]`;
 
@@ -132,7 +133,7 @@ function finishedBenchmarkLine(
 ): string {
   const result = [...progress.results].reverse()[0];
 
-  const fullName = `[${cyan(result.name.padEnd(40, "-"))}]`;
+  const fullName = benchNameFormatted(result.name);
 
   const fullCount = `Runs: [${
     yellow((result.runsCount || 1).toString().padStart(6))
@@ -166,4 +167,8 @@ function startBenchingLine(progress: any): string {
   );
 
   return `\n${cyanHeader} Starting benchmarking\n${cyanHeader} ${fullQueued} ${fullFiltered}\n`;
+}
+
+function benchNameFormatted(name: string) {
+  return `[${cyan(name)} ${gray(padEndVisible("", 40 - name.length, "-"))}]`;
 }
