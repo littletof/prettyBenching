@@ -5,7 +5,13 @@ import {
 } from "./deps.ts";
 let { cyan, green, yellow, gray, red, blue, setColorEnabled } = colors;
 
-import { getTimeColor, padEndVisible, padStartVisible, num, perc } from "./utils.ts";
+import {
+  getTimeColor,
+  padEndVisible,
+  padStartVisible,
+  num,
+  perc,
+} from "./utils.ts";
 
 export interface prettyBenchmarkResultOptions {
   precision?: number;
@@ -24,8 +30,7 @@ export function prettyBenchmarkResult(
   { precision = 10, threshold, outputFn = console.log, nocolor }:
     prettyBenchmarkResultOptions = { precision: 10, outputFn: console.log },
 ) {
-
-  // if(nocolor) { setColorEnabled(false); }
+  // if(nocolor) { setColorEnabled(false); } // TODO will have to turn back after finished
 
   return (result: BenchmarkRunResult) =>
     _prettyBenchmarkResult(result, { precision, threshold, outputFn });
@@ -51,7 +56,10 @@ function _prettyBenchmarkResult(
 function prettyBenchmarkHeader(name: string, options: ResultOptions) {
   options.outputFn(green(prettyBenchmarkSeparator()));
   options.outputFn(
-    padEndVisible(`${green("|")}    ${`Benchmark name: ${cyan(name)}`}`, padLength()+1) + `${green("|")}`,
+    padEndVisible(
+      `${green("|")}    ${`Benchmark name: ${cyan(name)}`}`,
+      padLength() + 1,
+    ) + `${green("|")}`,
   );
   options.outputFn(green(prettyBenchmarkSeparator()));
 }
@@ -67,7 +75,8 @@ function prettyBenchmarkSingleRunMetrics(
   const metrics = `${totalRuns}${green("|")}  ${totalMS}${green("|")}`;
 
   options.outputFn(
-    padEndVisible(`${green("|")}    ${metrics}`, padLength()+1) + `${green("|")}`
+    padEndVisible(`${green("|")}    ${metrics}`, padLength() + 1) +
+      `${green("|")}`,
   );
   options.outputFn(green(prettyBenchmarkSeparator()));
 }
@@ -86,10 +95,13 @@ function prettyBenchmarkMultipleRunMetrics(
   const avgRun = `Avg time: ${
     padEndVisible(`${yellow(num(result.measuredRunsAvgMs!))} ms`, 8)
   }`;
-  const metrics = `${totalRuns}${green("|")}  ${totalMS}${green("|")}   ${avgRun}`;
+  const metrics = `${totalRuns}${green("|")}  ${totalMS}${
+    green("|")
+  }   ${avgRun}`;
 
   options.outputFn(
-    padEndVisible(`${green("|")}    ${metrics}`, padLength()+1) + `${green("|")}`,
+    padEndVisible(`${green("|")}    ${metrics}`, padLength() + 1) +
+      `${green("|")}`,
   );
   options.outputFn(green(prettyBenchmarkSeparator()));
 }
@@ -136,7 +148,15 @@ function prettyBenchmarkMultipleRunBody(
     const percent = perc(rp).padStart(4) + "%";
 
     options.outputFn(
-      padEndVisible(`${cyan("|")} ${padEndVisible(`${num(groupHead, true)} ms`, Math.max(num(max).length, 6))} _[${count}][${percent}] ${cyan("|")} ${fullBar}`, padLength()+1) + `${cyan("|")}`,
+      padEndVisible(
+        `${cyan("|")} ${
+          padEndVisible(
+            `${num(groupHead, true)} ms`,
+            Math.max(num(max).length, 6),
+          )
+        } _[${count}][${percent}] ${cyan("|")} ${fullBar}`,
+        padLength() + 1,
+      ) + `${cyan("|")}`,
     );
   });
 
