@@ -4,38 +4,40 @@ import {
   BenchmarkRunResult,
 } from "./deps.ts";
 
-import { colors } from "./deps.ts";
-const { cyan, green, yellow, gray, red, white } = colors;
+const c: Colorer = new Colorer();
 
 import {
   getTimeColor,
   getTimePadSize,
-  getTimePrecision,
   usingHrTime,
   padEndVisible,
   num,
 } from "./utils.ts";
+import { Colorer } from "./colorer.ts";
 
 const headerPadding = "▒▒▒▒▒▒▒▒";
+const lineLength = 130;
 
 export interface prettyBenchmarkProgressOptions {
   threshold?: { [key: string]: { green: number; yellow: number } };
-  indicators?: {benches: RegExp, modFn: (str: string) => string}[]// TODO rename
+  indicators?: { benches: RegExp; modFn: (str: string) => string }[];
   nocolor?: boolean;
 }
 
 interface ProgressOptions {
   threshold?: { [key: string]: { green: number; yellow: number } };
-  indicators?: {benches: RegExp, modFn: (str: string) => string}[]// TODO rename
+  indicators?: { benches: RegExp; modFn: (str: string) => string }[];
+  nocolor: boolean;
 }
 
 export function prettyBenchmarkProgress(
-  {threshold, indicators, nocolor}: prettyBenchmarkProgressOptions = {},
+  { threshold, indicators, nocolor = false }: prettyBenchmarkProgressOptions =
+    {},
 ) {
-  // if(nocolor) { setColorEnabled(false); } // TODO will have to turn back after finished
+  if (nocolor) c.setColorEnabled(false);
 
   return (progress: BenchmarkRunProgress) =>
-    _prettyBenchmarkProgress(progress, {threshold, indicators});
+    _prettyBenchmarkProgress(progress, { threshold, indicators, nocolor });
 }
 
 function _prettyBenchmarkProgress(
@@ -75,7 +77,7 @@ function _prettyBenchmarkProgress(
   if (progress.state === ProgressState.BenchmarkingEnd) {
     console.log(); // Empty line
     considerPrecise(progress);
-    const cyanHeader = `${cyan(headerPadding)}`;
+    const cyanHeader = `${c.cyan(headerPadding)}`;
     console.log(`${cyanHeader} Benchmarking finished\n`);
     return;
   }
@@ -87,22 +89,28 @@ function considerPrecise(result: BenchmarkRunResult) {
     !!result.results.find(({ totalMs, runsCount }) =>
       totalMs / (runsCount || 1) < 10
     )
-    //!!result.results.find(({ measuredRunsAvgMs }) => measuredRunsAvgMs < 10) TODO in 0.57.0
+    //!!result.results.find(({ measuredRunsAvgMs }) => measuredRunsAvgMs < 10) TODO in std v0.57.0
   ) {
-    const yellowHeader = `${yellow(headerPadding)}`;
+    const yellowHeader = `${c.yellow(headerPadding)}`;
     console.log(
-      `${yellowHeader} Consider running benchmarks with --allow-hrtime for a more precise measurement`,
+      `${yellowHeader} Consider running benchmarks with ${
+        c.yellow(`--allow-hrtime`)
+      } for a more precise measurement`,
     );
   }
 }
 
-function startingBenchmarkLine(progress: any, options: ProgressOptions): string {
+function startingBenchmarkLine(
+  progress: any,
+  options: ProgressOptions,
+): string {
   const fullName = benchNameFormatted(progress.running.name, options);
   const fullTimes = `[${
-    yellow(progress.running.runsCount.toString().padStart(5))
+    c.yellow(progress.running.runsCount.toString().padStart(7))
   }]`;
 
   return `Running ${fullName} a total of ${fullTimes} times`;
+  // return padEndVisible(`Running ${fullName} ${fullTimes} runs queued`, lineLength);
 }
 
 function runningBenchmarkLine(progress: any, options: ProgressOptions): string {
@@ -112,27 +120,32 @@ function runningBenchmarkLine(progress: any, options: ProgressOptions): string {
 
   const fullName = benchNameFormatted(progress.running.name, options);
 
-  const fullPercent = `[${percent.toString().padStart(3)}%]`;
+  const maxBarLength = 48; // needs to be even
+  const progressBar = Array(Math.ceil(percent / 100 * maxBarLength)).fill("=")
+    .join("").padEnd(
+      maxBarLength,
+    );
 
-  const maxBarLength = 48;
-  const progressBar = Array(Math.ceil(percent / 100 * maxBarLength)).fill("=").join("").padEnd(
-    maxBarLength,
-  );
+  const inserted = progressBar.substr(0, maxBarLength / 2 - 2) +
+    c.white(
+      `${percent.toString().padEnd(2)}${
+        percent == 100
+          ? ""
+          : c.green(progressBar.substr(maxBarLength / 2, 1))
+      }%`,
+    ) + progressBar.substr(maxBarLength / 2 + 2);
 
-  // TODO test if substrings are correct
-  const inserted = progressBar.substr(0, 22) + white(`${percent.toString().padEnd(2)}${percent == 100? "": green(progressBar.substr(24,1))}%`) + progressBar.substr(26);
-
- // const fullProgressBar = `${yellow("[")}${green(progressBar)}${yellow("]")}`;
- const fullProgressBar = `${yellow("[")}${green(inserted)}${yellow("]")}`;
+  const fullProgressBar = `${c.yellow("[")}${c.green(inserted)}${
+    c.yellow("]")
+  }`;
 
   const progressDone = `${
     progress.running.measuredRunsMs.length.toString().padStart(6)
   }`;
   const progressTotal = `${progress.running.runsCount.toString().padStart(6)}`;
-  const progressCount = `[${green(progressDone)}/${yellow(progressTotal)}]`;
+  const progressCount = `[${c.green(progressDone)}/${c.yellow(progressTotal)}]`;
 
   return `Running ${fullName} ${progressCount} ${fullProgressBar}`;
-  // return `Running ${fullName} ${progressCount} ${fullPercent} ${fullProgressBar}`;
 }
 
 function finishedBenchmarkLine(
@@ -143,34 +156,42 @@ function finishedBenchmarkLine(
 
   const fullName = benchNameFormatted(result.name, options);
 
-  const fullCount = ` Runs: [${
-    yellow((result.runsCount || 1).toString().padStart(6))
+  const fullCount = `Runs: [${
+    c.yellow((result.runsCount || 1).toString().padStart(7))
   }]`;
 
   const fullTotalTime = `Total time: [${
-    yellow(
+    c.yellow(
       num(result.totalMs).padStart(getTimePadSize()),
     )
-  }${gray("ms")}]`;
+  }${c.gray("ms")}]`;
 
   const avgTime = !!result.measuredRunsAvgMs
     ? result.measuredRunsAvgMs
     : result.totalMs;
 
-  const colorFn = getTimeColor(result.name, avgTime, options?.threshold);
+  const colorFn = getTimeColor(
+    result.name,
+    avgTime,
+    options.nocolor,
+    options?.threshold,
+  );
   const fullAverage = `Avg: [${
-    colorFn(num(avgTime).padStart(getTimePadSize()))
-  }${gray("ms")}]`;
+    colorFn(num(avgTime, true).padStart(getTimePadSize()))
+  }${c.gray("ms")}]`;
 
-  return padEndVisible(`Benched ${fullName} ${fullCount} ${fullTotalTime} ${fullAverage}`, 130);
+  return padEndVisible(
+    `Benched ${fullName} ${fullCount} ${fullTotalTime} ${fullAverage}`,
+    lineLength,
+  );
 }
 
 function startBenchingLine(progress: any, options: ProgressOptions): string {
-  const cyanHeader = `${cyan(headerPadding)}`;
+  const cyanHeader = `${c.cyan(headerPadding)}`;
   const fullQueued = `Benchmarks queued: [${
-    yellow(progress.queued.length.toString().padStart(5))
+    c.yellow(progress.queued.length.toString().padStart(5))
   }]`;
-  const fullFiltered = gray(
+  const fullFiltered = c.gray(
     ` filtered: [${progress.filtered.toString().padStart(5)}]`,
   );
 
@@ -178,13 +199,16 @@ function startBenchingLine(progress: any, options: ProgressOptions): string {
 }
 
 function benchNameFormatted(name: string, options: ProgressOptions) {
-  return `${getBenchIndicator(name, options)}` + `[${cyan(name)} ${gray(padEndVisible("", 40 - name.length, "-"))}]`;
+  return `${getBenchIndicator(name, options)}` +
+    `[${c.cyan(name)} ${c.gray(padEndVisible("", 40 - name.length, "-"))}]`;
 }
 
 function getBenchIndicator(name: string, options: ProgressOptions) {
-  if(options.indicators && options.indicators.length > 0) {
-    const indChar = "▒";//"#"; // TODO should be ▒ but doesnt work with stdout https://github.com/denoland/deno/issues/6001
-    const indicator = options.indicators.find(({benches}) => benches.test(name));
+  if (options.indicators && options.indicators.length > 0) {
+    const indChar = "▒"; //"#"; // TODO should be ▒ but doesnt work with stdout https://github.com/denoland/deno/issues/6001
+    const indicator = options.indicators.find(({ benches }) =>
+      benches.test(name)
+    );
     return !!indicator ? indicator.modFn(indChar) : indChar;
   }
 

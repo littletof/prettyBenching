@@ -1,19 +1,24 @@
 import { colors } from "./deps.ts";
-const { cyan, green, yellow, gray, red } = colors;
+const { green, yellow, red, white } = colors;
 
-export function getTimeColor(name: string, time: number, threshold?: any) {
+export function getTimeColor(
+  name: string,
+  time: number,
+  nocolor: boolean,
+  threshold?: any,
+) {
+  if (nocolor) return white; // TODO using empty function causes a new line. maybe Deno related?!
   const th = threshold && threshold[name];
   if (!!th) {
     if (time <= th.green) return green;
     if (time <= th.yellow) return yellow;
     if (th.yellow < time) return red;
   }
-  return yellow; // TODO make default color an option
+  return yellow;
 }
 
 export function getTimePadSize() {
   return 12; // TODO
-  // return 8 + getTimePrecision();
 }
 
 export function getTimePrecision() {

@@ -1,9 +1,7 @@
 import {
   BenchmarkRunResult,
   BenchmarkResult,
-  colors,
 } from "./deps.ts";
-let { cyan, green, yellow, gray, red, blue, setColorEnabled } = colors;
 
 import {
   getTimeColor,
@@ -12,6 +10,9 @@ import {
   num,
   perc,
 } from "./utils.ts";
+import { Colorer } from "./colorer.ts";
+
+const c: Colorer = new Colorer();
 
 export interface prettyBenchmarkResultOptions {
   precision?: number;
@@ -39,8 +40,7 @@ function _prettyBenchmarkResult(
   results: BenchmarkRunResult,
   options: ResultOptions,
 ): BenchmarkRunResult {
-
-  if(options.nocolor) { setColorEnabled(false); } // TODO maybe use own color stripping
+  if (options.nocolor) c.setColorEnabled(false); // TODO maybe use own color stripping
 
   results.results.forEach((r) => {
     prettyBenchmarkHeader(r.name, options);
@@ -52,37 +52,37 @@ function _prettyBenchmarkResult(
     }
   });
 
-  if(options.nocolor) { setColorEnabled(true); } // TODO own color stripping
+  if (options.nocolor) c.setColorEnabled(true); // TODO own color stripping
 
   return results;
 }
 
 function prettyBenchmarkHeader(name: string, options: ResultOptions) {
-  options.outputFn(green(prettyBenchmarkSeparator()));
+  options.outputFn(c.green(prettyBenchmarkSeparator()));
   options.outputFn(
     padEndVisible(
-      `${green("|")}    ${`Benchmark name: ${cyan(name)}`}`,
+      `${c.green("|")}    ${`Benchmark name: ${c.cyan(name)}`}`,
       padLength() + 1,
-    ) + `${green("|")}`,
+    ) + `${c.green("|")}`,
   );
-  options.outputFn(green(prettyBenchmarkSeparator()));
+  options.outputFn(c.green(prettyBenchmarkSeparator()));
 }
 
 function prettyBenchmarkSingleRunMetrics(
   result: BenchmarkResult,
   options: ResultOptions,
 ) {
-  const totalRuns = `Total runs: ${yellow("1".padEnd(7))}`;
+  const totalRuns = `Total runs: ${c.yellow("1".padEnd(7))}`;
   const totalMS = `Total time: ${
-    padEndVisible(`${yellow(num(result.totalMs))} ms`, 16)
+    padEndVisible(`${c.yellow(num(result.totalMs))} ms`, 16)
   }`;
-  const metrics = `${totalRuns}${green("|")}  ${totalMS}${green("|")}`;
+  const metrics = `${totalRuns}${c.green("|")}  ${totalMS}${c.green("|")}`;
 
   options.outputFn(
-    padEndVisible(`${green("|")}    ${metrics}`, padLength() + 1) +
-      `${green("|")}`,
+    padEndVisible(`${c.green("|")}    ${metrics}`, padLength() + 1) +
+      `${c.green("|")}`,
   );
-  options.outputFn(green(prettyBenchmarkSeparator()));
+  options.outputFn(c.green(prettyBenchmarkSeparator()));
 }
 
 function prettyBenchmarkMultipleRunMetrics(
@@ -90,24 +90,24 @@ function prettyBenchmarkMultipleRunMetrics(
   options: ResultOptions,
 ) {
   const totalRuns = `Total runs: ${
-    // yellow(result.runsCount.toString().padEnd(7)) TODO in later std versions
-    padEndVisible(yellow((result.runsCount || 1).toString()), 7)
+    // c.yellow(result.runsCount.toString().padEnd(7)) TODO in later std versions
+    padEndVisible(c.yellow((result.runsCount || 1).toString()), 7)
   }`;
   const totalMS = `Total time: ${
-    padEndVisible(`${yellow(num(result.totalMs))} ms`, 16)
+    padEndVisible(`${c.yellow(num(result.totalMs))} ms`, 16)
   }`;
   const avgRun = `Avg time: ${
-    padEndVisible(`${yellow(num(result.measuredRunsAvgMs!))} ms`, 8)
+    padEndVisible(`${c.yellow(num(result.measuredRunsAvgMs!))} ms`, 8)
   }`;
-  const metrics = `${totalRuns}${green("|")}  ${totalMS}${
-    green("|")
+  const metrics = `${totalRuns}${c.green("|")}  ${totalMS}${
+    c.green("|")
   }   ${avgRun}`;
 
   options.outputFn(
-    padEndVisible(`${green("|")}    ${metrics}`, padLength() + 1) +
-      `${green("|")}`,
+    padEndVisible(`${c.green("|")}    ${metrics}`, padLength() + 1) +
+      `${c.green("|")}`,
   );
-  options.outputFn(green(prettyBenchmarkSeparator()));
+  options.outputFn(c.green(prettyBenchmarkSeparator()));
 }
 
 function prettyBenchmarkMultipleRunBody(
@@ -127,7 +127,7 @@ function prettyBenchmarkMultipleRunBody(
 
   // console.log(min, max, unit, r);
 
-  options.outputFn(`${cyan("|")}${"".padEnd(padLength())}${cyan("|")}`);
+  options.outputFn(`${c.cyan("|")}${"".padEnd(padLength())}${c.cyan("|")}`);
 
   /* r = r.map((v, i) => 72+Math.ceil(Math.random()*50*i*i));
       result.runsCount = r.reduce((pv, n) => pv+n);
@@ -153,19 +153,19 @@ function prettyBenchmarkMultipleRunBody(
 
     options.outputFn(
       padEndVisible(
-        `${cyan("|")} ${
+        `${c.cyan("|")} ${
           padEndVisible(
             `${num(groupHead, true)} ms`,
             Math.max(num(max).length, 6),
           )
-        } _[${count}][${percent}] ${cyan("|")} ${fullBar}`,
+        } _[${count}][${percent}] ${c.cyan("|")} ${fullBar}`,
         padLength() + 1,
-      ) + `${cyan("|")}`,
+      ) + `${c.cyan("|")}`,
     );
   });
 
-  options.outputFn(`${cyan("|")}${"".padEnd(padLength())}${cyan("|")}`);
-  options.outputFn(`${cyan(prettyBenchmarkSeparator())}`);
+  options.outputFn(`${c.cyan("|")}${"".padEnd(padLength())}${c.cyan("|")}`);
+  options.outputFn(`${c.cyan(prettyBenchmarkSeparator())}`);
   options.outputFn();
 }
 
