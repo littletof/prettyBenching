@@ -16,14 +16,14 @@ const c: Colorer = new Colorer();
 
 export interface prettyBenchmarkResultOptions {
   precision?: number;
-  threshold?: any;
+  threshold?: { [key: string]: { green: number; yellow: number } };
   outputFn?: (log?: string) => any;
   nocolor?: boolean;
 }
 
 interface ResultOptions {
   precision: number;
-  threshold?: any;
+  threshold?: { [key: string]: { green: number; yellow: number } };
   outputFn: (log?: string) => any;
   nocolor: boolean;
 }
@@ -40,55 +40,62 @@ function _prettyBenchmarkResult(
   results: BenchmarkRunResult,
   options: ResultOptions,
 ): BenchmarkRunResult {
-  if (options.nocolor) c.setColorEnabled(false); // TODO maybe use own color stripping
+  if (options.nocolor) c.setColorEnabled(false);
+
+  let strresult = "";
 
   results.results.forEach((r) => {
-    prettyBenchmarkHeader(r.name, options);
+    strresult += prettyBenchmarkHeader(r.name, options);
     if (r.runsCount == 1 || !r.runsCount) { // TODO runsCount will be always present
-      prettyBenchmarkSingleRunMetrics(r, options);
+      strresult += prettyBenchmarkSingleRunMetrics(r, options);
     } else {
-      prettyBenchmarkMultipleRunMetrics(r, options);
-      prettyBenchmarkMultipleRunBody(r, options);
+      strresult += prettyBenchmarkMultipleRunMetrics(r, options);
+      strresult += prettyBenchmarkMultipleRunBody(r, options);
     }
   });
 
-  if (options.nocolor) c.setColorEnabled(true); // TODO own color stripping
+  options.outputFn(strresult);
+
+  if (options.nocolor) c.setColorEnabled(true);
 
   return results;
 }
 
 function prettyBenchmarkHeader(name: string, options: ResultOptions) {
-  options.outputFn(c.green(prettyBenchmarkSeparator()));
-  options.outputFn(
-    padEndVisible(
-      `${c.green("|")}    ${`Benchmark name: ${c.cyan(name)}`}`,
-      padLength() + 1,
-    ) + `${c.green("|")}`,
-  );
-  options.outputFn(c.green(prettyBenchmarkSeparator()));
+  let strresult = "";
+  strresult += c.green(prettyBenchmarkSeparator()) + "\n";
+  strresult += padEndVisible(
+    `${c.green("|")}    ${`Benchmark name: ${c.cyan(name)}`}`,
+    padLength() + 1,
+  ) + `${c.green("|")}\n`;
+  strresult += c.green(prettyBenchmarkSeparator()) + "\n";
+
+  return strresult;
 }
 
 function prettyBenchmarkSingleRunMetrics(
   result: BenchmarkResult,
   options: ResultOptions,
 ) {
+  let strresult = "";
   const totalRuns = `Total runs: ${c.yellow("1".padEnd(7))}`;
   const totalMS = `Total time: ${
     padEndVisible(`${c.yellow(num(result.totalMs))} ms`, 16)
   }`;
   const metrics = `${totalRuns}${c.green("|")}  ${totalMS}${c.green("|")}`;
 
-  options.outputFn(
-    padEndVisible(`${c.green("|")}    ${metrics}`, padLength() + 1) +
-      `${c.green("|")}`,
-  );
-  options.outputFn(c.green(prettyBenchmarkSeparator()));
+  strresult += padEndVisible(`${c.green("|")}    ${metrics}`, padLength() + 1) +
+    `${c.green("|")}\n`;
+  strresult += c.green(prettyBenchmarkSeparator()) + "\n";
+
+  return strresult;
 }
 
 function prettyBenchmarkMultipleRunMetrics(
   result: BenchmarkResult,
   options: ResultOptions,
 ) {
+  let strresult = "";
   const totalRuns = `Total runs: ${
     // c.yellow(result.runsCount.toString().padEnd(7)) TODO in later std versions
     padEndVisible(c.yellow((result.runsCount || 1).toString()), 7)
@@ -103,17 +110,18 @@ function prettyBenchmarkMultipleRunMetrics(
     c.green("|")
   }   ${avgRun}`;
 
-  options.outputFn(
-    padEndVisible(`${c.green("|")}    ${metrics}`, padLength() + 1) +
-      `${c.green("|")}`,
-  );
-  options.outputFn(c.green(prettyBenchmarkSeparator()));
+  strresult += padEndVisible(`${c.green("|")}    ${metrics}`, padLength() + 1) +
+    `${c.green("|")}\n`;
+  strresult += c.green(prettyBenchmarkSeparator()) + "\n";
+
+  return strresult;
 }
 
 function prettyBenchmarkMultipleRunBody(
   result: BenchmarkResult,
   options: ResultOptions,
 ) {
+  let strresult = "";
   //console.log(JSON.stringify(result.measuredRunsMs?.sort())); // TODO fix grouping
   const max = Math.max(...result.measuredRunsMs!);
   const min = Math.min(...result.measuredRunsMs!);
@@ -127,7 +135,7 @@ function prettyBenchmarkMultipleRunBody(
 
   // console.log(min, max, unit, r);
 
-  options.outputFn(`${c.cyan("|")}${"".padEnd(padLength())}${c.cyan("|")}`);
+  strresult += `${c.cyan("|")}${"".padEnd(padLength())}${c.cyan("|")}\n`;
 
   /* r = r.map((v, i) => 72+Math.ceil(Math.random()*50*i*i));
       result.runsCount = r.reduce((pv, n) => pv+n);
@@ -144,29 +152,34 @@ function prettyBenchmarkMultipleRunBody(
     const groupHead = min + i * unit; // TODO Handle precision. if eg. bigger then 100, only fixed 2/3
     const bar = Array(rc).fill("=").join("");
 
-    const colorFn = getTimeColor(result.name, groupHead, options.threshold);
+    const colorFn = getTimeColor(
+      result.name,
+      groupHead,
+      options.nocolor,
+      options.threshold,
+    );
 
     const fullBar = colorFn(bar);
 
     const count = r.toString().padStart(6);
     const percent = perc(rp).padStart(4) + "%";
 
-    options.outputFn(
-      padEndVisible(
-        `${c.cyan("|")} ${
-          padEndVisible(
-            `${num(groupHead, true)} ms`,
-            Math.max(num(max).length, 6),
-          )
-        } _[${count}][${percent}] ${c.cyan("|")} ${fullBar}`,
-        padLength() + 1,
-      ) + `${c.cyan("|")}`,
-    );
+    strresult += padEndVisible(
+      `${c.cyan("|")} ${
+        padEndVisible(
+          `${num(groupHead, true)} ms`,
+          Math.max(num(max).length, 6),
+        )
+      } _[${count}][${percent}] ${c.cyan("|")} ${fullBar}`,
+      padLength() + 1,
+    ) + `${c.cyan("|")}\n`;
   });
 
-  options.outputFn(`${c.cyan("|")}${"".padEnd(padLength())}${c.cyan("|")}`);
-  options.outputFn(`${c.cyan(prettyBenchmarkSeparator())}`);
-  options.outputFn();
+  strresult += `${c.cyan("|")}${"".padEnd(padLength())}${c.cyan("|")}\n`;
+  strresult += `${c.cyan(prettyBenchmarkSeparator())}\n`;
+  strresult += "\n";
+
+  return strresult;
 }
 
 function prettyBenchmarkSeparator() {

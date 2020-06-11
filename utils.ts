@@ -5,7 +5,7 @@ export function getTimeColor(
   name: string,
   time: number,
   nocolor: boolean,
-  threshold?: any,
+  threshold?: { [key: string]: { green: number; yellow: number } },
 ) {
   if (nocolor) return white; // TODO using empty function causes a new line. maybe Deno related?!
   const th = threshold && threshold[name];

@@ -129,9 +129,7 @@ function runningBenchmarkLine(progress: any, options: ProgressOptions): string {
   const inserted = progressBar.substr(0, maxBarLength / 2 - 2) +
     c.white(
       `${percent.toString().padEnd(2)}${
-        percent == 100
-          ? ""
-          : c.green(progressBar.substr(maxBarLength / 2, 1))
+        percent == 100 ? "" : c.green(progressBar.substr(maxBarLength / 2, 1))
       }%`,
     ) + progressBar.substr(maxBarLength / 2 + 2);
 
