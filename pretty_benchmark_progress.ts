@@ -203,7 +203,7 @@ function benchNameFormatted(name: string, options: ProgressOptions) {
 
 function getBenchIndicator(name: string, options: ProgressOptions) {
   if (options.indicators && options.indicators.length > 0) {
-    const indChar = "▒"; //"#"; // TODO should be ▒ but doesnt work with stdout https://github.com/denoland/deno/issues/6001
+    const indChar = "#"; // TODO should be ▒ but doesnt work with stdout https://github.com/denoland/deno/issues/6001
     const indicator = options.indicators.find(({ benches }) =>
       benches.test(name)
     );
