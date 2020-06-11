@@ -1,7 +1,7 @@
-import { prettyBenchmarkProgress, prettyBenchmarkResult } from "./mod.ts";
+import { prettyBenchmarkProgress, prettyBenchmarkResult } from "../mod.ts";
 import {writeJsonSync, writeFileStrSync } from "https://deno.land/std@0.56.0/fs/mod.ts";
 
-import { bench, runBenchmarks, BenchmarkRunProgress, ProgressState} from "./deps.ts";
+import { bench, runBenchmarks, BenchmarkRunProgress, ProgressState} from "../deps.ts";
 
 
 
