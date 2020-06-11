@@ -1,7 +1,7 @@
 # prettyBenching
 A simple Deno library, that gives you pretty benchmarking progress and results in the commandline
 
-**⚠ The lib is in a very early stage of developement. Appeareance is likely to change until v1.0.0 of this lib ⚠**
+**⚠ Appeareance is likely to change until v1.0.0 of this lib ⚠**
 
 [![deno version](https://img.shields.io/badge/deno-1.0.5-success?logo=deno)](https://github.com/denoland/deno)
 [![deno/std version](https://img.shields.io/badge/deno/std-0.56.0-success?logo=deno)](https://deno.land/std@0.56.0)
@@ -16,17 +16,20 @@ Add the following to your `deps.ts`
 export {
   prettyBenchmarkResult,
   prettyBenchmarkProgress
-} from 'https://deno.land/x/pretty_benching@v0.0.1/mod.ts';
+} from 'https://deno.land/x/pretty_benching@v0.0.2/mod.ts';
 ```
 
 or just simply
 ```ts
-import { prettyBenchmarkResult, prettyBenchmarkProgress } from 'https://deno.land/x/pretty_benching@v0.0.1/mod.ts';
+import { prettyBenchmarkResult, prettyBenchmarkProgress } from 'https://deno.land/x/pretty_benching@v0.0.2/mod.ts';
 ```
 
 ## Note
 
 Using Deno's `--allow-hrtime` flag when running your code will result in a more precise benchmarking, because than float milliseconds will be used for measurement instead of integer.
+
+You can use `nocolor` in the options of both `prettyBenchmarkProgress` and `prettyBenchmarkResult` to turn off the colored on the output.
+It doesn't interfere with the Deno's color settings.
 
 # prettyBenchmarkProgress
 [![deno version](https://img.shields.io/badge/deno-1.0.5-success?logo=deno)](https://github.com/denoland/deno)
@@ -64,6 +67,20 @@ runBenchmarks({ silent: true }, prettyBenchmarkProgress({threshold}))
 ```
 
 ![threshold](https://raw.githubusercontent.com/littletof/prettyBenching/master/docs/imgs/prettyBenchingProgress_example_threshold.png)
+
+### Indicators
+
+You can use indicators, which help you categorise your benchmarks. You can change the character which gets added before the benchmark. 
+
+```ts
+const indicators = [
+  { benches: /100/, modFn: colors.bgRed },
+  { benches: /for/, modFn: colors.red },
+  { benches: /custom/, modFn: () => colors.bgYellow(colors.black("%")) }, // change "icon"
+];
+```
+![indicator](https://raw.githubusercontent.com/littletof/prettyBenching/master/docs/imgs/prettyBenchingProgress_example_indicators.png)
+
 
 # prettyBenchmarkResults
 [![deno version](https://img.shields.io/badge/deno-1.0.3-success?logo=deno)](https://github.com/denoland/deno)
