@@ -3,8 +3,8 @@ A simple Deno library, that gives you pretty benchmarking progress and results i
 
 **⚠ Appeareance is likely to change until v1.0.0 of this lib ⚠**
 
-[![deno version](https://img.shields.io/badge/deno-1.0.5-success?logo=deno)](https://github.com/denoland/deno)
-[![deno/std version](https://img.shields.io/badge/deno/std-0.56.0-success?logo=deno)](https://deno.land/std@0.56.0)
+[![deno version](https://img.shields.io/badge/deno-1.1.0-success?logo=deno)](https://github.com/denoland/deno)
+[![deno/std version](https://img.shields.io/badge/deno/std-0.57.0-success?logo=deno)](https://deno.land/std@0.57.0)
 
 [![Build Status](https://github.com/littletof/prettyBenching/workflows/CI/badge.svg)](https://github.com/littletof/prettyBenching/actions?query=workflow%3ACI)
 ![](https://img.shields.io/maintenance/yes/2021)
@@ -18,12 +18,12 @@ Add the following to your `deps.ts`
 export {
   prettyBenchmarkResult,
   prettyBenchmarkProgress
-} from 'https://deno.land/x/pretty_benching@v0.0.2/mod.ts';
+} from 'https://deno.land/x/pretty_benching@v0.0.3/mod.ts';
 ```
 
 or just simply
 ```ts
-import { prettyBenchmarkResult, prettyBenchmarkProgress } from 'https://deno.land/x/pretty_benching@v0.0.2/mod.ts';
+import { prettyBenchmarkResult, prettyBenchmarkProgress } from 'https://deno.land/x/pretty_benching@v0.0.3/mod.ts';
 ```
 
 ## Note
@@ -34,8 +34,6 @@ You can use `nocolor` in the options of both `prettyBenchmarkProgress` and `pret
 It doesn't interfere with the Deno's `fmt` color settings.
 
 # prettyBenchmarkProgress
-[![deno version](https://img.shields.io/badge/deno-1.0.5-success?logo=deno)](https://github.com/denoland/deno)
-[![deno/std version](https://img.shields.io/badge/deno/std-0.56.0-success?logo=deno)](https://github.com/denoland/deno)
 
 Prints the Deno `runBenchmarks()` methods `progressCb` callback values in a nicely readable format.
 
@@ -85,8 +83,6 @@ const indicators = [
 
 
 # prettyBenchmarkResults
-[![deno version](https://img.shields.io/badge/deno-1.0.3-success?logo=deno)](https://github.com/denoland/deno)
-[![deno version](https://img.shields.io/badge/deno/std-0.54.0-success?logo=deno)](https://deno.land/std@0.54.0)
 
 Prints the Deno `runBenchmarks()` methods result in a nicely readable format.
 

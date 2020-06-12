@@ -17,6 +17,7 @@ const c: Colorer = new Colorer();
 export interface prettyBenchmarkResultOptions {
   precision?: number;
   threshold?: { [key: string]: { green: number; yellow: number } };
+  // deno-lint-ignore no-explicit-any
   outputFn?: (log?: string) => any;
   nocolor?: boolean;
 }
@@ -24,6 +25,7 @@ export interface prettyBenchmarkResultOptions {
 interface ResultOptions {
   precision: number;
   threshold?: { [key: string]: { green: number; yellow: number } };
+  // deno-lint-ignore no-explicit-any
   outputFn: (log?: string) => any;
   nocolor: boolean;
 }
@@ -46,7 +48,7 @@ function _prettyBenchmarkResult(
 
   results.results.forEach((r) => {
     strresult += prettyBenchmarkHeader(r.name, options);
-    if (r.runsCount == 1 || !r.runsCount) { // TODO runsCount will be always present
+    if (r.runsCount == 1) {
       strresult += prettyBenchmarkSingleRunMetrics(r, options);
     } else {
       strresult += prettyBenchmarkMultipleRunMetrics(r, options);
@@ -97,8 +99,7 @@ function prettyBenchmarkMultipleRunMetrics(
 ) {
   let strresult = "";
   const totalRuns = `Total runs: ${
-    // c.yellow(result.runsCount.toString().padEnd(7)) TODO in later std versions
-    padEndVisible(c.yellow((result.runsCount || 1).toString()), 7)
+    padEndVisible(c.yellow((result.runsCount).toString()), 7)
   }`;
   const totalMS = `Total time: ${
     padEndVisible(`${c.yellow(num(result.totalMs))} ms`, 16)
@@ -123,10 +124,10 @@ function prettyBenchmarkMultipleRunBody(
 ) {
   let strresult = "";
   //console.log(JSON.stringify(result.measuredRunsMs?.sort())); // TODO fix grouping
-  const max = Math.max(...result.measuredRunsMs!);
-  const min = Math.min(...result.measuredRunsMs!);
-  const unit = (max - min) / options.precision!;
-  let r = result.measuredRunsMs!.reduce((prev, runMs, i, a) => { // TODO !
+  const max = Math.max(...result.measuredRunsMs);
+  const min = Math.min(...result.measuredRunsMs);
+  const unit = (max - min) / options.precision;
+  let r = result.measuredRunsMs.reduce((prev, runMs, i, a) => { // TODO !
     // console.log(min, max, unit, runMs, ((runMs-min)/unit), ((runMs-min)/unit)*10, Math.ceil(((runMs-min)/unit)));
     prev[Math.min(Math.ceil(((runMs - min) / unit)), options.precision - 1)]++;
 
@@ -144,7 +145,7 @@ function prettyBenchmarkMultipleRunBody(
   const rMax = Math.max(...r);
   r.forEach((r: number, i: number) => {
     let rc = r;
-    const rp = r / result.runsCount! * 100;
+    const rp = r / result.runsCount * 100;
     if (rMax > 61) {
       rc = Math.ceil(rp / 100 * 61);
     }

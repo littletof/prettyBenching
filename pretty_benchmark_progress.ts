@@ -86,10 +86,7 @@ function _prettyBenchmarkProgress(
 function considerPrecise(result: BenchmarkRunResult) {
   if (
     !usingHrTime() &&
-    !!result.results.find(({ totalMs, runsCount }) =>
-      totalMs / (runsCount || 1) < 10
-    )
-    //!!result.results.find(({ measuredRunsAvgMs }) => measuredRunsAvgMs < 10) TODO in std v0.57.0
+    !!result.results.find(({ measuredRunsAvgMs }) => measuredRunsAvgMs < 10)
   ) {
     const yellowHeader = `${c.yellow(headerPadding)}`;
     console.log(
@@ -101,24 +98,27 @@ function considerPrecise(result: BenchmarkRunResult) {
 }
 
 function startingBenchmarkLine(
-  progress: any,
+  progress: BenchmarkRunProgress,
   options: ProgressOptions,
 ): string {
-  const fullName = benchNameFormatted(progress.running.name, options);
+  const fullName = benchNameFormatted(progress.running!.name, options);
   const fullTimes = `[${
-    c.yellow(progress.running.runsCount.toString().padStart(7))
+    c.yellow(progress.running!.runsCount.toString().padStart(7))
   }]`;
 
   return `Running ${fullName} a total of ${fullTimes} times`;
   // return padEndVisible(`Running ${fullName} ${fullTimes} runs queued`, lineLength);
 }
 
-function runningBenchmarkLine(progress: any, options: ProgressOptions): string {
+function runningBenchmarkLine(
+  progress: BenchmarkRunProgress,
+  options: ProgressOptions,
+): string {
   const percent = Math.round(
-    progress.running.measuredRunsMs.length / progress.running.runsCount * 100,
+    progress.running!.measuredRunsMs.length / progress.running!.runsCount * 100,
   );
 
-  const fullName = benchNameFormatted(progress.running.name, options);
+  const fullName = benchNameFormatted(progress.running!.name, options);
 
   const maxBarLength = 48; // needs to be even
   const progressBar = Array(Math.ceil(percent / 100 * maxBarLength)).fill("=")
@@ -138,16 +138,16 @@ function runningBenchmarkLine(progress: any, options: ProgressOptions): string {
   }`;
 
   const progressDone = `${
-    progress.running.measuredRunsMs.length.toString().padStart(6)
+    progress.running!.measuredRunsMs.length.toString().padStart(6)
   }`;
-  const progressTotal = `${progress.running.runsCount.toString().padStart(6)}`;
+  const progressTotal = `${progress.running!.runsCount.toString().padStart(6)}`;
   const progressCount = `[${c.green(progressDone)}/${c.yellow(progressTotal)}]`;
 
   return `Running ${fullName} ${progressCount} ${fullProgressBar}`;
 }
 
 function finishedBenchmarkLine(
-  progress: any,
+  progress: BenchmarkRunProgress,
   options: ProgressOptions,
 ): string {
   const result = [...progress.results].reverse()[0];
@@ -184,7 +184,10 @@ function finishedBenchmarkLine(
   );
 }
 
-function startBenchingLine(progress: any, options: ProgressOptions): string {
+function startBenchingLine(
+  progress: BenchmarkRunProgress,
+  options: ProgressOptions,
+): string {
   const cyanHeader = `${c.cyan(headerPadding)}`;
   const fullQueued = `Benchmarks queued: [${
     c.yellow(progress.queued.length.toString().padStart(5))

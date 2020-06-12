@@ -1,16 +1,11 @@
+// deno-lint-ignore-file
+
 import { prettyBenchmarkProgress, prettyBenchmarkResult } from "../mod.ts";
 import {
   writeJsonSync,
   writeFileStrSync,
   readJsonSync,
-} from "https://deno.land/std@0.56.0/fs/mod.ts";
-
-import {
-  bench,
-  runBenchmarks,
-  BenchmarkRunProgress,
-  ProgressState,
-} from "../deps.ts";
+} from "https://deno.land/std@0.57.0/fs/mod.ts";
 
 const progressData: any[] = readJsonSync(
   "./docs/benchmark_progress_inputs.json",

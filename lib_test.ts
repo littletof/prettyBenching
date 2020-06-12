@@ -61,7 +61,7 @@ test({
   fn: async function (): Promise<void> {
     runBenchmarks({ silent: true }, prettyBenchmarkProgress({ threshold }))
       .then(prettyBenchmarkResult({ precision: 5, threshold })).catch(
-        (e: any) => {
+        (e) => {
           // console.log(red(e.benchmarkName));
           console.error(colors.red(e.stack));
         },

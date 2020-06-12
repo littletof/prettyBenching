@@ -1,8 +1,10 @@
+// deno-lint-ignore-file
+
 import { prettyBenchmarkProgress, prettyBenchmarkResult } from "../mod.ts";
 import {
   writeJsonSync,
   writeFileStrSync,
-} from "https://deno.land/std@0.56.0/fs/mod.ts";
+} from "https://deno.land/std@0.57.0/fs/mod.ts";
 
 import {
   bench,
