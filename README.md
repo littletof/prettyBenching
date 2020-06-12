@@ -28,8 +28,8 @@ import { prettyBenchmarkResult, prettyBenchmarkProgress } from 'https://deno.lan
 
 Using Deno's `--allow-hrtime` flag when running your code will result in a more precise benchmarking, because than float milliseconds will be used for measurement instead of integer.
 
-You can use `nocolor` in the options of both `prettyBenchmarkProgress` and `prettyBenchmarkResult` to turn off the colored on the output.
-It doesn't interfere with the Deno's color settings.
+You can use `nocolor` in the options of both `prettyBenchmarkProgress` and `prettyBenchmarkResult` to turn off the coloring on the output.
+It doesn't interfere with the Deno's `fmt` color settings.
 
 # prettyBenchmarkProgress
 [![deno version](https://img.shields.io/badge/deno-1.0.5-success?logo=deno)](https://github.com/denoland/deno)
