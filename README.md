@@ -10,6 +10,8 @@ A simple Deno library, that gives you pretty benchmarking progress and results i
 ![](https://img.shields.io/maintenance/yes/2021)
 [![documentation](https://img.shields.io/badge/%E2%80%8E-docs-blue.svg?logo=deno)](https://doc.deno.land/https/deno.land/x/pretty_benching/mod.ts)
 
+[![deno version](https://img.shields.io/badge/ROADMAP-5e5e5e?logo=discover)](#roadmap)
+
 ## Getting started
 Add the following to your `deps.ts`
 ```ts 
@@ -143,3 +145,33 @@ runBenchmarks().then(prettyBenchmarkResult({ precision: 5, threshold }))
 
 ![threshold](https://raw.githubusercontent.com/littletof/prettyBenching/master/docs/imgs/prettyBenchingResult_example_threshold.png)
 
+
+# Roadmap
+
+#### BenchmarkProgress
+- [x] Add `indicator` options
+- [x] Add `nocolor` option
+- [ ] Add overridable output function like in benchmark results
+
+#### BenchmarkResults
+- [x] Overrideable output function
+- [x] Refactor outputting result in a single call
+- [x] Add `nocolor` option
+- [ ] Fix graph
+- [ ] Add `indicator` options like in progress
+- [ ] Tidy up current benchmark results look
+- [ ] Add options to define what parts are shown in the result cards. (eg. show graph, more calculated values like mean, ...)
+- [ ] Add an option to have a minimalist result output, that resembles the final progress output, instead of the big cards.
+  
+#### Historic data
+- [ ] Add module to enable historic data save/read inside repo
+- [ ] Make use of historic module, enable automatic calculating of thresholds from previous runs
+- [ ] Option to use historic data, to tell if benchmarks got better or worse from previous runs.
+
+#### Operational
+- [x] Write README docs
+- [x] Separate `prettyBenchmarkResults` and `prettyBenchmarkProgress` into independently importable modules.
+- [ ] Write JSDocs
+- [ ] Refactor README
+- [ ] Add showcase module, which helps to have consistent docs images, and the ability to follow the change on how the outputs look like.
+- [ ] Make module contributor friendly
