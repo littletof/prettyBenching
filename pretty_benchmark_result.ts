@@ -18,7 +18,7 @@ export interface prettyBenchmarkResultOptions {
   precision?: number;
   threshold?: { [key: string]: { green: number; yellow: number } };
   // deno-lint-ignore no-explicit-any
-  outputFn?: (log?: string) => any;
+  outputFn?: (log: string) => any;
   nocolor?: boolean;
 }
 
@@ -26,13 +26,13 @@ interface ResultOptions {
   precision: number;
   threshold?: { [key: string]: { green: number; yellow: number } };
   // deno-lint-ignore no-explicit-any
-  outputFn: (log?: string) => any;
+  outputFn: (log: string) => any;
   nocolor: boolean;
 }
 
 export function prettyBenchmarkResult(
-  { precision = 10, threshold, outputFn = console.log, nocolor = false }:
-    prettyBenchmarkResultOptions = { precision: 10, outputFn: console.log },
+  { precision = 5, threshold, outputFn = console.log, nocolor = false }:
+    prettyBenchmarkResultOptions = { precision: 5, outputFn: console.log },
 ) {
   return (result: BenchmarkRunResult) =>
     _prettyBenchmarkResult(result, { precision, threshold, outputFn, nocolor });

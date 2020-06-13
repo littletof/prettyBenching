@@ -4,8 +4,6 @@ import {
   BenchmarkRunResult,
 } from "./deps.ts";
 
-const c: Colorer = new Colorer();
-
 import {
   getTimeColor,
   getTimePadSize,
@@ -17,6 +15,7 @@ import { Colorer } from "./colorer.ts";
 
 const headerPadding = "▒▒▒▒▒▒▒▒";
 const lineLength = 130;
+const c: Colorer = new Colorer();
 
 export interface prettyBenchmarkProgressOptions {
   threshold?: { [key: string]: { green: number; yellow: number } };
@@ -55,7 +54,7 @@ function _prettyBenchmarkProgress(
   if (progress.state === ProgressState.BenchStart) {
     const line = startingBenchmarkLine(progress, options);
     // const line = runningBenchmarkLine(progress, options);
-    Deno.stdout.writeSync(new TextEncoder().encode(`\r${line}\t`));
+    Deno.stdout.writeSync(new TextEncoder().encode(`${line}\t`));
     return;
   }
 
@@ -69,7 +68,7 @@ function _prettyBenchmarkProgress(
   // Bench run result
   if (progress.state === ProgressState.BenchResult) {
     const line = finishedBenchmarkLine(progress, options);
-    Deno.stdout.writeSync(new TextEncoder().encode(`\r${line.padEnd(200)}\n`));
+    Deno.stdout.writeSync(new TextEncoder().encode(`\r${padEndVisible(line,140)}\n`));
     return;
   }
 
@@ -164,19 +163,16 @@ function finishedBenchmarkLine(
     )
   }${c.gray("ms")}]`;
 
-  const avgTime = !!result.measuredRunsAvgMs
-    ? result.measuredRunsAvgMs
-    : result.totalMs;
-
+  const avgTime = result.measuredRunsAvgMs;
+  const paddedAvgTime = num(avgTime, true).padStart(getTimePadSize());
   const colorFn = getTimeColor(
     result.name,
     avgTime,
     options.nocolor,
     options?.threshold,
   );
-  const fullAverage = `Avg: [${
-    colorFn(num(avgTime, true).padStart(getTimePadSize()))
-  }${c.gray("ms")}]`;
+  const coloredTime = colorFn(paddedAvgTime);
+  const fullAverage = `Avg: [${coloredTime}${c.gray("ms")}]`;
 
   return padEndVisible(
     `Benched ${fullName} ${fullCount} ${fullTotalTime} ${fullAverage}`,
