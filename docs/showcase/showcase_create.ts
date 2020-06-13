@@ -55,28 +55,34 @@ runBenchmarks({ silent: true }, (progress) => {
   );
 
 function saveresult(result: any) {
-  writeFileStrSync("./docs/showcase/benchmark_progress_inputs.json", prettyJSON(progress));
-  writeFileStrSync("./docs/showcase/benchmark_result_input.json", prettyJSON(result));
+  writeFileStrSync(
+    "./docs/showcase/benchmark_progress_inputs.json",
+    prettyJSON(progress),
+  );
+  writeFileStrSync(
+    "./docs/showcase/benchmark_result_input.json",
+    prettyJSON(result),
+  );
 }
 
 function write(prog: BenchmarkRunProgress) {
-    progress.push(prog);
+  progress.push(prog);
 }
 
 function prettyJSON(obj: any) {
-  if (typeof obj === 'string') {
+  if (typeof obj === "string") {
     obj = JSON.parse(obj);
   }
-  const output = JSON.stringify(obj, function(k,v) {
-    if(k === "measuredRunsMs" && v instanceof Array){
+  const output = JSON.stringify(obj, function (k, v) {
+    if (k === "measuredRunsMs" && v instanceof Array) {
       return JSON.stringify(v);
     }
     return v;
   }, 2)
-    .replace(/\"\[/g, '[')
-    .replace(/\]\"/g,']')
-    .replace(/\"\{/g, '{')
-    .replace(/\}\"/g,'}');
+    .replace(/\"\[/g, "[")
+    .replace(/\]\"/g, "]")
+    .replace(/\"\{/g, "{")
+    .replace(/\}\"/g, "}");
 
   return output;
 }

@@ -68,7 +68,9 @@ function _prettyBenchmarkProgress(
   // Bench run result
   if (progress.state === ProgressState.BenchResult) {
     const line = finishedBenchmarkLine(progress, options);
-    Deno.stdout.writeSync(new TextEncoder().encode(`\r${padEndVisible(line,140)}\n`));
+    Deno.stdout.writeSync(
+      new TextEncoder().encode(`\r${padEndVisible(line, 140)}\n`),
+    );
     return;
   }
 
