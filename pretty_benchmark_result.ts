@@ -13,6 +13,7 @@ import {
 import { Colorer } from "./colorer.ts";
 
 const c: Colorer = new Colorer();
+const tab = "    ";
 
 export interface prettyBenchmarkResultOptions {
   precision?: number;
@@ -65,12 +66,9 @@ function _prettyBenchmarkResult(
 
 function prettyBenchmarkHeader(name: string, options: ResultOptions) {
   let strresult = "";
-  strresult += c.green(prettyBenchmarkSeparator()) + "\n";
-  strresult += padEndVisible(
-    `${c.green("|")}    ${`Benchmark name: ${c.cyan(name)}`}`,
-    padLength() + 1,
-  ) + `${c.green("|")}\n`;
-  strresult += c.green(prettyBenchmarkSeparator()) + "\n";
+  strresult += tableLine(undefined, topcharset());
+  strresult += tableLine(`${tab}${`Benchmark name: ${c.cyan(name)}`}`);
+  strresult += tableLine(undefined, middlecharset());
 
   return strresult;
 }
@@ -86,9 +84,8 @@ function prettyBenchmarkSingleRunMetrics(
   }`;
   const metrics = `${totalRuns}${c.green("|")}  ${totalMS}${c.green("|")}`;
 
-  strresult += padEndVisible(`${c.green("|")}    ${metrics}`, padLength() + 1) +
-    `${c.green("|")}\n`;
-  strresult += c.green(prettyBenchmarkSeparator()) + "\n";
+  strresult += tableLine(`${tab}${metrics}`);
+  strresult += tableLine(undefined, bottomcharset()) + "\n";
 
   return strresult;
 }
@@ -111,9 +108,8 @@ function prettyBenchmarkMultipleRunMetrics(
     c.green("|")
   }   ${avgRun}`;
 
-  strresult += padEndVisible(`${c.green("|")}    ${metrics}`, padLength() + 1) +
-    `${c.green("|")}\n`;
-  strresult += c.green(prettyBenchmarkSeparator()) + "\n";
+  strresult += tableLine(`${tab}${metrics}`);
+  strresult += tableLine(undefined, middlecharset());
 
   return strresult;
 }
@@ -136,7 +132,7 @@ function prettyBenchmarkMultipleRunBody(
 
   // console.log(min, max, unit, r);
 
-  strresult += `${c.cyan("|")}${"".padEnd(padLength())}${c.cyan("|")}\n`;
+  strresult += strresult += tableLine(" ".repeat(padLength()));
 
   /* r = r.map((v, i) => 72+Math.ceil(Math.random()*50*i*i));
       result.runsCount = r.reduce((pv, n) => pv+n);
@@ -165,28 +161,84 @@ function prettyBenchmarkMultipleRunBody(
     const count = r.toString().padStart(6);
     const percent = perc(rp).padStart(4) + "%";
 
-    strresult += padEndVisible(
-      `${c.cyan("|")} ${
-        padEndVisible(
-          `${num(groupHead, true)} ms`,
-          Math.max(num(max).length, 6),
-        )
-      } _[${count}][${percent}] ${c.cyan("|")} ${fullBar}`,
-      padLength() + 1,
-    ) + `${c.cyan("|")}\n`;
+    const barLine = ` ${
+      padEndVisible(
+        `${num(groupHead, true)} ms`,
+        Math.max(num(max).length, 6),
+      )
+    } _[${count}][${percent}] ${c.cyan(chars.middle)} ${fullBar}`;
+
+    strresult += tableLine(barLine);
   });
 
-  strresult += `${c.cyan("|")}${"".padEnd(padLength())}${c.cyan("|")}\n`;
-  strresult += `${c.cyan(prettyBenchmarkSeparator())}\n`;
+  strresult += tableLine(" ".repeat(padLength()));
+  strresult += tableLine(undefined, bottomcharset());
   strresult += "\n";
 
   return strresult;
 }
 
-function prettyBenchmarkSeparator() {
-  return `+-------------------------------------------------------------------------------------------+`;
+function padLength() {
+  return prettyBenchmarkSeparator(basecharset()).length - 2;
 }
 
-function padLength() {
-  return prettyBenchmarkSeparator().length - 2;
+function tableLine(content?: string, chars: charset = tableLinecharset()) {
+  return padEndVisible(`${c.green(chars.start)}${content || c.green(chars.line.repeat(padLength()))}`, padLength() + 1) +`${c.green(chars.stop)}\n`;
 }
+
+function prettyBenchmarkSeparator(
+  caps: charset = basecharset(),
+) {
+  return `${caps.start}${caps.line.repeat(91)}${caps.stop}`;
+}
+
+interface charset {
+  start: string;
+  stop: string;
+  line: string;
+  is: string;
+}
+
+const basecharset = () => ({ start: "+", stop: "+", line: "-", is: "+" });
+const bottomcharset = () => ({
+  start: chars.bottomleft,
+  stop: chars.bottomright,
+  line: chars.bottom,
+  is: chars.bottommid,
+});
+const topcharset = () => ({
+  start: chars.topleft,
+  stop: chars.topright,
+  line: chars.top,
+  is: chars.topmid,
+});
+const middlecharset = () => ({
+  start: chars.midleft,
+  stop: chars.midright,
+  line: chars.mid,
+  is: chars.midmid,
+});
+const tableLinecharset = () => ({
+  start: chars.left,
+  stop: chars.right,
+  line: chars.mid,
+  is: chars.midmid,
+})
+
+const chars = {
+  top: "─",
+  topmid: "┬",
+  topleft: "┌",
+  topright: "┐",
+  bottom: "─",
+  bottommid: "┴",
+  bottomleft: "└",
+  bottomright: "┘",
+  left: "│",
+  midleft: "├",
+  mid: "─",
+  midmid: "┼",
+  right: "│",
+  midright: "┤",
+  middle: "│",
+};
