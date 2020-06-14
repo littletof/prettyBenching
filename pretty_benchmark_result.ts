@@ -19,7 +19,7 @@ const tab = "    ";
 
 export interface prettyBenchmarkResultOptions {
   precision?: number;
-  threshold?: { [key: string]: { green: number; yellow: number } };
+  thresholds?: { [key: string]: { green: number; yellow: number } };
   // deno-lint-ignore no-explicit-any
   outputFn?: (log: string) => any;
   nocolor?: boolean;
@@ -27,18 +27,21 @@ export interface prettyBenchmarkResultOptions {
 
 interface ResultOptions {
   precision: number;
-  threshold?: { [key: string]: { green: number; yellow: number } };
+  thresholds?: { [key: string]: { green: number; yellow: number } };
   // deno-lint-ignore no-explicit-any
   outputFn: (log: string) => any;
   nocolor: boolean;
 }
 
 export function prettyBenchmarkResult(
-  { precision = 5, threshold, outputFn = console.log, nocolor = false }:
+  { precision = 5, thresholds, outputFn = console.log, nocolor = false }:
     prettyBenchmarkResultOptions = { precision: 5, outputFn: console.log },
 ) {
   return (result: BenchmarkRunResult) =>
-    _prettyBenchmarkResult(result, { precision, threshold, outputFn, nocolor });
+    _prettyBenchmarkResult(
+      result,
+      { precision, thresholds, outputFn, nocolor },
+    );
 }
 
 function _prettyBenchmarkResult(
@@ -149,7 +152,7 @@ function prettyBenchmarkMultipleRunBody(
       result.name,
       groupHead,
       options.nocolor,
-      options.threshold,
+      options.thresholds,
     );
 
     const fullBar = colorFn(bar);

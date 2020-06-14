@@ -18,25 +18,25 @@ const lineLength = 130;
 const c: Colorer = new Colorer();
 
 export interface prettyBenchmarkProgressOptions {
-  threshold?: { [key: string]: { green: number; yellow: number } };
+  thresholds?: { [key: string]: { green: number; yellow: number } };
   indicators?: { benches: RegExp; modFn: (str: string) => string }[];
   nocolor?: boolean;
 }
 
 interface ProgressOptions {
-  threshold?: { [key: string]: { green: number; yellow: number } };
+  thresholds?: { [key: string]: { green: number; yellow: number } };
   indicators?: { benches: RegExp; modFn: (str: string) => string }[];
   nocolor: boolean;
 }
 
 export function prettyBenchmarkProgress(
-  { threshold, indicators, nocolor = false }: prettyBenchmarkProgressOptions =
+  { thresholds, indicators, nocolor = false }: prettyBenchmarkProgressOptions =
     {},
 ) {
   if (nocolor) c.setColorEnabled(false);
 
   return (progress: BenchmarkRunProgress) =>
-    _prettyBenchmarkProgress(progress, { threshold, indicators, nocolor });
+    _prettyBenchmarkProgress(progress, { thresholds, indicators, nocolor });
 }
 
 function _prettyBenchmarkProgress(
@@ -171,7 +171,7 @@ function finishedBenchmarkLine(
     result.name,
     avgTime,
     options.nocolor,
-    options?.threshold,
+    options?.thresholds,
   );
   const coloredTime = colorFn(paddedAvgTime);
   const fullAverage = `Avg: [${coloredTime}${c.gray("ms")}]`;
