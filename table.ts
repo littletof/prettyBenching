@@ -1,4 +1,3 @@
-import { Colorer } from "./colorer.ts";
 import {
   padEndVisible,
   lDiff,
@@ -8,7 +7,6 @@ import {
   disjunct,
 } from "./utils.ts";
 
-const c = new Colorer();
 const separatorToken = "#&imaseparator&#";
 
 enum chars {
@@ -29,6 +27,8 @@ enum chars {
   middle = "│",
 }
 
+type colorFunction = (str: string) => string;
+
 interface charset {
   start: string;
   stop: string;
@@ -39,14 +39,25 @@ interface charset {
 export class TableBuilder {
   width: number;
   lines: string[] = [];
-  colorFn = c.green;
+  colorFn: colorFunction;
+  tempColorFn: colorFunction;
 
-  constructor(width: number) {
+  constructor(width: number, colorFn: colorFunction) {
     this.width = width;
+    this.colorFn = this.tempColorFn = colorFn;
   }
 
   line(line: string) {
-    this.lines.push(line);
+    this.lines.push(this.tableLine(line));
+    return this;
+  }
+
+  cellLine(...cells: string[]) {
+    if (cells.length == 1) {
+      cells.push("");
+    }
+    this.lines.push(this.tableLine(cells.join(this.tempColorFn(chars.middle))));
+    this.tempColorFn = this.colorFn;
     return this;
   }
 
@@ -55,27 +66,96 @@ export class TableBuilder {
     return this;
   }
 
-  color(colorFn: (str: string) => string) {
-    this.colorFn = colorFn;
+  color(colorFn: colorFunction) {
+    this.colorFn = this.tempColorFn = colorFn;
+    return this;
+  }
+
+  tc(colorFn: colorFunction) { // TODO reconsider
+    this.tempColorFn = colorFn;
     return this;
   }
 
   build() {
     let result = "";
-    result += getHSeparator(undefined, this.lines[0]);
-    this.lines.forEach((l, i) => {
+    result += this.getHSeparator(undefined, this.lines[0]);
+    this.lines.forEach((l, i, a) => {
       if (l === separatorToken) {
-        result += getHSeparator(this.lines[i - 1], this.lines[i + 1]);
+        if (i === a.length - 1) { // last line is separator token, remove it so table end connects properly
+          this.lines.splice(i, 1);
+          return;
+        }
+        result += this.getHSeparator(this.lines[i - 1], this.lines[i + 1]);
         return;
       }
-      result += l + "\n";
+      result += l;
     });
-    result += getHSeparator(this.lines[this.lines.length - 1], undefined);
+    result += this.getHSeparator(this.lines[this.lines.length - 1], undefined);
     return result;
+  }
+
+  private getHSeparator(topLine?: string, bottomLine?: string) {
+    const topc = topLine
+      ? this.getWSeparatorPositions(stripColor(topLine))
+      : [];
+    const bottomc = bottomLine
+      ? this.getWSeparatorPositions(stripColor(bottomLine))
+      : [];
+    const inter = intersect(topc, bottomc) as number[];
+    const topd = disjunct(topc, inter) as number[];
+    const bottomd = disjunct(bottomc, inter) as number[];
+
+    let lineBase = middlecharset();
+
+    if (topc.length == 0) {
+      lineBase = topcharset();
+    } else if (bottomc.length == 0) {
+      lineBase = bottomcharset();
+    }
+
+    const crosses: { i: number; t: chars }[] = [];
+    inter.forEach((ind: number) =>
+      !this.isCap(ind) && crosses.push({ i: ind, t: chars.midmid })
+    );
+    topd.forEach((ind: number) =>
+      !this.isCap(ind) && crosses.push({ i: ind, t: chars.bottommid })
+    );
+    bottomd.forEach((ind: number) =>
+      !this.isCap(ind) && crosses.push({ i: ind, t: chars.topmid })
+    );
+
+    return this.tableLine(undefined, crosses, lineBase);
+  }
+
+  private tableLine(
+    content?: string,
+    crosses?: { i: number; t: chars }[],
+    chars: charset = tableLinecharset(),
+  ) {
+    const line = padEndVisible(
+      `${this.colorFn(chars.start)}${content ||
+        this.colorFn(chars.line.repeat(this.width))}`,
+      this.width + 1,
+    ) + `${this.colorFn(chars.stop)}\n`;
+    const lineArray = line.split("");
+    if (crosses) {
+      crosses.forEach(({ i, t }) => {
+        const colDiff = lDiff(line.substr(0, i));
+        lineArray.splice(i + colDiff, 1, t);
+      });
+    }
+    return lineArray.join("");
+  }
+
+  private isCap(index: number) {
+    return (index == 0 || index == this.width + 1);
+  }
+
+  private getWSeparatorPositions(line: string) {
+    return matchWithIndex(line, /│/g);
   }
 }
 
-const basecharset = () => ({ start: "+", stop: "+", line: "-", is: "+" });
 const bottomcharset = () => ({
   start: chars.bottomleft,
   stop: chars.bottomright,
@@ -100,112 +180,3 @@ const tableLinecharset = () => ({
   line: chars.mid,
   is: chars.midmid,
 });
-
-console.log(
-  getHSeparator(
-    undefined,
-    "│    Total runs: 2      │  Total time: 0.0527 ms    │  -   Avg time: 0.0263 ms              │",
-  ),
-);
-
-console.log(
-  new TableBuilder(91)
-    .line(
-      "│    Benchmark name: finished                          │                                    │",
-    )
-    .separator()
-    .line(
-      "│    Total runs: 2      │  Total time: 0.0527 ms       │   Avg time: 0.0263 ms              │",
-    )
-    .separator()
-    .line(
-      "│                            │                                                              │",
-    )
-    .line(
-      "│ 0.3284 ms _[     1][   1%] │ =                                                            │",
-    )
-    .line(
-      "│ 0.6995 ms _[    96][  96%] │ ===========================================================  │",
-    )
-    .line(
-      "│ 1.0706 ms _[     1][   1%] │ =                                                            │",
-    )
-    .line(
-      "│ 1.4417 ms _[     0][   0%] │                                                              │",
-    )
-    .line(
-      "│ 1.8128 ms _[     2][   2%] │ ==                                                           │",
-    )
-    .line(
-      "│                            │                                                              │",
-    )
-    .build(),
-);
-
-function padLength() {
-  return prettyBenchmarkSeparator(basecharset()).length - 2; // todo width
-}
-
-function prettyBenchmarkSeparator(
-  caps: charset = basecharset(),
-) {
-  return `${caps.start}${caps.line.repeat(91)}${caps.stop}`; // todo width
-}
-
-function getHSeparator(topLine?: string, bottomLine?: string) {
-  const topc = topLine ? getWSeparatorPositions(stripColor(topLine)) : [];
-  const bottomc = bottomLine
-    ? getWSeparatorPositions(stripColor(bottomLine))
-    : [];
-  const inter = intersect(topc, bottomc) as number[];
-  const topd = disjunct(topc, inter) as number[];
-  const bottomd = disjunct(bottomc, inter) as number[];
-
-  let lineBase = middlecharset();
-
-  if (topc.length == 0) {
-    lineBase = topcharset();
-  } else if (bottomc.length == 0) {
-    lineBase = bottomcharset();
-  }
-
-  const crosses: { i: number; t: chars }[] = [];
-  inter.forEach((ind: number) =>
-    (ind != 0 && ind != 92) && crosses.push({ i: ind, t: chars.midmid })
-  ); // TODO 92 = width
-  topd.forEach((ind: number) =>
-    (ind != 0 && ind != 92) && crosses.push({ i: ind, t: chars.bottommid })
-  );
-  bottomd.forEach((ind: number) =>
-    (ind != 0 && ind != 92) && crosses.push({ i: ind, t: chars.topmid })
-  );
-
-  // console.log(tableLine(undefined, crosses, lineBase));
-  // console.log(topd, bottomd, inter);
-  return tableLine(undefined, crosses, lineBase);
-}
-
-function getWSeparatorPositions(line: string) {
-  const regexp = /│/g;
-  return matchWithIndex(line, regexp);
-}
-
-function tableLine(
-  content?: string,
-  crosses?: { i: number; t: chars }[],
-  chars: charset = tableLinecharset(),
-) {
-  const line = padEndVisible(
-    `${c.green(chars.start)}${content ||
-      c.green(chars.line.repeat(padLength()))}`,
-    padLength() + 1,
-  ) + `${c.green(chars.stop)}\n`;
-  const lineArray = line.split("");
-  if (crosses) {
-    crosses.forEach(({ i, t }) => {
-      const colDiff = lDiff(line.substr(0, i));
-      lineArray.splice(i + colDiff, 1, t);
-    });
-  }
-  return lineArray.join("");
-}

@@ -46,6 +46,11 @@ export function perc(num: number) {
   return (num % 1 !== 0) ? num.toFixed(1) : `${num}`;
 }
 
+export function rtime(num: number) {
+  const log = Math.max(Math.floor(Math.log10(num)), 0);
+  return num.toFixed(Math.max(getTimePrecision() - log, 0));
+}
+
 export function lDiff(str: string) {
   const escaped = stripColor(str);
   return str.length - escaped.length;

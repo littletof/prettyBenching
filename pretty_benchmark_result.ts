@@ -9,9 +9,10 @@ import {
   padStartVisible,
   num,
   perc,
-  lDiff,
+  rtime,
 } from "./utils.ts";
 import { Colorer } from "./colorer.ts";
+import { TableBuilder } from "./table.ts";
 
 const c: Colorer = new Colorer();
 const tab = "    ";
@@ -46,66 +47,55 @@ function _prettyBenchmarkResult(
 ): BenchmarkRunResult {
   if (options.nocolor) c.setColorEnabled(false);
 
-  let strresult = "";
+  const output = results.results.map((r) => {
+    const tb = new TableBuilder(91, c.green); // 91
 
-  results.results.forEach((r) => {
-    strresult += prettyBenchmarkHeader(r.name, options);
+    prettyBenchmarkHeader(tb, r, options);
     if (r.runsCount == 1) {
-      strresult += prettyBenchmarkSingleRunMetrics(r, options);
+      prettyBenchmarkSingleRunMetrics(tb, r, options);
     } else {
-      strresult += prettyBenchmarkMultipleRunMetrics(r, options);
-      strresult += prettyBenchmarkMultipleRunBody(r, options);
+      prettyBenchmarkMultipleRunMetrics(tb, r, options);
+      prettyBenchmarkMultipleRunBody(tb, r, options);
     }
-  });
 
-  options.outputFn(strresult);
+    return tb.build();
+  }).join("\n");
+
+  options.outputFn(output);
 
   if (options.nocolor) c.setColorEnabled(true);
 
   return results;
 }
 
-function prettyBenchmarkHeader(name: string, options: ResultOptions) {
-  let strresult = "";
-  strresult += tableLine(undefined, undefined, topcharset());
-  strresult += tableLine(`${tab}${`Benchmark name: ${c.cyan(name)}`}`);
-  strresult += tableLine(
-    undefined,
-    [{ i: 24, t: chars.topmid }, { i: 55, t: chars.topmid }],
-    middlecharset(),
-  );
-
-  return strresult;
+function prettyBenchmarkHeader(
+  tb: TableBuilder,
+  r: BenchmarkResult,
+  options: ResultOptions,
+) {
+  tb.line(`${tab}${`Benchmark name: ${c.cyan(r.name)}`}`);
+  tb.separator();
 }
 
 function prettyBenchmarkSingleRunMetrics(
+  tb: TableBuilder,
   result: BenchmarkResult,
   options: ResultOptions,
 ) {
-  let strresult = "";
   const totalRuns = `Total runs: ${c.yellow("1".padEnd(7))}`;
   const totalMS = `Total time: ${
     padEndVisible(`${c.yellow(num(result.totalMs))} ms`, 16)
   }`;
-  const metrics = `${totalRuns}${c.green(chars.middle)}  ${totalMS}${
-    c.green(chars.middle)
-  }`;
 
-  strresult += tableLine(`${tab}${metrics}`);
-  strresult += tableLine(
-    undefined,
-    [{ i: 24, t: chars.bottommid }, { i: 55, t: chars.bottommid }],
-    bottomcharset(),
-  ) + "\n";
-
-  return strresult;
+  tb.cellLine(`${tab}${totalRuns}`, `  ${totalMS}`);
+  tb.separator();
 }
 
 function prettyBenchmarkMultipleRunMetrics(
+  tb: TableBuilder,
   result: BenchmarkResult,
   options: ResultOptions,
 ) {
-  let strresult = "";
   const totalRuns = `Total runs: ${
     padEndVisible(c.yellow((result.runsCount).toString()), 7)
   }`;
@@ -115,29 +105,16 @@ function prettyBenchmarkMultipleRunMetrics(
   const avgRun = `Avg time: ${
     padEndVisible(`${c.yellow(num(result.measuredRunsAvgMs!))} ms`, 8)
   }`;
-  const metrics = `${totalRuns}${c.green(chars.middle)}  ${totalMS}${
-    c.green(chars.middle)
-  }   ${avgRun}`;
 
-  strresult += tableLine(`${tab}${metrics}`);
-  strresult += tableLine(
-    undefined,
-    [
-      { i: 24, t: chars.bottommid },
-      { i: 55, t: chars.bottommid },
-      { i: 29, t: chars.topmid },
-    ],
-    middlecharset(),
-  );
-
-  return strresult;
+  tb.cellLine(`${tab}${totalRuns}`, `  ${totalMS}`, `  ${avgRun}`);
+  tb.separator();
 }
 
 function prettyBenchmarkMultipleRunBody(
+  tb: TableBuilder,
   result: BenchmarkResult,
   options: ResultOptions,
 ) {
-  let strresult = "";
   //console.log(JSON.stringify(result.measuredRunsMs?.sort())); // TODO fix grouping
   const max = Math.max(...result.measuredRunsMs);
   const min = Math.min(...result.measuredRunsMs);
@@ -151,10 +128,7 @@ function prettyBenchmarkMultipleRunBody(
 
   // console.log(min, max, unit, r);
 
-  strresult += tableLine(
-    c.gray(" ".repeat(padLength())),
-    [{ i: 29, t: chars.middle }],
-  );
+  tb.tc(c.gray).cellLine(" ".repeat(31));
 
   /* r = r.map((v, i) => 72+Math.ceil(Math.random()*50*i*i));
       result.runsCount = r.reduce((pv, n) => pv+n);
@@ -183,109 +157,16 @@ function prettyBenchmarkMultipleRunBody(
     const count = r.toString().padStart(6);
     const percent = perc(rp).padStart(4) + "%";
 
-    const barLine = ` ${
-      padEndVisible(
-        `${num(groupHead, true)} ms`,
-        Math.max(num(max).length, 6),
+    const barHeader = ` ${
+      padStartVisible(
+        `${rtime(groupHead)} ms`,
+        Math.max(rtime(max).length, 12),
       )
-    } _[${count}][${percent}] ${c.gray(chars.middle)} ${fullBar}`;
+    } _[${count}][${percent}] `;
 
-    strresult += tableLine(barLine);
+    tb.tc(c.gray).cellLine(barHeader, fullBar);
   });
 
-  strresult += tableLine(
-    c.gray(" ".repeat(padLength())),
-    [{ i: 29, t: chars.middle }],
-  );
-  strresult += tableLine(
-    undefined,
-    [{ i: 29, t: chars.bottommid }],
-    bottomcharset(),
-  );
-  strresult += "\n";
-
-  return strresult;
-}
-
-// --- innnen
-
-function padLength() {
-  return prettyBenchmarkSeparator(basecharset()).length - 2;
-}
-
-function tableLine(
-  content?: string,
-  crosses?: { i: number; t: chars }[],
-  chars: charset = tableLinecharset(),
-) {
-  const line = padEndVisible(
-    `${c.green(chars.start)}${content ||
-      c.green(chars.line.repeat(padLength()))}`,
-    padLength() + 1,
-  ) + `${c.green(chars.stop)}\n`;
-  const lineArray = line.split("");
-  if (crosses) {
-    crosses.forEach(({ i, t }) => {
-      const colDiff = lDiff(line.substr(0, i));
-      lineArray.splice(i + colDiff, 1, t);
-    });
-  }
-  return lineArray.join("");
-}
-
-function prettyBenchmarkSeparator(
-  caps: charset = basecharset(),
-) {
-  return `${caps.start}${caps.line.repeat(91)}${caps.stop}`;
-}
-
-interface charset {
-  start: string;
-  stop: string;
-  line: string;
-  is: string;
-}
-
-const basecharset = () => ({ start: "+", stop: "+", line: "-", is: "+" });
-const bottomcharset = () => ({
-  start: chars.bottomleft,
-  stop: chars.bottomright,
-  line: chars.bottom,
-  is: chars.bottommid,
-});
-const topcharset = () => ({
-  start: chars.topleft,
-  stop: chars.topright,
-  line: chars.top,
-  is: chars.topmid,
-});
-const middlecharset = () => ({
-  start: chars.midleft,
-  stop: chars.midright,
-  line: chars.mid,
-  is: chars.midmid,
-});
-const tableLinecharset = () => ({
-  start: chars.left,
-  stop: chars.right,
-  line: chars.mid,
-  is: chars.midmid,
-});
-
-enum chars {
-  top = "─",
-  topmid = "┬",
-  topleft = "┌",
-  topright = "┐",
-  bottom = "─",
-  bottommid = "┴",
-  bottomleft = "└",
-  bottomright = "┘",
-  left = "│",
-  midleft = "├",
-  mid = "─",
-  midmid = "┼",
-  right = "│",
-  midright = "┤",
-  middle = "│",
+  tb.tc(c.gray).cellLine(" ".repeat(31));
+  tb.separator();
 }
