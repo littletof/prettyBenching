@@ -69,7 +69,11 @@ function prettyBenchmarkHeader(name: string, options: ResultOptions) {
   let strresult = "";
   strresult += tableLine(undefined, undefined, topcharset());
   strresult += tableLine(`${tab}${`Benchmark name: ${c.cyan(name)}`}`);
-  strresult += tableLine(undefined, [{i: 24, t: chars.topmid},{i: 55, t: chars.topmid}], middlecharset());
+  strresult += tableLine(
+    undefined,
+    [{ i: 24, t: chars.topmid }, { i: 55, t: chars.topmid }],
+    middlecharset(),
+  );
 
   return strresult;
 }
@@ -83,10 +87,16 @@ function prettyBenchmarkSingleRunMetrics(
   const totalMS = `Total time: ${
     padEndVisible(`${c.yellow(num(result.totalMs))} ms`, 16)
   }`;
-  const metrics = `${totalRuns}${c.green(chars.middle)}  ${totalMS}${c.green(chars.middle)}`;
+  const metrics = `${totalRuns}${c.green(chars.middle)}  ${totalMS}${
+    c.green(chars.middle)
+  }`;
 
   strresult += tableLine(`${tab}${metrics}`);
-  strresult += tableLine(undefined, [{i: 24, t: chars.bottommid},{i: 55, t: chars.bottommid}], bottomcharset()) + "\n";
+  strresult += tableLine(
+    undefined,
+    [{ i: 24, t: chars.bottommid }, { i: 55, t: chars.bottommid }],
+    bottomcharset(),
+  ) + "\n";
 
   return strresult;
 }
@@ -110,7 +120,15 @@ function prettyBenchmarkMultipleRunMetrics(
   }   ${avgRun}`;
 
   strresult += tableLine(`${tab}${metrics}`);
-  strresult += tableLine(undefined, [{i: 24, t: chars.bottommid},{i: 55, t: chars.bottommid}, {i: 29, t: chars.topmid}], middlecharset());
+  strresult += tableLine(
+    undefined,
+    [
+      { i: 24, t: chars.bottommid },
+      { i: 55, t: chars.bottommid },
+      { i: 29, t: chars.topmid },
+    ],
+    middlecharset(),
+  );
 
   return strresult;
 }
@@ -133,7 +151,10 @@ function prettyBenchmarkMultipleRunBody(
 
   // console.log(min, max, unit, r);
 
-  strresult += tableLine(c.gray(" ".repeat(padLength())), [{i: 29, t: chars.middle}]);
+  strresult += tableLine(
+    c.gray(" ".repeat(padLength())),
+    [{ i: 29, t: chars.middle }],
+  );
 
   /* r = r.map((v, i) => 72+Math.ceil(Math.random()*50*i*i));
       result.runsCount = r.reduce((pv, n) => pv+n);
@@ -172,24 +193,41 @@ function prettyBenchmarkMultipleRunBody(
     strresult += tableLine(barLine);
   });
 
-  strresult += tableLine(c.gray(" ".repeat(padLength())), [{i: 29, t: chars.middle}]);
-  strresult += tableLine(undefined, [{i: 29, t: chars.bottommid}], bottomcharset());
+  strresult += tableLine(
+    c.gray(" ".repeat(padLength())),
+    [{ i: 29, t: chars.middle }],
+  );
+  strresult += tableLine(
+    undefined,
+    [{ i: 29, t: chars.bottommid }],
+    bottomcharset(),
+  );
   strresult += "\n";
 
   return strresult;
 }
 
+// --- innnen
+
 function padLength() {
   return prettyBenchmarkSeparator(basecharset()).length - 2;
 }
 
-function tableLine(content?: string, crosses?: {i: number, t:chars }[], chars: charset = tableLinecharset()) {
-  const line = padEndVisible(`${c.green(chars.start)}${content || c.green(chars.line.repeat(padLength()))}`, padLength() + 1) +`${c.green(chars.stop)}\n`;
+function tableLine(
+  content?: string,
+  crosses?: { i: number; t: chars }[],
+  chars: charset = tableLinecharset(),
+) {
+  const line = padEndVisible(
+    `${c.green(chars.start)}${content ||
+      c.green(chars.line.repeat(padLength()))}`,
+    padLength() + 1,
+  ) + `${c.green(chars.stop)}\n`;
   const lineArray = line.split("");
-  if(crosses) {
-    crosses.forEach(({i, t}) => {
+  if (crosses) {
+    crosses.forEach(({ i, t }) => {
       const colDiff = lDiff(line.substr(0, i));
-      lineArray.splice(i+colDiff, 1, t);
+      lineArray.splice(i + colDiff, 1, t);
     });
   }
   return lineArray.join("");
@@ -232,7 +270,7 @@ const tableLinecharset = () => ({
   stop: chars.right,
   line: chars.mid,
   is: chars.midmid,
-})
+});
 
 enum chars {
   top = "─",
@@ -250,4 +288,4 @@ enum chars {
   right = "│",
   midright = "┤",
   middle = "│",
-};
+}

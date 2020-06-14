@@ -47,6 +47,27 @@ export function perc(num: number) {
 }
 
 export function lDiff(str: string) {
-  const escaped = str.replace(/\x1b\[[0-9\;]*m/g, "");
+  const escaped = stripColor(str);
   return str.length - escaped.length;
+}
+
+export function stripColor(str: string) {
+  return str.replace(/\x1b\[[0-9\;]*m/g, "");
+}
+
+export function matchWithIndex(line: string, regexp: RegExp) {
+  const indexes = [];
+  let match;
+  while ((match = regexp.exec(line)) != null) {
+    indexes.push(match.index);
+  }
+  return indexes;
+}
+
+export function intersect(a: unknown[], b: unknown[]) {
+  return a.filter((value) => -1 !== b.indexOf(value));
+}
+
+export function disjunct(base: unknown[], dis: unknown[]) {
+  return base.filter((value) => -1 === dis.indexOf(value));
 }
