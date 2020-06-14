@@ -69,7 +69,7 @@ function prettyBenchmarkHeader(name: string, options: ResultOptions) {
   let strresult = "";
   strresult += tableLine(undefined, undefined, topcharset());
   strresult += tableLine(`${tab}${`Benchmark name: ${c.cyan(name)}`}`);
-  strresult += tableLine(undefined, [{i: 24, t: crosstype.top},{i: 55, t: crosstype.top}], middlecharset());
+  strresult += tableLine(undefined, [{i: 24, t: chars.topmid},{i: 55, t: chars.topmid}], middlecharset());
 
   return strresult;
 }
@@ -86,7 +86,7 @@ function prettyBenchmarkSingleRunMetrics(
   const metrics = `${totalRuns}${c.green(chars.middle)}  ${totalMS}${c.green(chars.middle)}`;
 
   strresult += tableLine(`${tab}${metrics}`);
-  strresult += tableLine(undefined, [{i: 24, t: crosstype.bottom},{i: 55, t: crosstype.bottom}], bottomcharset()) + "\n";
+  strresult += tableLine(undefined, [{i: 24, t: chars.bottommid},{i: 55, t: chars.bottommid}], bottomcharset()) + "\n";
 
   return strresult;
 }
@@ -110,7 +110,7 @@ function prettyBenchmarkMultipleRunMetrics(
   }   ${avgRun}`;
 
   strresult += tableLine(`${tab}${metrics}`);
-  strresult += tableLine(undefined, [{i: 24, t: crosstype.bottom},{i: 55, t: crosstype.bottom}, {i: 29, t: crosstype.top}], middlecharset());
+  strresult += tableLine(undefined, [{i: 24, t: chars.bottommid},{i: 55, t: chars.bottommid}, {i: 29, t: chars.topmid}], middlecharset());
 
   return strresult;
 }
@@ -133,7 +133,7 @@ function prettyBenchmarkMultipleRunBody(
 
   // console.log(min, max, unit, r);
 
-  strresult += tableLine(c.gray(" ".repeat(padLength())), [{i: 29, t: crosstype.middle}]);
+  strresult += tableLine(c.gray(" ".repeat(padLength())), [{i: 29, t: chars.middle}]);
 
   /* r = r.map((v, i) => 72+Math.ceil(Math.random()*50*i*i));
       result.runsCount = r.reduce((pv, n) => pv+n);
@@ -172,8 +172,8 @@ function prettyBenchmarkMultipleRunBody(
     strresult += tableLine(barLine);
   });
 
-  strresult += tableLine(c.gray(" ".repeat(padLength())), [{i: 29, t: crosstype.middle}]);
-  strresult += tableLine(undefined, [{i: 29, t: crosstype.bottom}], bottomcharset());
+  strresult += tableLine(c.gray(" ".repeat(padLength())), [{i: 29, t: chars.middle}]);
+  strresult += tableLine(undefined, [{i: 29, t: chars.bottommid}], bottomcharset());
   strresult += "\n";
 
   return strresult;
@@ -183,7 +183,7 @@ function padLength() {
   return prettyBenchmarkSeparator(basecharset()).length - 2;
 }
 
-function tableLine(content?: string, crosses?: {i: number, t:crosstype }[], chars: charset = tableLinecharset()) {
+function tableLine(content?: string, crosses?: {i: number, t:chars }[], chars: charset = tableLinecharset()) {
   const line = padEndVisible(`${c.green(chars.start)}${content || c.green(chars.line.repeat(padLength()))}`, padLength() + 1) +`${c.green(chars.stop)}\n`;
   const lineArray = line.split("");
   if(crosses) {
@@ -206,10 +206,6 @@ interface charset {
   stop: string;
   line: string;
   is: string;
-}
-
-enum crosstype {
-  top = "┬", bottom = "┴", cross = "┼", middle = "│"
 }
 
 const basecharset = () => ({ start: "+", stop: "+", line: "-", is: "+" });
@@ -238,20 +234,20 @@ const tableLinecharset = () => ({
   is: chars.midmid,
 })
 
-const chars = {
-  top: "─",
-  topmid: "┬",
-  topleft: "┌",
-  topright: "┐",
-  bottom: "─",
-  bottommid: "┴",
-  bottomleft: "└",
-  bottomright: "┘",
-  left: "│",
-  midleft: "├",
-  mid: "─",
-  midmid: "┼",
-  right: "│",
-  midright: "┤",
-  middle: "│",
+enum chars {
+  top = "─",
+  topmid = "┬",
+  topleft = "┌",
+  topright = "┐",
+  bottom = "─",
+  bottommid = "┴",
+  bottomleft = "└",
+  bottomright = "┘",
+  left = "│",
+  midleft = "├",
+  mid = "─",
+  midmid = "┼",
+  right = "│",
+  midright = "┤",
+  middle = "│",
 };
