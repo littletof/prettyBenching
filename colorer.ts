@@ -8,6 +8,7 @@ export class Colorer {
   }
 
   cyan = (str: string) => this.color(str, colors.cyan);
+  blue = (str: string) => this.color(str, colors.blue);
   green = (str: string) => this.color(str, colors.green);
   yellow = (str: string) => this.color(str, colors.yellow);
   gray = (str: string) => this.color(str, colors.gray);

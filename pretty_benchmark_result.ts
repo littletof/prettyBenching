@@ -9,6 +9,7 @@ import {
   padStartVisible,
   num,
   perc,
+  lDiff,
 } from "./utils.ts";
 import { Colorer } from "./colorer.ts";
 
@@ -66,9 +67,9 @@ function _prettyBenchmarkResult(
 
 function prettyBenchmarkHeader(name: string, options: ResultOptions) {
   let strresult = "";
-  strresult += tableLine(undefined, topcharset());
+  strresult += tableLine(undefined, undefined, topcharset());
   strresult += tableLine(`${tab}${`Benchmark name: ${c.cyan(name)}`}`);
-  strresult += tableLine(undefined, middlecharset());
+  strresult += tableLine(undefined, [{i: 24, t: crosstype.top},{i: 55, t: crosstype.top}], middlecharset());
 
   return strresult;
 }
@@ -82,10 +83,10 @@ function prettyBenchmarkSingleRunMetrics(
   const totalMS = `Total time: ${
     padEndVisible(`${c.yellow(num(result.totalMs))} ms`, 16)
   }`;
-  const metrics = `${totalRuns}${c.green("|")}  ${totalMS}${c.green("|")}`;
+  const metrics = `${totalRuns}${c.green(chars.middle)}  ${totalMS}${c.green(chars.middle)}`;
 
   strresult += tableLine(`${tab}${metrics}`);
-  strresult += tableLine(undefined, bottomcharset()) + "\n";
+  strresult += tableLine(undefined, [{i: 24, t: crosstype.bottom},{i: 55, t: crosstype.bottom}], bottomcharset()) + "\n";
 
   return strresult;
 }
@@ -104,12 +105,12 @@ function prettyBenchmarkMultipleRunMetrics(
   const avgRun = `Avg time: ${
     padEndVisible(`${c.yellow(num(result.measuredRunsAvgMs!))} ms`, 8)
   }`;
-  const metrics = `${totalRuns}${c.green("|")}  ${totalMS}${
-    c.green("|")
+  const metrics = `${totalRuns}${c.green(chars.middle)}  ${totalMS}${
+    c.green(chars.middle)
   }   ${avgRun}`;
 
   strresult += tableLine(`${tab}${metrics}`);
-  strresult += tableLine(undefined, middlecharset());
+  strresult += tableLine(undefined, [{i: 24, t: crosstype.bottom},{i: 55, t: crosstype.bottom}, {i: 29, t: crosstype.top}], middlecharset());
 
   return strresult;
 }
@@ -132,7 +133,7 @@ function prettyBenchmarkMultipleRunBody(
 
   // console.log(min, max, unit, r);
 
-  strresult += strresult += tableLine(" ".repeat(padLength()));
+  strresult += tableLine(c.gray(" ".repeat(padLength())), [{i: 29, t: crosstype.middle}]);
 
   /* r = r.map((v, i) => 72+Math.ceil(Math.random()*50*i*i));
       result.runsCount = r.reduce((pv, n) => pv+n);
@@ -166,13 +167,13 @@ function prettyBenchmarkMultipleRunBody(
         `${num(groupHead, true)} ms`,
         Math.max(num(max).length, 6),
       )
-    } _[${count}][${percent}] ${c.cyan(chars.middle)} ${fullBar}`;
+    } _[${count}][${percent}] ${c.gray(chars.middle)} ${fullBar}`;
 
     strresult += tableLine(barLine);
   });
 
-  strresult += tableLine(" ".repeat(padLength()));
-  strresult += tableLine(undefined, bottomcharset());
+  strresult += tableLine(c.gray(" ".repeat(padLength())), [{i: 29, t: crosstype.middle}]);
+  strresult += tableLine(undefined, [{i: 29, t: crosstype.bottom}], bottomcharset());
   strresult += "\n";
 
   return strresult;
@@ -182,8 +183,16 @@ function padLength() {
   return prettyBenchmarkSeparator(basecharset()).length - 2;
 }
 
-function tableLine(content?: string, chars: charset = tableLinecharset()) {
-  return padEndVisible(`${c.green(chars.start)}${content || c.green(chars.line.repeat(padLength()))}`, padLength() + 1) +`${c.green(chars.stop)}\n`;
+function tableLine(content?: string, crosses?: {i: number, t:crosstype }[], chars: charset = tableLinecharset()) {
+  const line = padEndVisible(`${c.green(chars.start)}${content || c.green(chars.line.repeat(padLength()))}`, padLength() + 1) +`${c.green(chars.stop)}\n`;
+  const lineArray = line.split("");
+  if(crosses) {
+    crosses.forEach(({i, t}) => {
+      const colDiff = lDiff(line.substr(0, i));
+      lineArray.splice(i+colDiff, 1, t);
+    });
+  }
+  return lineArray.join("");
 }
 
 function prettyBenchmarkSeparator(
@@ -197,6 +206,10 @@ interface charset {
   stop: string;
   line: string;
   is: string;
+}
+
+enum crosstype {
+  top = "┬", bottom = "┴", cross = "┼", middle = "│"
 }
 
 const basecharset = () => ({ start: "+", stop: "+", line: "-", is: "+" });
