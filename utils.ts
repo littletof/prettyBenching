@@ -62,9 +62,7 @@ export function num(num: number, force?: boolean) {
 }
 
 export function perc(num: number) {
-  return (num % 1 !== 0 && num.toFixed() != "100")
-    ? num.toFixed(1)
-    : num.toFixed();
+  return (num % 1 !== 0 && num < 99.9995) ? num.toFixed(1) : num.toFixed();
 }
 
 export function rtime(num: number, from: number = 0) {

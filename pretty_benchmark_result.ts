@@ -71,9 +71,15 @@ function _prettyBenchmarkResult(
     prettyBenchmarkHeader(tb, r, options);
     if (r.runsCount == 1) {
       prettyBenchmarkSingleRunMetrics(tb, r, options);
+      if (!!options.thresholds && Object.keys(options.thresholds).length != 0) {
+        prettyBenchmarkThresholdLine(tb, r, options);
+      }
     } else {
       prettyBenchmarkMultipleRunMetrics(tb, r, options);
       prettyBenchmarkMultipleRunCalcedMetrics(tb, r, options);
+      if (!!options.thresholds && Object.keys(options.thresholds).length != 0) {
+        prettyBenchmarkThresholdLine(tb, r, options);
+      }
       if (r.runsCount >= 10) prettyBenchmarkMultipleRunBody(tb, r, options);
     }
 
@@ -106,12 +112,35 @@ function prettyBenchmarkSingleRunMetrics(
   options: ResultOptions,
 ) {
   const totalRuns = `Total runs: ${c.yellow("1".padEnd(7))}`;
+  const timeColor = getTimeColor(
+    result.name,
+    result.totalMs,
+    options.nocolor,
+    options.thresholds,
+  );
   const totalMS = `Total time: ${
-    padEndVisible(`${c.yellow(rtime(result.totalMs, 4))} ms`, 16)
+    padEndVisible(`${timeColor(rtime(result.totalMs, 4))} ms`, 16)
   }`;
 
   tb.cellLine(`${tab}${totalRuns}`, `  ${totalMS}`);
   tb.separator();
+}
+
+function prettyBenchmarkThresholdLine(
+  tb: TableBuilder,
+  result: BenchmarkResult,
+  options: ResultOptions,
+) {
+  const threshold = options.thresholds && options.thresholds[result.name];
+  if (threshold) {
+    const sep = "=".repeat(10);
+    tb.line(
+      `${tab}Thresholds:  ${c.green(`0 ${sep} ${threshold.green}`)} ${
+        c.yellow(`${sep} ${threshold.yellow}`)
+      } ${c.red(`${sep} ∞`)}`,
+    );
+    tb.separator();
+  }
 }
 
 function prettyBenchmarkMultipleRunMetrics(
@@ -125,8 +154,15 @@ function prettyBenchmarkMultipleRunMetrics(
   const totalMS = `Total time: ${
     padEndVisible(`${c.yellow(rtime(result.totalMs, 4))} ms`, 16)
   }`;
+
+  const timeColor = getTimeColor(
+    result.name,
+    result.measuredRunsAvgMs,
+    options.nocolor,
+    options.thresholds,
+  );
   const avgRun = `Avg time: ${
-    padEndVisible(`${c.yellow(rtime(result.measuredRunsAvgMs, 4))} ms`, 8)
+    padEndVisible(`${timeColor(rtime(result.measuredRunsAvgMs, 4))} ms`, 8)
   }`;
 
   tb.cellLine(`${tab}${totalRuns}`, `  ${totalMS}`, `  ${avgRun}`);
@@ -149,11 +185,38 @@ function prettyBenchmarkMultipleRunCalcedMetrics(
     : (sorted.length % 2 == 0 ? sorted[middle]
     : (sorted[middle - 1] + sorted[middle]) / 2);
 
+  // const deviation = Math.sqrt(sorted.map(x => Math.pow(x-result.measuredRunsAvgMs,2)).reduce((a,b) => a+b)/sorted.length); // TODO find a place stdDeviation
+
+  const minColor = getTimeColor(
+    result.name,
+    min,
+    options.nocolor,
+    options.thresholds,
+  );
+  const maxColor = getTimeColor(
+    result.name,
+    max,
+    options.nocolor,
+    options.thresholds,
+  );
+  const meanColor = getTimeColor(
+    result.name,
+    mean,
+    options.nocolor,
+    options.thresholds,
+  );
+  const medianColor = getTimeColor(
+    result.name,
+    median,
+    options.nocolor,
+    options.thresholds,
+  );
+
   tb.cellLine(
-    `${tab}min: ${timeStr(min)} `,
-    ` max: ${timeStr(max)} `,
-    ` mean: ${timeStr(mean)} `,
-    ` median: ${timeStr(median)} `,
+    `${tab}min: ${minColor(timeStr(min))} `,
+    ` max: ${maxColor(timeStr(max))} `,
+    ` mean: ${meanColor(timeStr(mean))} `,
+    ` median: ${medianColor(timeStr(median))} `,
   );
   tb.separator();
 }
@@ -169,7 +232,7 @@ function prettyBenchmarkMultipleRunBody(
   const unit = (max - min) / options.precision;
   let r = result.measuredRunsMs.reduce((prev, runMs, i, a) => {
     // console.log(min, max, unit, runMs, ((runMs-min)/unit), ((runMs-min)/unit)*10, Math.ceil(((runMs-min)/unit)));
-    prev[Math.min(Math.ceil(((runMs - min) / unit)), options.precision - 1)]++;
+    prev[Math.min(Math.floor(((runMs - min) / unit)), options.precision - 1)]++;
 
     return prev;
   }, new Array(options.precision).fill(0));
@@ -215,7 +278,7 @@ function prettyBenchmarkMultipleRunBody(
 }
 
 function timeStr(time: number, from: number = 3) {
-  return padEndVisible(`${c.yellow(rtime(time, from))} ms `, 9 + 4);
+  return padEndVisible(`${rtime(time, from)} ${c.white("ms")} `, 9 + 4); // TODO gray ms?
 }
 
 function getTableColor(name: string, indicators?: Indicators[]) {
