@@ -122,7 +122,7 @@ function prettyBenchmarkSingleRunMetrics(
     padEndVisible(`${timeColor(rtime(result.totalMs, 4))} ms`, 16)
   }`;
 
-  tb.cellLine(`${tab}${totalRuns}`, `  ${totalMS}`);
+  tb.cellLine(`${tab}${totalRuns}`, `  ${totalMS}`, "");
   tb.separator();
 }
 

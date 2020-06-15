@@ -19,14 +19,11 @@ const data = readJsonSync(
   join("docs", "showcase", "benchmark_result_input.json"),
 );
 
-const thres = {
-  "multiple-runs": { green: 76, yellow: 82 },
-};
 const resultFn = prettyBenchmarkResult(
   {
     nocolor: false,
-    thresholds: thres,
-    indicators: [{ benches: /multiple-runs/, tableColor: colors.magenta }],
+    thresholds: {"multiple-runs": { green: 76, yellow: 82 }},
+    indicators: [{ benches: /multiple-runs/, tableColor: colors.magenta, modFn: str => "🚀" }],
   },
 );
 

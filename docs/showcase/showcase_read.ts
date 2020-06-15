@@ -18,7 +18,11 @@ const progressData: any[] = readJsonSync(
 const resultData = readJsonSync(join(pathBase, "benchmark_result_input.json"));
 
 const nocolor = true;
-const pg = prettyBenchmarkProgress({ nocolor });
+const pg = prettyBenchmarkProgress({ 
+  nocolor,
+  thresholds: {"multiple-runs": { green: 76, yellow: 82 }},
+  indicators: [{ benches: /multiple-runs/, modFn: str => "%" }],
+});
 
 const fid = await Deno.open(
   join(pathBase, "showcase.txt"),
@@ -59,7 +63,12 @@ progressData.forEach((pd: BenchmarkRunProgress) => {
 
 let resultLog: string = "";
 const resultFn = prettyBenchmarkResult(
-  { nocolor: true, outputFn: (log?: string) => resultLog = log! },
+  { 
+    nocolor: true,
+    outputFn: (log?: string) => resultLog = log!,
+    thresholds: {"multiple-runs": { green: 76, yellow: 82 }},
+    indicators: [{ benches: /multiple-runs/, modFn: str => "%" }],
+  },
 );
 resultFn(resultData as any);
 
