@@ -56,14 +56,14 @@ End when finished:
 You can define thresholds to specific benchmarks and than the times of the runs will be colored respectively
 
 ```ts
-const threshold = {
+const thresholds = {
   "for100ForIncrementX1e6": {green: 0.85, yellow: 1},
   "for100ForIncrementX1e8": {green: 84, yellow: 93},
   "forIncrementX1e9": {green: 900, yellow: 800},
   "forIncrementX1e9x2": {green: 15000, yellow: 18000},
 }
 
-runBenchmarks({ silent: true }, prettyBenchmarkProgress({threshold}))
+runBenchmarks({ silent: true }, prettyBenchmarkProgress({thresholds}))
 ```
 
 ![threshold](https://raw.githubusercontent.com/littletof/prettyBenching/master/docs/imgs/prettyBenchingProgress_example_threshold.png)
@@ -131,7 +131,7 @@ const thresholds = {
   "forIncrementX1e9x2": {green: 15000, yellow: 18000},
 }
 
-runBenchmarks().then(prettyBenchmarkResult({ precision: 5, threshold }))
+runBenchmarks().then(prettyBenchmarkResult({ thresholds }))
 .catch((e: any) => {
     console.log(red(e.benchmarkName));
     console.error(red(e.stack));
@@ -141,6 +141,26 @@ runBenchmarks().then(prettyBenchmarkResult({ precision: 5, threshold }))
 
 ![threshold](https://raw.githubusercontent.com/littletof/prettyBenching/master/docs/imgs/prettyBenchingResult_example_threshold.png)
 
+### Indicators
+
+You can use indicators, which help you categorise your benchmarks. You can change the character which gets added before the benchmark. 
+
+```ts
+const indicators = [
+  {
+    benches: /multiple-runs/,
+    tableColor: colors.magenta,
+    modFn: (str) => "🚀",
+  }
+];
+
+runBenchmarks().then(prettyBenchmarkResult({ indicators }));
+```
+![indicator](https://raw.githubusercontent.com/littletof/prettyBenching/master/docs/imgs/prettyBenchingResult_example_indicators.png)
+
+### Parts
+
+TODO
 
 # Roadmap
 
@@ -153,10 +173,10 @@ runBenchmarks().then(prettyBenchmarkResult({ precision: 5, threshold }))
 - [x] Overrideable output function
 - [x] Refactor outputting result in a single call
 - [x] Add `nocolor` option
-- [ ] Fix graph
-- [ ] Add `indicator` options like in progress
-- [ ] Tidy up current benchmark results look
-- [ ] Add options to define what parts are shown in the result cards. (eg. show graph, more calculated values like mean, ...)
+- [x] Fix graph
+- [x] Add `indicator` options like in progress
+- [x] Tidy up current benchmark results look
+- [x] Add options to define what parts are shown in the result cards. (eg. show graph, more calculated values like mean, ...)
 - [ ] Add an option to have a minimalist result output, that resembles the final progress output, instead of the big cards.
   
 #### Historic data
