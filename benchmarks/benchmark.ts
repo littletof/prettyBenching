@@ -1,3 +1,5 @@
+// deno-lint-ignore-file
+
 import {
   bench,
   runBenchmarks,
@@ -5,7 +7,6 @@ import {
 import { readJsonSync } from "https://deno.land/std@0.57.0/fs/mod.ts";
 import { join } from "https://deno.land/std@0.57.0/path/mod.ts";
 import { prettyBenchmarkResult } from "../mod.ts";
-import { TableBuilder } from "../table.ts";
 import { colors } from "../deps.ts";
 
 console.log(
