@@ -51,13 +51,14 @@ function _prettyBenchmarkResult(
   if (options.nocolor) c.setColorEnabled(false);
 
   const output = results.results.map((r) => {
-    const tb = new TableBuilder(91, c.green); // 91
+    const tb = new TableBuilder(91, c.green);
 
     prettyBenchmarkHeader(tb, r, options);
     if (r.runsCount == 1) {
       prettyBenchmarkSingleRunMetrics(tb, r, options);
     } else {
       prettyBenchmarkMultipleRunMetrics(tb, r, options);
+      prettyBenchmarkMultipleRunCalcedMetrics(tb, r, options);
       prettyBenchmarkMultipleRunBody(tb, r, options);
     }
 
@@ -87,7 +88,7 @@ function prettyBenchmarkSingleRunMetrics(
 ) {
   const totalRuns = `Total runs: ${c.yellow("1".padEnd(7))}`;
   const totalMS = `Total time: ${
-    padEndVisible(`${c.yellow(num(result.totalMs))} ms`, 16)
+    padEndVisible(`${c.yellow(rtime(result.totalMs, 4))} ms`, 16)
   }`;
 
   tb.cellLine(`${tab}${totalRuns}`, `  ${totalMS}`);
@@ -103,13 +104,30 @@ function prettyBenchmarkMultipleRunMetrics(
     padEndVisible(c.yellow((result.runsCount).toString()), 7)
   }`;
   const totalMS = `Total time: ${
-    padEndVisible(`${c.yellow(num(result.totalMs))} ms`, 16)
+    padEndVisible(`${c.yellow(rtime(result.totalMs, 4))} ms`, 16)
   }`;
   const avgRun = `Avg time: ${
-    padEndVisible(`${c.yellow(num(result.measuredRunsAvgMs!))} ms`, 8)
+    padEndVisible(`${c.yellow(rtime(result.measuredRunsAvgMs, 4))} ms`, 8)
   }`;
 
   tb.cellLine(`${tab}${totalRuns}`, `  ${totalMS}`, `  ${avgRun}`);
+  tb.separator();
+}
+
+function prettyBenchmarkMultipleRunCalcedMetrics(
+  tb: TableBuilder,
+  result: BenchmarkResult,
+  options: ResultOptions,
+) {
+  const max = Math.max(...result.measuredRunsMs);
+  const min = Math.min(...result.measuredRunsMs);
+  const mean = (max+min)/2; // not as avg
+
+  const sorted = [...result.measuredRunsMs].sort();
+  const middle = Math.floor(sorted.length/2);
+  const median = sorted.length == 0 ? 0 : sorted.length % 2 == 0 ? sorted[middle] : (sorted[middle-1] + sorted[middle]) / 2;
+
+  tb.cellLine(`${tab}min: ${timeStr(min)} `,` max: ${timeStr(max)} `,` mean: ${timeStr(mean)} `,` median: ${timeStr(median)} `);
   tb.separator();
 }
 
@@ -122,30 +140,25 @@ function prettyBenchmarkMultipleRunBody(
   const max = Math.max(...result.measuredRunsMs);
   const min = Math.min(...result.measuredRunsMs);
   const unit = (max - min) / options.precision;
-  let r = result.measuredRunsMs.reduce((prev, runMs, i, a) => { // TODO !
+  let r = result.measuredRunsMs.reduce((prev, runMs, i, a) => {
     // console.log(min, max, unit, runMs, ((runMs-min)/unit), ((runMs-min)/unit)*10, Math.ceil(((runMs-min)/unit)));
     prev[Math.min(Math.ceil(((runMs - min) / unit)), options.precision - 1)]++;
 
     return prev;
   }, new Array(options.precision).fill(0));
 
-  // console.log(min, max, unit, r);
-
   tb.tc(c.gray).cellLine(" ".repeat(31));
 
-  /* r = r.map((v, i) => 72+Math.ceil(Math.random()*50*i*i));
-      result.runsCount = r.reduce((pv, n) => pv+n);
-      console.log(r, result.runsCount);*/
-
   const rMax = Math.max(...r);
+  const maxBarLength = 58;
   r.forEach((r: number, i: number) => {
     let rc = r;
     const rp = r / result.runsCount * 100;
-    if (rMax > 61) {
-      rc = Math.ceil(rp / 100 * 61);
+    if (rMax > maxBarLength) {
+      rc = Math.ceil(rp / 100 * maxBarLength);
     }
 
-    const groupHead = min + i * unit; // TODO Handle precision. if eg. bigger then 100, only fixed 2/3
+    const groupHead = min + i * unit;
     const bar = Array(rc).fill("=").join("");
 
     const colorFn = getTimeColor(
@@ -172,4 +185,8 @@ function prettyBenchmarkMultipleRunBody(
 
   tb.tc(c.gray).cellLine(" ".repeat(31));
   tb.separator();
+}
+
+function timeStr(time: number, from: number = 3) {
+  return padEndVisible(`${c.yellow(rtime(time, from))} ms `, 9+4);
 }
