@@ -59,7 +59,7 @@ function _prettyBenchmarkResult(
     } else {
       prettyBenchmarkMultipleRunMetrics(tb, r, options);
       prettyBenchmarkMultipleRunCalcedMetrics(tb, r, options);
-      prettyBenchmarkMultipleRunBody(tb, r, options);
+      if(r.runsCount >= 10) { prettyBenchmarkMultipleRunBody(tb, r, options); }
     }
 
     return tb.build();
