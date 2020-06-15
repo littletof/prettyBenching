@@ -48,7 +48,7 @@ dummyBench("single");
 dummyBench("multiple", 2);
 dummyBench("multiple", 1000);
 
-const threshold = {
+const thresholds = {
   "for100ForIncrementX1e6": { green: 0.85, yellow: 1 },
   "for100ForIncrementX1e8": { green: 84, yellow: 93 },
   "forIncrementX1e9": { green: 900, yellow: 800 },
@@ -59,8 +59,8 @@ const threshold = {
 test({
   name: "commandlineBenching",
   fn: async function (): Promise<void> {
-    runBenchmarks({ silent: true }, prettyBenchmarkProgress({ threshold }))
-      .then(prettyBenchmarkResult({ precision: 5, threshold })).catch(
+    runBenchmarks({ silent: true }, prettyBenchmarkProgress({ thresholds }))
+      .then(prettyBenchmarkResult({ precision: 5, thresholds })).catch(
         (e) => {
           // console.log(red(e.benchmarkName));
           console.error(colors.red(e.stack));
