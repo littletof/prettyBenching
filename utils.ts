@@ -17,6 +17,21 @@ export function getTimeColor(
   return yellow;
 }
 
+export function getBenchIndicator(
+  name: string,
+  indicators?: { benches: RegExp; modFn?: (str: string) => string }[],
+) {
+  if (indicators && indicators.length > 0) {
+    const indChar = "#"; // TODO should be ▒ but doesnt work with stdout https://github.com/denoland/deno/issues/6001
+    const indicator = indicators.find(({ benches }) => benches.test(name));
+    return (!!indicator && typeof indicator.modFn == "function")
+      ? indicator.modFn(indChar)
+      : " ";
+  }
+
+  return "";
+}
+
 export function getTimePadSize() {
   return 12; // TODO
 }
@@ -47,13 +62,15 @@ export function num(num: number, force?: boolean) {
 }
 
 export function perc(num: number) {
-  return (num % 1 !== 0 && num.toFixed() != '100') ? num.toFixed(1) : num.toFixed();
+  return (num % 1 !== 0 && num.toFixed() != "100")
+    ? num.toFixed(1)
+    : num.toFixed();
 }
 
 export function rtime(num: number, from: number = 0) {
   const log = Math.max(Math.floor(Math.log10(num)), 0);
   const defPrec = isFloat(num) ? 4 : 0;
-  return num.toFixed(Math.max(defPrec - Math.max(log-from, 0), 0));
+  return num.toFixed(Math.max(defPrec - Math.max(log - from, 0), 0));
 }
 
 export function lDiff(str: string) {

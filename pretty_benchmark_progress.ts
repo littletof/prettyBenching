@@ -10,6 +10,7 @@ import {
   usingHrTime,
   padEndVisible,
   num,
+  getBenchIndicator,
 } from "./utils.ts";
 import { Colorer } from "./colorer.ts";
 
@@ -19,13 +20,13 @@ const c: Colorer = new Colorer();
 
 export interface prettyBenchmarkProgressOptions {
   thresholds?: { [key: string]: { green: number; yellow: number } };
-  indicators?: { benches: RegExp; modFn: (str: string) => string }[];
+  indicators?: { benches: RegExp; modFn?: (str: string) => string }[];
   nocolor?: boolean;
 }
 
 interface ProgressOptions {
   thresholds?: { [key: string]: { green: number; yellow: number } };
-  indicators?: { benches: RegExp; modFn: (str: string) => string }[];
+  indicators?: { benches: RegExp; modFn?: (str: string) => string }[];
   nocolor: boolean;
 }
 
@@ -198,18 +199,6 @@ function startBenchingLine(
 }
 
 function benchNameFormatted(name: string, options: ProgressOptions) {
-  return `${getBenchIndicator(name, options)}` +
+  return `${getBenchIndicator(name, options.indicators)}` +
     `[${c.cyan(name)} ${c.gray(padEndVisible("", 40 - name.length, "-"))}]`;
-}
-
-function getBenchIndicator(name: string, options: ProgressOptions) {
-  if (options.indicators && options.indicators.length > 0) {
-    const indChar = "#"; // TODO should be ▒ but doesnt work with stdout https://github.com/denoland/deno/issues/6001
-    const indicator = options.indicators.find(({ benches }) =>
-      benches.test(name)
-    );
-    return !!indicator ? indicator.modFn(indChar) : indChar;
-  }
-
-  return "";
 }

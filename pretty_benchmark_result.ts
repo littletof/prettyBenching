@@ -10,6 +10,7 @@ import {
   num,
   perc,
   rtime,
+  getBenchIndicator,
 } from "./utils.ts";
 import { Colorer } from "./colorer.ts";
 import { TableBuilder } from "./table.ts";
@@ -17,9 +18,16 @@ import { TableBuilder } from "./table.ts";
 const c: Colorer = new Colorer();
 const tab = "    ";
 
+type Indicators = {
+  benches: RegExp;
+  modFn?: (str: string) => string;
+  tableColor?: (str: string) => string;
+};
+
 export interface prettyBenchmarkResultOptions {
   precision?: number;
   thresholds?: { [key: string]: { green: number; yellow: number } };
+  indicators?: Indicators[];
   // deno-lint-ignore no-explicit-any
   outputFn?: (log: string) => any;
   nocolor?: boolean;
@@ -28,19 +36,25 @@ export interface prettyBenchmarkResultOptions {
 interface ResultOptions {
   precision: number;
   thresholds?: { [key: string]: { green: number; yellow: number } };
+  indicators?: Indicators[];
   // deno-lint-ignore no-explicit-any
   outputFn: (log: string) => any;
   nocolor: boolean;
 }
 
 export function prettyBenchmarkResult(
-  { precision = 5, thresholds, outputFn = console.log, nocolor = false }:
-    prettyBenchmarkResultOptions = { precision: 5, outputFn: console.log },
+  {
+    precision = 5,
+    thresholds,
+    indicators,
+    outputFn = console.log,
+    nocolor = false,
+  }: prettyBenchmarkResultOptions = { precision: 5, outputFn: console.log },
 ) {
   return (result: BenchmarkRunResult) =>
     _prettyBenchmarkResult(
       result,
-      { precision, thresholds, outputFn, nocolor },
+      { precision, thresholds, indicators, outputFn, nocolor },
     );
 }
 
@@ -51,7 +65,8 @@ function _prettyBenchmarkResult(
   if (options.nocolor) c.setColorEnabled(false);
 
   const output = results.results.map((r) => {
-    const tb = new TableBuilder(91, c.green);
+    const tableColor = getTableColor(r.name, options.indicators);
+    const tb = new TableBuilder(91, tableColor);
 
     prettyBenchmarkHeader(tb, r, options);
     if (r.runsCount == 1) {
@@ -59,7 +74,7 @@ function _prettyBenchmarkResult(
     } else {
       prettyBenchmarkMultipleRunMetrics(tb, r, options);
       prettyBenchmarkMultipleRunCalcedMetrics(tb, r, options);
-      if(r.runsCount >= 10) { prettyBenchmarkMultipleRunBody(tb, r, options); }
+      if (r.runsCount >= 10) prettyBenchmarkMultipleRunBody(tb, r, options);
     }
 
     return tb.build();
@@ -77,7 +92,11 @@ function prettyBenchmarkHeader(
   r: BenchmarkResult,
   options: ResultOptions,
 ) {
-  tb.line(`${tab}${`Benchmark name: ${c.cyan(r.name)}`}`);
+  const indicator = getBenchIndicator(r.name, options.indicators);
+  const indTab = indicator == ""
+    ? tab
+    : padStartVisible(`${indicator} `, tab.length);
+  tb.line(`${indTab}${`Benchmark name: ${c.cyan(r.name)}`}`);
   tb.separator();
 }
 
@@ -121,13 +140,21 @@ function prettyBenchmarkMultipleRunCalcedMetrics(
 ) {
   const max = Math.max(...result.measuredRunsMs);
   const min = Math.min(...result.measuredRunsMs);
-  const mean = (max+min)/2; // not as avg
+  const mean = (max + min) / 2; // not as avg
 
   const sorted = [...result.measuredRunsMs].sort();
-  const middle = Math.floor(sorted.length/2);
-  const median = sorted.length == 0 ? 0 : sorted.length % 2 == 0 ? sorted[middle] : (sorted[middle-1] + sorted[middle]) / 2;
+  const middle = Math.floor(sorted.length / 2);
+  const median = sorted.length == 0
+    ? 0
+    : (sorted.length % 2 == 0 ? sorted[middle]
+    : (sorted[middle - 1] + sorted[middle]) / 2);
 
-  tb.cellLine(`${tab}min: ${timeStr(min)} `,` max: ${timeStr(max)} `,` mean: ${timeStr(mean)} `,` median: ${timeStr(median)} `);
+  tb.cellLine(
+    `${tab}min: ${timeStr(min)} `,
+    ` max: ${timeStr(max)} `,
+    ` mean: ${timeStr(mean)} `,
+    ` median: ${timeStr(median)} `,
+  );
   tb.separator();
 }
 
@@ -188,5 +215,16 @@ function prettyBenchmarkMultipleRunBody(
 }
 
 function timeStr(time: number, from: number = 3) {
-  return padEndVisible(`${c.yellow(rtime(time, from))} ms `, 9+4);
+  return padEndVisible(`${c.yellow(rtime(time, from))} ms `, 9 + 4);
+}
+
+function getTableColor(name: string, indicators?: Indicators[]) {
+  if (indicators && indicators.length > 0) {
+    const indicator = indicators.find(({ benches }) => benches.test(name));
+    return !!indicator && typeof indicator.tableColor == "function"
+      ? indicator.tableColor
+      : c.green;
+  }
+
+  return c.green;
 }
