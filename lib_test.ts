@@ -60,7 +60,7 @@ test({
   name: "commandlineBenching",
   fn: async function (): Promise<void> {
     runBenchmarks({ silent: true }, prettyBenchmarkProgress({ thresholds }))
-      .then(prettyBenchmarkResult({ precision: 5, thresholds })).catch(
+      .then(prettyBenchmarkResult({ thresholds })).catch(
         (e) => {
           // console.log(red(e.benchmarkName));
           console.error(colors.red(e.stack));

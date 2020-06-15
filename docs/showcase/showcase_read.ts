@@ -68,6 +68,7 @@ const resultFn = prettyBenchmarkResult(
     outputFn: (log?: string) => resultLog = log!,
     thresholds: { "multiple-runs": { green: 76, yellow: 82 } },
     indicators: [{ benches: /multiple-runs/, modFn: (str) => "%" }],
+    parts: { extraMetrics: true, graphBars: 5, graph: true, threshold: true },
   },
 );
 resultFn(resultData as any);
