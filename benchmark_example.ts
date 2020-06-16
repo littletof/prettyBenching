@@ -110,7 +110,7 @@ runBenchmarks(
           extraMetrics: true,
           threshold: true,
           graph: true,
-          graphBars: 10,
+          graphBars: 5,
         },
       },
     ),

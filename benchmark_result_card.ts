@@ -224,12 +224,10 @@ function prettyBenchmarkMultipleRunGraph(
 ) {
   const barsCount = options.parts.graphBars || 5;
 
-  //console.log(JSON.stringify(result.measuredRunsMs?.sort())); // TODO fix grouping
   const max = Math.max(...result.measuredRunsMs);
   const min = Math.min(...result.measuredRunsMs);
   const unit = (max - min) / barsCount;
   let r = result.measuredRunsMs.reduce((prev, runMs, i, a) => {
-    // console.log(min, max, unit, runMs, ((runMs-min)/unit), ((runMs-min)/unit)*10, Math.ceil(((runMs-min)/unit)));
     prev[Math.min(Math.floor(((runMs - min) / unit)), barsCount - 1)]++;
 
     return prev;
