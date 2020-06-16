@@ -7,12 +7,15 @@ export class Colorer {
     this.doColor = to;
   }
 
+  black = (str: string) => this.color(str, colors.black);
+  blue = (str: string) => this.color(str, colors.blue);
   cyan = (str: string) => this.color(str, colors.cyan);
-  green = (str: string) => this.color(str, colors.green);
-  yellow = (str: string) => this.color(str, colors.yellow);
   gray = (str: string) => this.color(str, colors.gray);
+  green = (str: string) => this.color(str, colors.green);
+  magenta = (str: string) => this.color(str, colors.magenta);
   red = (str: string) => this.color(str, colors.red);
   white = (str: string) => this.color(str, colors.white);
+  yellow = (str: string) => this.color(str, colors.yellow);
 
   private color(str: string, colorFn: (str: string) => string): string {
     return !!this.doColor ? colorFn(str) : str;

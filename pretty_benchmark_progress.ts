@@ -10,6 +10,7 @@ import {
   usingHrTime,
   padEndVisible,
   num,
+  getBenchIndicator,
 } from "./utils.ts";
 import { Colorer } from "./colorer.ts";
 
@@ -18,25 +19,25 @@ const lineLength = 130;
 const c: Colorer = new Colorer();
 
 export interface prettyBenchmarkProgressOptions {
-  threshold?: { [key: string]: { green: number; yellow: number } };
-  indicators?: { benches: RegExp; modFn: (str: string) => string }[];
+  thresholds?: { [key: string]: { green: number; yellow: number } };
+  indicators?: { benches: RegExp; modFn?: (str: string) => string }[];
   nocolor?: boolean;
 }
 
 interface ProgressOptions {
-  threshold?: { [key: string]: { green: number; yellow: number } };
-  indicators?: { benches: RegExp; modFn: (str: string) => string }[];
+  thresholds?: { [key: string]: { green: number; yellow: number } };
+  indicators?: { benches: RegExp; modFn?: (str: string) => string }[];
   nocolor: boolean;
 }
 
 export function prettyBenchmarkProgress(
-  { threshold, indicators, nocolor = false }: prettyBenchmarkProgressOptions =
+  { thresholds, indicators, nocolor = false }: prettyBenchmarkProgressOptions =
     {},
 ) {
   if (nocolor) c.setColorEnabled(false);
 
   return (progress: BenchmarkRunProgress) =>
-    _prettyBenchmarkProgress(progress, { threshold, indicators, nocolor });
+    _prettyBenchmarkProgress(progress, { thresholds, indicators, nocolor });
 }
 
 function _prettyBenchmarkProgress(
@@ -171,7 +172,7 @@ function finishedBenchmarkLine(
     result.name,
     avgTime,
     options.nocolor,
-    options?.threshold,
+    options?.thresholds,
   );
   const coloredTime = colorFn(paddedAvgTime);
   const fullAverage = `Avg: [${coloredTime}${c.gray("ms")}]`;
@@ -198,18 +199,6 @@ function startBenchingLine(
 }
 
 function benchNameFormatted(name: string, options: ProgressOptions) {
-  return `${getBenchIndicator(name, options)}` +
+  return `${getBenchIndicator(name, options.indicators)}` +
     `[${c.cyan(name)} ${c.gray(padEndVisible("", 40 - name.length, "-"))}]`;
-}
-
-function getBenchIndicator(name: string, options: ProgressOptions) {
-  if (options.indicators && options.indicators.length > 0) {
-    const indChar = "#"; // TODO should be ▒ but doesnt work with stdout https://github.com/denoland/deno/issues/6001
-    const indicator = options.indicators.find(({ benches }) =>
-      benches.test(name)
-    );
-    return !!indicator ? indicator.modFn(indChar) : indChar;
-  }
-
-  return "";
 }

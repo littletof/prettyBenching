@@ -18,12 +18,12 @@ Add the following to your `deps.ts`
 export {
   prettyBenchmarkResult,
   prettyBenchmarkProgress
-} from 'https://deno.land/x/pretty_benching@v0.0.3/mod.ts';
+} from 'https://deno.land/x/pretty_benching@v0.1.0/mod.ts';
 ```
 
 or just simply
 ```ts
-import { prettyBenchmarkResult, prettyBenchmarkProgress } from 'https://deno.land/x/pretty_benching@v0.0.3/mod.ts';
+import { prettyBenchmarkResult, prettyBenchmarkProgress } from 'https://deno.land/x/pretty_benching@v0.1.0/mod.ts';
 ```
 
 ## Note
@@ -56,14 +56,14 @@ End when finished:
 You can define thresholds to specific benchmarks and than the times of the runs will be colored respectively
 
 ```ts
-const threshold = {
+const thresholds = {
   "for100ForIncrementX1e6": {green: 0.85, yellow: 1},
   "for100ForIncrementX1e8": {green: 84, yellow: 93},
   "forIncrementX1e9": {green: 900, yellow: 800},
   "forIncrementX1e9x2": {green: 15000, yellow: 18000},
 }
 
-runBenchmarks({ silent: true }, prettyBenchmarkProgress({threshold}))
+runBenchmarks({ silent: true }, prettyBenchmarkProgress({thresholds}))
 ```
 
 ![threshold](https://raw.githubusercontent.com/littletof/prettyBenching/master/docs/imgs/prettyBenchingProgress_example_threshold.png)
@@ -90,29 +90,17 @@ Prints the Deno `runBenchmarks()` methods result in a nicely readable format.
 
 Simply call `prettyBenchmarkResult` with the desired settings.
 
-With `precision` you can define, into how many groups should the results be grouped when displaying a multiple run benchmark result
+Setting the `nocolor` option to `true` will remove all the built in coloring. Its usefull, if you log it somewhere or save the output to a file. It won't interfere with Deno's `fmt` color settings.
 
 Use the `silent: true` flag in `runBenchmarks`, if you dont want to see the default output
 
 ```ts
 // ...add benches...
 
-runBenchmarks()
+runBenchmarks({silent: true})
 .then(prettyBenchmarkResult())
 .catch((e: any) => {
-  console.log(red(e.benchmarkName))
-  console.error(red(e.stack));
-});
-```
-or 
-```ts
-// ...add benches...
-
-runBenchmarks({silent: true})
-.then(prettyBenchmarkResult({precision: 5}))
-.catch((e: any) => {
-  console.log(red(e.benchmarkName))
-  console.error(red(e.stack));
+  console.error(e.stack);
 });
 ```
 
@@ -121,7 +109,7 @@ The output would look something like this:
 
 ### Thresholds
 
-You can define thresholds to specific benchmarks and than the times of the runs will be colored respectively
+You can define thresholds to specific benchmarks and than related things, like times or graph bars will be colored respectively. This can use the same thresholds object as in `prettyBenchmarkProgress`.
 
 ```ts
 const thresholds = {
@@ -131,16 +119,55 @@ const thresholds = {
   "forIncrementX1e9x2": {green: 15000, yellow: 18000},
 }
 
-runBenchmarks().then(prettyBenchmarkResult({ precision: 5, threshold }))
-.catch((e: any) => {
-    console.log(red(e.benchmarkName));
-    console.error(red(e.stack));
-  },
-);
+runBenchmarks().then(prettyBenchmarkResult({ thresholds }));
 ```
 
 ![threshold](https://raw.githubusercontent.com/littletof/prettyBenching/master/docs/imgs/prettyBenchingResult_example_threshold.png)
 
+### Indicators
+
+You can use indicators, which help you categorise your benchmarks besides just their names. You can set what color the table should have. With `modFn` you can also change what color the marker should be, or even change the indicator icon like seen below (default is `#`).
+You can pass this object to `prettyBenchmarkProgress` too.
+
+```ts
+const indicators = [
+  {
+    benches: /multiple-runs/,
+    tableColor: colors.magenta,
+    modFn: (str) => "🚀",
+  }
+];
+
+runBenchmarks().then(prettyBenchmarkResult({ indicators }));
+```
+![indicator](https://raw.githubusercontent.com/littletof/prettyBenching/master/docs/imgs/prettyBenchingResult_example_indicators.png)
+
+### Parts
+
+You can change what the result cards should contain with the `parts` object. Once you define it you have to set all parts you want. The default parts setting is `{ graph: true, graphBars: 5 }`
+
+![thresholdLine](https://raw.githubusercontent.com/littletof/prettyBenching/master/docs/imgs/prettyBenchingResult_example_full_extra.png)
+
+##### Extra metrics `{ extraMetrics: true }`
+
+Setting this will give you an extra row, which adds extra calculated values like `min`, `max`, `mean as ((min+max)/2)` , `median`.
+
+![extraMetrics](https://raw.githubusercontent.com/littletof/prettyBenching/master/docs/imgs/prettyBenchingResult_example_extrametrics_line.png)
+
+##### Threshold `{ threshold: true }`
+
+> Need to have `thresholds` in the root which have a matching threshold for the specific benchmark, otherwise it wont add it to the specific card.
+
+It simply show what the set thresholds for the benchmark. Can be usefull if `nocolor` is set to true.
+
+![thresholdLine](https://raw.githubusercontent.com/littletof/prettyBenching/master/docs/imgs/prettyBenchingResult_example_threshold_line.png)
+
+##### Graph `{ graph: true, graphBars: 5 }`
+
+Adds a graph, which shows the distribution of the runs of the benchmark.
+> Only shows, when there are `10` or more runs set.
+
+With `graphBars` you can set how many bars it should show. Default is `5`.
 
 # Roadmap
 
@@ -153,10 +180,11 @@ runBenchmarks().then(prettyBenchmarkResult({ precision: 5, threshold }))
 - [x] Overrideable output function
 - [x] Refactor outputting result in a single call
 - [x] Add `nocolor` option
-- [ ] Fix graph
-- [ ] Add `indicator` options like in progress
-- [ ] Tidy up current benchmark results look
-- [ ] Add options to define what parts are shown in the result cards. (eg. show graph, more calculated values like mean, ...)
+- [x] Fix graph
+- [x] Add `indicator` options like in progress
+- [x] Tidy up current benchmark results look
+- [x] Add options to define what parts are shown in the result cards. (eg. show graph, more calculated values like mean, ...)
+- [ ] Find a place in `extraMetrics` for `standard deviation`.
 - [ ] Add an option to have a minimalist result output, that resembles the final progress output, instead of the big cards.
   
 #### Historic data
@@ -167,7 +195,8 @@ runBenchmarks().then(prettyBenchmarkResult({ precision: 5, threshold }))
 #### Operational
 - [x] Write README docs
 - [x] Separate `prettyBenchmarkResults` and `prettyBenchmarkProgress` into independently importable modules.
+- [x] Add the ability to follow the change on how the outputs look like.
 - [ ] Write JSDocs
 - [ ] Refactor README
-- [ ] Add showcase module, which helps to have consistent docs images, and the ability to follow the change on how the outputs look like.
+- [ ] Add showcase module, which helps to have consistent docs images
 - [ ] Make module contributor friendly
