@@ -22,7 +22,10 @@ const data = readJsonSync(
 const resultFn = prettyBenchmarkResult(
   {
     nocolor: false,
-    thresholds: { "multiple-runs": { green: 76, yellow: 82 }, "benchmark-start": { green: 2, yellow: 3 } },
+    thresholds: {
+      "multiple-runs": { green: 76, yellow: 82 },
+      "benchmark-start": { green: 2, yellow: 3 },
+    },
     indicators: [
       {
         benches: /multiple-runs/,
@@ -30,7 +33,7 @@ const resultFn = prettyBenchmarkResult(
         modFn: (str) => "🚀",
       },
     ],
-    parts: {threshold: true, extraMetrics: true, graph: true}
+    parts: { threshold: true, extraMetrics: true, graph: true },
   },
 );
 
