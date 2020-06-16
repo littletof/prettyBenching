@@ -169,7 +169,7 @@ Adds a graph, which shows the distribution of the runs of the benchmark.
 
 With `graphBars` you can set how many bars it should show. Default is `5`.
 
-# Roadmap to v1.0.0
+# Roadmap
 
 #### BenchmarkProgress
 - [x] Add `indicator` options
