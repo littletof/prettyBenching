@@ -113,11 +113,9 @@ You can define thresholds to specific benchmarks and than related things, like t
 
 ```ts
 const thresholds = {
-  "for100ForIncrementX1e6": {green: 0.85, yellow: 1},
-  "for100ForIncrementX1e8": {green: 84, yellow: 93},
-  "forIncrementX1e9": {green: 900, yellow: 800},
-  "forIncrementX1e9x2": {green: 15000, yellow: 18000},
-}
+      "multiple-runs": { green: 76, yellow: 82 },
+      "benchmark-start": { green: 2, yellow: 3 },
+};
 
 runBenchmarks().then(prettyBenchmarkResult({ thresholds }));
 ```
@@ -144,7 +142,9 @@ runBenchmarks().then(prettyBenchmarkResult({ indicators }));
 
 ### Parts
 
-You can change what the result cards should contain with the `parts` object. Once you define it you have to set all parts you want. The default parts setting is `{ graph: true, graphBars: 5 }`
+You can change what the result cards should contain with the `parts` object. Once you define it you have to set all parts you want. The default parts setting is `{ graph: true, graphBars: 5 }`.
+
+Using all options:
 
 ![thresholdLine](https://raw.githubusercontent.com/littletof/prettyBenching/master/docs/imgs/prettyBenchingResult_example_full_extra.png)
 
@@ -169,7 +169,7 @@ Adds a graph, which shows the distribution of the runs of the benchmark.
 
 With `graphBars` you can set how many bars it should show. Default is `5`.
 
-# Roadmap
+# Roadmap to v1.0.0
 
 #### BenchmarkProgress
 - [x] Add `indicator` options
