@@ -144,6 +144,24 @@ runBenchmarks().then(prettyBenchmarkResult({ indicators }));
 
 You can change what the result cards should contain with the `parts` object. Once you define it you have to set all parts you want. The default parts setting is `{ graph: true, graphBars: 5 }`.
 
+You can define what `parts` you want to use in the options, like this:
+
+```ts
+prettyBenchmarkResult(
+      {
+        nocolor: false,
+        thresholds,
+        indicators,
+        parts: {
+          extraMetrics: true,
+          threshold: true,
+          graph: true,
+          graphBars: 10,
+        },
+      },
+    )
+```
+
 Using all options:
 
 ![thresholdLine](https://raw.githubusercontent.com/littletof/prettyBenching/master/docs/imgs/prettyBenchingResult_example_full_extra.png)
