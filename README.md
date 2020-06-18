@@ -203,6 +203,7 @@ With `graphBars` you can set how many bars it should show. Default is `5`.
 - [x] Tidy up current benchmark results look
 - [x] Add options to define what parts are shown in the result cards. (eg. show graph, more calculated values like mean, ...)
 - [ ] Find a place in `extraMetrics` for `standard deviation`.
+- [ ] Add option to crop outlayer results from graph (maybe with a percent limit).
 - [ ] Add an option to have a minimalist result output, that resembles the final progress output, instead of the big cards.
   
 #### Historic data
