@@ -215,6 +215,7 @@ With `graphBars` you can set how many bars it should show. Default is `5`.
 - [x] Write README docs
 - [x] Separate `prettyBenchmarkResults` and `prettyBenchmarkProgress` into independently importable modules.
 - [x] Add the ability to follow the change on how the outputs look like.
+- [ ] Proper tests
 - [ ] Write JSDocs
 - [ ] Refactor README
 - [ ] Add showcase module, which helps to have consistent docs images

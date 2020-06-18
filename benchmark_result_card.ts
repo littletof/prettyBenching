@@ -55,7 +55,7 @@ export function getResultCard(
     thresholds,
     parts = { graph: true, graphBars: 5 },
   }: prettyBenchmarkCardResultOptions = {
-    nocolor: true,
+    nocolor: false,
     parts: { graph: true, graphBars: 5 },
   },
 ) {

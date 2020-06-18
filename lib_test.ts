@@ -70,6 +70,19 @@ test({
   },
 });
 
+test({
+  name: "without options",
+  fn: async function (): Promise<void> {
+    runBenchmarks({ silent: true }, prettyBenchmarkProgress())
+      .then(prettyBenchmarkResult()).catch(
+        (e) => {
+          console.error(colors.red(e.stack));
+        },
+      );
+    assert(true);
+  },
+});
+
 function dummyBench(name: string, runs = 1): void {
   bench({
     name,
