@@ -34,18 +34,22 @@ function _prettyBenchmarkResultCb(
   results: BenchmarkRunResult,
   options?: prettyBenchmarkResultOptions,
 ) {
-  if (options && options.nocolor) c.setColorEnabled(false);
+  if (options?.nocolor) {
+    c.setColorEnabled(false);
+  }
 
   const output = results.results.map((r) => {
     // TODO switch on options.type
     return getResultCard(r, c, options);
   }).join("\n");
 
-  (options && typeof options.outputFn == "function")
+  typeof options?.outputFn == "function"
     ? options.outputFn(output)
     : console.log(output);
 
-  if (options && options.nocolor) c.setColorEnabled(true);
+  if (options?.nocolor) {
+    c.setColorEnabled(true);
+  }
 
   return results;
 }
