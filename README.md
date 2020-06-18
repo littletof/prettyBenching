@@ -185,6 +185,8 @@ It simply show what the set thresholds for the benchmark. Can be usefull if `noc
 Adds a graph, which shows the distribution of the runs of the benchmark.
 > Only shows, when there are `10` or more runs set.
 
+The graph shows the results groupped into timeframes, where the groups frame start from the value on the head of its line, and end with excluding the value on the next line.
+
 With `graphBars` you can set how many bars it should show. Default is `5`.
 
 # Roadmap
@@ -215,6 +217,8 @@ With `graphBars` you can set how many bars it should show. Default is `5`.
 - [x] Write README docs
 - [x] Separate `prettyBenchmarkResults` and `prettyBenchmarkProgress` into independently importable modules.
 - [x] Add the ability to follow the change on how the outputs look like.
+- [ ] Refactor how optional `options` are handled
+- [ ] Proper tests
 - [ ] Write JSDocs
 - [ ] Refactor README
 - [ ] Add showcase module, which helps to have consistent docs images

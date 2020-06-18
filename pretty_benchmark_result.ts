@@ -21,7 +21,7 @@ export type prettyBenchmarkResultOptions =
 const c: Colorer = new Colorer();
 
 export function prettyBenchmarkResult(
-  options: prettyBenchmarkResultOptions,
+  options?: prettyBenchmarkResultOptions,
 ) {
   return (result: BenchmarkRunResult) =>
     _prettyBenchmarkResultCb(
@@ -32,20 +32,24 @@ export function prettyBenchmarkResult(
 
 function _prettyBenchmarkResultCb(
   results: BenchmarkRunResult,
-  options: prettyBenchmarkResultOptions,
+  options?: prettyBenchmarkResultOptions,
 ) {
-  if (options.nocolor) c.setColorEnabled(false);
+  if (options?.nocolor) {
+    c.setColorEnabled(false);
+  }
 
   const output = results.results.map((r) => {
     // TODO switch on options.type
     return getResultCard(r, c, options);
   }).join("\n");
 
-  typeof options.outputFn == "function"
+  typeof options?.outputFn == "function"
     ? options.outputFn(output)
     : console.log(output);
 
-  if (options.nocolor) c.setColorEnabled(true);
+  if (options?.nocolor) {
+    c.setColorEnabled(true);
+  }
 
   return results;
 }
