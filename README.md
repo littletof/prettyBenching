@@ -13,6 +13,14 @@ A simple Deno library, that gives you pretty benchmarking progress and results i
 
 [![deno version](https://img.shields.io/badge/ROADMAP-5e5e5e?logo=discover)](#roadmap)
 
+## Try it out
+
+This runs a short benchmark to showcase the module live.
+
+```sh
+deno run -r --allow-hrtime https://deno.land/x/pretty_benching/example.ts
+```
+
 ## Getting started
 
 Add the following to your `deps.ts`
@@ -28,14 +36,6 @@ or just simply import it directly:
 
 ```ts
 import { prettyBenchmarkResult, prettyBenchmarkProgress } from 'https://deno.land/x/pretty_benching@v0.1.2/mod.ts';
-```
-
-## Try it out
-
-This runs a short benchmark to showcase the module.
-
-```sh
-deno run -r --allow-hrtime https://deno.land/x/pretty_benching/example.ts
 ```
 
 ## Note
@@ -58,9 +58,11 @@ await runBenchmarks({ silent: true }, prettyBenchmarkProgress())
 ```
 
 The output would look something like this during running:
+
 ![running](https://raw.githubusercontent.com/littletof/prettyBenching/master/docs/imgs/prettyBenchingProgress_example_running.png)
 
 End when finished:
+
 ![finished](https://raw.githubusercontent.com/littletof/prettyBenching/master/docs/imgs/prettyBenchingProgress_example_finished.png)
 
 ### Thresholds
@@ -117,6 +119,7 @@ runBenchmarks({silent: true})
 ```
 
 The output would look something like this:
+
 ![example](https://raw.githubusercontent.com/littletof/prettyBenching/master/docs/imgs/prettyBenchingResult_example.png)
 
 ### Thresholds
