@@ -1,29 +1,41 @@
 # prettyBenching
+
 A simple Deno library, that gives you pretty benchmarking progress and results in the commandline
 
 **⚠ Appeareance is likely to change until v1.0.0 of this lib ⚠**
 
-[![deno version](https://img.shields.io/badge/deno-1.1.0-success?logo=deno)](https://github.com/denoland/deno)
-[![deno/std version](https://img.shields.io/badge/deno/std-0.57.0-success?logo=deno)](https://deno.land/std@0.57.0)
+[![deno version](https://img.shields.io/badge/deno-1.2.0-success?logo=deno)](https://github.com/denoland/deno)
+[![deno/std version](https://img.shields.io/badge/deno/std-0.61.0-success?logo=deno)](https://deno.land/std@0.61.0)
 
 [![Build Status](https://github.com/littletof/prettyBenching/workflows/CI/badge.svg)](https://github.com/littletof/prettyBenching/actions?query=workflow%3ACI)
-![](https://img.shields.io/maintenance/yes/2021)
+![maintained](https://img.shields.io/maintenance/yes/2021)
 [![documentation](https://img.shields.io/badge/%E2%80%8E-docs-blue.svg?logo=deno)](https://doc.deno.land/https/deno.land/x/pretty_benching/mod.ts)
 
 [![deno version](https://img.shields.io/badge/ROADMAP-5e5e5e?logo=discover)](#roadmap)
 
 ## Getting started
+
 Add the following to your `deps.ts`
-```ts 
+
+```ts
 export {
   prettyBenchmarkResult,
   prettyBenchmarkProgress
-} from 'https://deno.land/x/pretty_benching@v0.1.1/mod.ts';
+} from 'https://deno.land/x/pretty_benching@v0.1.2/mod.ts';
 ```
 
-or just simply
+or just simply import it directly:
+
 ```ts
-import { prettyBenchmarkResult, prettyBenchmarkProgress } from 'https://deno.land/x/pretty_benching@v0.1.1/mod.ts';
+import { prettyBenchmarkResult, prettyBenchmarkProgress } from 'https://deno.land/x/pretty_benching@v0.1.2/mod.ts';
+```
+
+## Try it out
+
+This runs a short benchmark to showcase the module.
+
+```sh
+deno run -r --allow-hrtime https://deno.land/x/pretty_benching/example.ts
 ```
 
 ## Note
@@ -76,11 +88,11 @@ You can use indicators, which help you categorise your benchmarks. You can chang
 const indicators = [
   { benches: /100/, modFn: colors.bgRed },
   { benches: /for/, modFn: colors.red },
-  { benches: /custom/, modFn: () => colors.bgYellow(colors.black("%")) }, // change "icon"
+  { benches: /custom/, modFn: () => colors.bgYellow(colors.black("%")) }, // changes indicator char
 ];
 ```
-![indicator](https://raw.githubusercontent.com/littletof/prettyBenching/master/docs/imgs/prettyBenchingProgress_example_indicators.png)
 
+![indicator](https://raw.githubusercontent.com/littletof/prettyBenching/master/docs/imgs/prettyBenchingProgress_example_indicators.png)
 
 # prettyBenchmarkResults
 
@@ -132,12 +144,13 @@ const indicators = [
   {
     benches: /multiple-runs/,
     tableColor: colors.magenta,
-    modFn: (str) => "🚀",
+    modFn: () => "🚀",
   }
 ];
 
 runBenchmarks().then(prettyBenchmarkResult({ indicators }));
 ```
+
 ![indicator](https://raw.githubusercontent.com/littletof/prettyBenching/master/docs/imgs/prettyBenchingResult_example_indicators.png)
 
 ### Parts
@@ -192,11 +205,14 @@ With `graphBars` you can set how many bars it should show. Default is `5`.
 # Roadmap
 
 #### BenchmarkProgress
+
 - [x] Add `indicator` options
 - [x] Add `nocolor` option
+- [ ] Unify `indicator` option types, use color like `tableColor`
 - [ ] Add overridable output function like in benchmark results
 
 #### BenchmarkResults
+
 - [x] Overrideable output function
 - [x] Refactor outputting result in a single call
 - [x] Add `nocolor` option
@@ -209,11 +225,13 @@ With `graphBars` you can set how many bars it should show. Default is `5`.
 - [ ] Add an option to have a minimalist result output, that resembles the final progress output, instead of the big cards.
   
 #### Historic data
+
 - [ ] Add module to enable historic data save/read inside repo
 - [ ] Make use of historic module, enable automatic calculating of thresholds from previous runs
 - [ ] Option to use historic data, to tell if benchmarks got better or worse from previous runs.
 
 #### Operational
+
 - [x] Write README docs
 - [x] Separate `prettyBenchmarkResults` and `prettyBenchmarkProgress` into independently importable modules.
 - [x] Add the ability to follow the change on how the outputs look like.

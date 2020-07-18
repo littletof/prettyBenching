@@ -77,6 +77,12 @@ function _prettyBenchmarkProgress(
 
   // Finished benching
   if (progress.state === ProgressState.BenchmarkingEnd) {
+    if (progress.running) {
+      console.log("\n"); // Double empty line
+      console.log(c.red(`${headerPadding} Benchmarking failed`));
+      console.log(c.red(`${headerPadding} An error was thrown while running benchmark [${progress.running.name}]\n`));
+      return;
+    }
     console.log(); // Empty line
     considerPrecise(progress);
     const cyanHeader = `${c.cyan(headerPadding)}`;
