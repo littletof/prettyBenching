@@ -1,4 +1,7 @@
-import { prettyBenchmarkProgress, prettyBenchmarkResult } from "https://deno.land/x/pretty_benching@v0.1.2/mod.ts";
+import {
+  prettyBenchmarkProgress,
+  prettyBenchmarkResult,
+} from "https://deno.land/x/pretty_benching@v0.1.2/mod.ts";
 
 import {
   runBenchmarks,

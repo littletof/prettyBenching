@@ -79,8 +79,11 @@ function _prettyBenchmarkProgress(
   if (progress.state === ProgressState.BenchmarkingEnd) {
     if (progress.running) {
       console.log("\n"); // Double empty line
-      console.log(c.red(`${headerPadding} Benchmarking failed`));
-      console.log(c.red(`${headerPadding} An error was thrown while running benchmark [${progress.running.name}]\n`));
+      console.log(
+        c.red(
+          `${headerPadding} Benchmarking failed\n${headerPadding} An error was thrown while running benchmark [${progress.running.name}]\n`,
+        ),
+      );
       return;
     }
     console.log(); // Empty line
