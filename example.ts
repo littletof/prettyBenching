@@ -10,6 +10,9 @@ import {
 
 import * as colors from "https://deno.land/std@0.61.0/fmt/colors.ts";
 
+// TODO fix import
+import { prettyBenchmarkDown } from "./pretty_benchmark_down.ts";
+
 bench({
   name: "Sorting arrays",
   runs: 4000,
@@ -86,7 +89,7 @@ runBenchmarks(
   { silent: true, skip: /_long/ },
   prettyBenchmarkProgress({ indicators, thresholds }),
 )
-  .then(
+  /* .then(
     prettyBenchmarkResult(
       {
         thresholds,
@@ -99,4 +102,6 @@ runBenchmarks(
         },
       },
     ),
-  );
+  );*/
+  .then(prettyBenchmarkDown({title: 'test', description:'Idontknow but anything goes here', footer:'Summa summárum', output: console.log, groups: [{include: /arrays/, name: 'Arrays', description: 'ez array műveletes'}, {include: /[sS]/, name: 'S', description: 'SSSS'}]}));
+
