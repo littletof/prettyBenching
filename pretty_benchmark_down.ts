@@ -64,7 +64,8 @@ export function _prettyBenchmarkDown(result: BenchmarkRunResult, options?: prett
 
     if(options?.groups && options.groups.length > 0) {
 
-        let grouppedResults: { [key: string]: GroupDefinition & { items: BenchmarkResult[] }}  = { 'unmatched': {name: 'unmatched', items: []} as any};
+        let grouppedResults: { [key: string]: GroupDefinition & { items: BenchmarkResult[] }}  = {};
+        const unmatched: GroupDefinition & { items: BenchmarkResult[] } = {name: 'Ungrouped benches', items: []} as any;            
 
         result.results.forEach(r =>{
             let matched = false;
@@ -81,21 +82,21 @@ export function _prettyBenchmarkDown(result: BenchmarkRunResult, options?: prett
             });
 
             if(!matched) {
-                if(!grouppedResults['unmatched'].items.some((i: BenchmarkResult) => i.name === r.name && i.totalMs === r.totalMs)){
-                    grouppedResults['unmatched'].items.push(r);
+                if(!unmatched.items.some((i: BenchmarkResult) => i.name === r.name && i.totalMs === r.totalMs)){
+                    unmatched.items.push(r);
                 }
             }
         });
 
+        grouppedResults['unmatched'] = unmatched;
+
         Object.keys(grouppedResults).forEach(k => {
             const resultGroup = grouppedResults[k];
 
-            if(k != 'unmatched') {
-                markdown+= `## ${resultGroup.name}\n`;
+            markdown+= `## ${resultGroup.name}\n`;
 
-                if(resultGroup.description) {
-                    markdown+=`${resultGroup.description}\n`;
-                }
+            if(resultGroup.description) {
+                markdown+=`${resultGroup.description}\n`;
             }
 
             markdown+= headerRow(options);
@@ -155,7 +156,7 @@ export function thresholdResultColumn(thresholds: Thresholds) {
 }
 
 export function thresholdsColumn(thresholds: Thresholds, showResult?: boolean) {
-    return {title: '', align: 'right', formatter: (result: BenchmarkResult, cd: ColumnDefinition) => {
+    return {title: 'Thresholds', align: 'right', formatter: (result: BenchmarkResult, cd: ColumnDefinition) => {
         let value = "<small>";
         const inRange = getInThresholdRange(result, thresholds);
         const th = thresholds && thresholds[result.name];
