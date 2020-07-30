@@ -13,6 +13,10 @@ export {
 } from "./pretty_benchmark_progress.ts";
 export {
   prettyBenchmarkDown,
+  defaultColumns,
+  indicatorColumn,
+  thresholdResultColumn,
+  thresholdsColumn,
   prettyBenchmarkDownOptions,
   ColumnDefinition,
   GroupDefinition,

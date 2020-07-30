@@ -7,7 +7,12 @@ test({
     assert(mod != null);
     assertEquals(typeof mod.prettyBenchmarkResult, "function");
     assertEquals(typeof mod.prettyBenchmarkProgress, "function");
+    
     assertEquals(typeof mod.prettyBenchmarkDown, "function");
-    assertEquals(Object.keys(mod).length, 3);
+    assertEquals(typeof mod.indicatorColumn, "function");
+    assertEquals(typeof mod.thresholdsColumn, "function");
+    assertEquals(typeof mod.thresholdResultColumn, "function");
+    assertEquals(typeof mod.defaultColumns, "object");
+    assertEquals(Object.keys(mod).length, 7);
   },
 });
