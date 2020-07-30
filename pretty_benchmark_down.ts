@@ -34,6 +34,7 @@ interface ColumnDefinition {
 interface GroupDefinition {
     include: RegExp;
     name: string;
+    columns?: ColumnDefinition[];
     description?: string;
     afterTable?: string;
 }
@@ -93,15 +94,15 @@ export function _prettyBenchmarkDown(result: BenchmarkRunResult, options?: prett
         Object.keys(grouppedResults).forEach(k => {
             const resultGroup = grouppedResults[k];
 
-            markdown+= `## ${resultGroup.name}\n`;
+            markdown+= `## ${resultGroup.name}\n\n`;
 
             if(resultGroup.description) {
                 markdown+=`${resultGroup.description}\n`;
             }
 
-            markdown+= headerRow(options);
+            markdown+= headerRow(options, resultGroup);
             resultGroup.items.forEach((r: BenchmarkResult) => {
-                markdown+=tableRow(r, options);
+                markdown+=tableRow(r, options, resultGroup);
             });
 
             markdown+='\n';
@@ -192,11 +193,11 @@ function getInThresholdRange(result: BenchmarkResult, thresholds: Thresholds) {
     return null;
 }
 
-function headerRow(options?: prettyBenchmarkDownOptions) {
+function headerRow(options?: prettyBenchmarkDownOptions, group?: GroupDefinition) {
     let titles = '|';
     let alignments = '|';
 
-    const columns: ColumnDefinition[] = options?.columns ? options.columns : defaultColumns;
+    const columns: ColumnDefinition[] = group?.columns || options?.columns || defaultColumns;
 
     // TODO if historic/treshold columns.push
 
@@ -208,10 +209,10 @@ function headerRow(options?: prettyBenchmarkDownOptions) {
     return `${titles}\n${alignments}\n`;
 }
 
-function tableRow(result: BenchmarkResult, options?: prettyBenchmarkDownOptions) {
+function tableRow(result: BenchmarkResult, options?: prettyBenchmarkDownOptions, group?: GroupDefinition) {
     let values = `|`;
     
-    const columns: ColumnDefinition[] = options?.columns ? options.columns : defaultColumns;
+    const columns: ColumnDefinition[] = group?.columns || options?.columns || defaultColumns;
 
     // TODO if historic/treshold columns.push
 
