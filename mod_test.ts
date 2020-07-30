@@ -7,7 +7,7 @@ test({
     assert(mod != null);
     assertEquals(typeof mod.prettyBenchmarkResult, "function");
     assertEquals(typeof mod.prettyBenchmarkProgress, "function");
-    
+
     assertEquals(typeof mod.prettyBenchmarkDown, "function");
     assertEquals(typeof mod.indicatorColumn, "function");
     assertEquals(typeof mod.thresholdsColumn, "function");

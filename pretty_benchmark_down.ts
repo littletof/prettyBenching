@@ -60,9 +60,9 @@ function _prettyBenchmarkDown(
       [key: string]: GroupDefinition & { items: BenchmarkResult[] };
     } = {};
     const unmatched: GroupDefinition & { items: BenchmarkResult[] } = {
-        name: "Ungrouped benches",
-        items: [],
-    // deno-lint-ignore no-explicit-any
+      name: "Ungrouped benches",
+      items: [],
+      // deno-lint-ignore no-explicit-any
     } as any;
 
     runResult.results.forEach((r) => {
@@ -184,13 +184,11 @@ export function thresholdsColumn(thresholds: Thresholds, showResult?: boolean) {
         return "-";
       }
 
-      value += `<= ${th.green} ✅` + (showResult
-        ? (inRange === 1 ? " 🠴" : " ")
-        : "") +
+      value += `<= ${th.green} ✅` +
+        (showResult ? (inRange === 1 ? " 🠴" : " ") : "") +
         "<br>";
-      value += `<= ${th.yellow} 🔶` + (showResult
-        ? (inRange === 2 ? " 🠴" : " ")
-        : "") +
+      value += `<= ${th.yellow} 🔶` +
+        (showResult ? (inRange === 2 ? " 🠴" : " ") : "") +
         "<br>";
       value += ` > ${th.yellow} 🔴` +
         (showResult ? (inRange === 3 ? " 🠴" : " ") : "");
