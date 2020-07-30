@@ -26,7 +26,7 @@ export function getInThresholdRange(
 ) {
   const th = thresholds && thresholds[name];
 
-  if (!!th) {
+  if (th) {
     if (time <= th.green) return 1;
     if (time <= th.yellow) return 2;
     if (th.yellow < time) return 3;
@@ -49,7 +49,7 @@ export function getBenchIndicator(
   return ""; // no indicators were defined
 }
 
- /** strips terminal color */
+/** strips terminal color */
 export function stripColor(str: string) {
   return str.replace(/\x1b\[[0-9\;]*m/g, "");
 }

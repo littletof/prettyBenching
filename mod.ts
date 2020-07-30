@@ -1,5 +1,7 @@
 export {
-  BenchIndicator, Threshold, Thresholds
+  BenchIndicator,
+  Threshold,
+  Thresholds,
 } from "./types.ts";
 export {
   prettyBenchmarkResult,
@@ -13,5 +15,5 @@ export {
   prettyBenchmarkDown,
   prettyBenchmarkDownOptions,
   ColumnDefinition,
-  GroupDefinition
+  GroupDefinition,
 } from "./pretty_benchmark_down.ts";

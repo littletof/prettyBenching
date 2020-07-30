@@ -4,13 +4,13 @@ import {
   BenchmarkRunResult,
 } from "./deps.ts";
 import { Thresholds, BenchIndicator } from "./types.ts";
-import { getTimeColor,getBenchIndicator } from "./common.ts";
+import { getTimeColor, getBenchIndicator } from "./common.ts";
 
 import {
   getTimePadSize,
   usingHrTime,
   padEndVisible,
-  num
+  num,
 } from "./utils.ts";
 import { Colorer } from "./colorer.ts";
 

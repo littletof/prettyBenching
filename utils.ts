@@ -18,11 +18,11 @@ export function isFloat(num: number) {
   return num % 1 !== 0;
 }
 
-export function padEndVisible(str: string, to: number, char: string = " ") {
+export function padEndVisible(str: string, to: number, char = " ") {
   return str.padEnd(to + lDiff(str), char);
 }
 
-export function padStartVisible(str: string, to: number, char: string = " ") {
+export function padStartVisible(str: string, to: number, char = " ") {
   return str.padStart(to + lDiff(str), char);
 }
 
@@ -34,7 +34,7 @@ export function perc(num: number) {
   return (num % 1 !== 0 && num < 99.9995) ? num.toFixed(1) : num.toFixed();
 }
 
-export function rtime(num: number, from: number = 0) {
+export function rtime(num: number, from = 0) {
   const log = Math.max(Math.floor(Math.log10(num)), 0);
   const defPrec = isFloat(num) ? 4 : 0;
   return num.toFixed(Math.max(defPrec - Math.max(log - from, 0), 0));

@@ -1,12 +1,16 @@
 import { BenchmarkResult } from "./deps.ts";
 import { BenchIndicator, Thresholds } from "./types.ts";
-import { getTimeColor,getBenchIndicator, calculateExtraMetrics } from "./common.ts";
+import {
+  getTimeColor,
+  getBenchIndicator,
+  calculateExtraMetrics,
+} from "./common.ts";
 
 import {
   padEndVisible,
   padStartVisible,
   perc,
-  rtime
+  rtime,
 } from "./utils.ts";
 
 import { TableBuilder } from "./table.ts";
@@ -164,7 +168,7 @@ function prettyBenchmarkMultipleRunCalcedMetrics(
   result: BenchmarkResult,
   options: CardResultOptions,
 ) {
-  const {max, min, mean, median} = calculateExtraMetrics(result);
+  const { max, min, mean, median } = calculateExtraMetrics(result);
 
   const minColor = getTimeColor(
     result.name,
@@ -256,7 +260,7 @@ function prettyBenchmarkMultipleRunGraph(
   tb.separator();
 }
 
-function timeStr(time: number, from: number = 3) {
+function timeStr(time: number, from = 3) {
   return padEndVisible(`${rtime(time, from)} ${c.white("ms")} `, 9 + 4); // TODO gray ms?
 }
 

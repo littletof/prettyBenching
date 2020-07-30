@@ -1,7 +1,7 @@
 import { colors } from "./deps.ts";
 
 export class Colorer {
-  doColor: boolean = true;
+  doColor = true;
 
   setColorEnabled(to: boolean) {
     this.doColor = to;
@@ -18,6 +18,6 @@ export class Colorer {
   yellow = (str: string) => this.color(str, colors.yellow);
 
   private color(str: string, colorFn: (str: string) => string): string {
-    return !!this.doColor ? colorFn(str) : str;
+    return this.doColor ? colorFn(str) : str;
   }
 }
