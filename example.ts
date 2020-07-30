@@ -6,12 +6,13 @@ import {
 import {
   runBenchmarks,
   bench,
+  BenchmarkResult,
 } from "https://deno.land/std@0.61.0/testing/bench.ts";
 
 import * as colors from "https://deno.land/std@0.61.0/fmt/colors.ts";
 
 // TODO fix import
-import { prettyBenchmarkDown } from "./pretty_benchmark_down.ts";
+import { prettyBenchmarkDown, defaultColumns, indicatorColumn, thresholdResultColumn, thresholdsColumn } from "./pretty_benchmark_down.ts";
 
 bench({
   name: "Sorting arrays",
@@ -103,5 +104,25 @@ runBenchmarks(
       },
     ),
   );*/
-  .then(prettyBenchmarkDown({title: 'test', description:'Idontknow but anything goes here', footer:'Summa summárum', output: console.log, groups: [{include: /arrays/, name: 'Arrays', description: 'ez array műveletes'}, {include: /[sS]/, name: 'S', description: 'SSSS'}]}));
+  // .then(prettyBenchmarkDown({title: 'test', description:'Idontknow but anything goes here', footer:'Summa summárum', output: console.log, groups: [{include: /arrays/, name: 'Arrays', description: 'ez array műveletes'}, {include: /[sS]/, name: 'S', description: 'SSSS'}]}));
+  .then(prettyBenchmarkDown(
+  {
+    title: 'MY example benchMarkdown',
+    description: 'long text',
+    afterTables: '---\n This can be a footer or something else',
+    columns: [
+      indicatorColumn(indicators),
+      ...defaultColumns,
+      thresholdResultColumn(thresholds),
+      thresholdsColumn(thresholds),
+      thresholdsColumn(thresholds, true),
+      {title: 'test', propertyKey: 'runsCount'},
+      {title: 'noproperty'},
+      {title: 'undefined', propertyKey: 'ilyennincs'},
+      {title: 'format', toFixed: 3, formatter: (result: BenchmarkResult, cd: any) => { return result.measuredRunsAvgMs.toFixed(cd.toFixed) + 'bambamarha'; }},
+      // {title: 'tresholds', toFixed: 3, formatter: (result: BenchmarkResult, cd: any) => { return '<small><= 123 ✅<br/><= 654 🔶<br/> > 654 🔴</small>'; }, align: "right"},
+      // {title: 'historic', toFixed: 3, formatter: (result: BenchmarkResult, cd: any) => { return Math.random() > 0.5 ? `+10% 🔼`:' -5% 🔰'; }, align: "right"}
+    ]
+  }
+  ));
 
