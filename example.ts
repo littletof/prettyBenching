@@ -105,7 +105,7 @@ runBenchmarks(
     ),
   );*/
   // .then(prettyBenchmarkDown({title: 'test', description:'Idontknow but anything goes here', footer:'Summa summárum', output: console.log, groups: [{include: /arrays/, name: 'Arrays', description: 'ez array műveletes'}, {include: /[sS]/, name: 'S', description: 'SSSS'}]}));
-  .then(prettyBenchmarkDown(
+  .then(prettyBenchmarkDown(console.log,
   {
     title: 'MY example benchMarkdown',
     description: 'long text',

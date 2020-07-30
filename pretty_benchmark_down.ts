@@ -1,16 +1,6 @@
 import { BenchmarkRunResult, BenchmarkResult } from "./deps.ts";
 
-// TODO add columns: {head: string, propertyKey: string}
-// if undefined put - on place
-// foreign keys are allowed, but values for them have to be put manually on the results
-
-// TODO Add the indicators somehow
-
 // TODO historic: better or worse by x percent to last value
-
-// TODO example github action on commits/PRs it comments on the pr if it got better or worse
-
-// TODO support automatic output to file instead of cb function
 
 export interface prettyBenchmarkDownOptions {
     title?: string;
@@ -18,9 +8,7 @@ export interface prettyBenchmarkDownOptions {
     afterTables?: string;
     groups?: GroupDefinition[];
     columns?: ColumnDefinition[];
-    output?: (out: string) => void;
 }
-
 
 // TODO move interfaces into a common file
 interface ColumnDefinition {
@@ -48,11 +36,11 @@ interface Thresholds {
     [key: string]: { green: number; yellow: number } 
 }
 
-export function prettyBenchmarkDown(options?: prettyBenchmarkDownOptions) {
-    return (result: BenchmarkRunResult) => _prettyBenchmarkDown(result, options);
+export function prettyBenchmarkDown(outputFn: (out: string) => void, options?: prettyBenchmarkDownOptions) {
+    return (result: BenchmarkRunResult) => _prettyBenchmarkDown(result, outputFn, options);
 }
 
-export function _prettyBenchmarkDown(result: BenchmarkRunResult, options?: prettyBenchmarkDownOptions) {
+export function _prettyBenchmarkDown(runResult: BenchmarkRunResult, outputFn: (out: string) => void, options?: prettyBenchmarkDownOptions) {
     let markdown = "";
 
     if(options?.title) {
@@ -68,7 +56,7 @@ export function _prettyBenchmarkDown(result: BenchmarkRunResult, options?: prett
         let grouppedResults: { [key: string]: GroupDefinition & { items: BenchmarkResult[] }}  = {};
         const unmatched: GroupDefinition & { items: BenchmarkResult[] } = {name: 'Ungrouped benches', items: []} as any;            
 
-        result.results.forEach(r =>{
+        runResult.results.forEach(r =>{
             let matched = false;
             options.groups?.forEach(g => {
                 if(r.name.match(g.include)) {
@@ -114,7 +102,7 @@ export function _prettyBenchmarkDown(result: BenchmarkRunResult, options?: prett
 
     } else {
         markdown+= headerRow(options);
-        result.results.forEach(r => {
+        runResult.results.forEach(r => {
             markdown+=tableRow(r, options);
         });
         markdown+='\n';
@@ -124,13 +112,9 @@ export function _prettyBenchmarkDown(result: BenchmarkRunResult, options?: prett
         markdown+= `${options.afterTables}\n`;
     }
 
-    if(options?.output) {
-        options.output(markdown);
-    } else {
-        console.log(markdown);
-    }
+    outputFn(markdown);
 
-    return result;
+    return runResult;
 }
 
 export const defaultColumns: ColumnDefinition[] = [
@@ -139,11 +123,12 @@ export const defaultColumns: ColumnDefinition[] = [
     {title: 'Total (ms)', propertyKey: 'totalMs', align: 'right', toFixed: 3},
     {title: 'Average (ms)', propertyKey: 'measuredRunsAvgMs', align: 'right', toFixed: 3},
 ];
+
 export function indicatorColumn(indicators: BenchIndicator[]): ColumnDefinition {
     return {title: '', formatter: (result: BenchmarkResult, cd: ColumnDefinition) => {
         const indicator = indicators.find(({ benches }) => benches.test(result.name));
         return (!!indicator && typeof indicator.modFn == "function")
-            ? indicator.modFn('#') // TODO use const-s ts for # everywhere
+            ? indicator.modFn('#').replace(/\x1b\[[0-9\;]*m/g, "") // strips terminal color // TODO use consts.ts for # everywhere
             : " ";
     }};
 }
@@ -199,8 +184,6 @@ function headerRow(options?: prettyBenchmarkDownOptions, group?: GroupDefinition
 
     const columns: ColumnDefinition[] = group?.columns || options?.columns || defaultColumns;
 
-    // TODO if historic/treshold columns.push
-
     columns.forEach(c => {
         titles+=`${c.title}|`;
         alignments+=`${alignment(c.align)}|`;
@@ -213,8 +196,6 @@ function tableRow(result: BenchmarkResult, options?: prettyBenchmarkDownOptions,
     let values = `|`;
     
     const columns: ColumnDefinition[] = group?.columns || options?.columns || defaultColumns;
-
-    // TODO if historic/treshold columns.push
 
     columns.forEach(c => {
 
