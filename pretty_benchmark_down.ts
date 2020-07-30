@@ -166,9 +166,9 @@ export function thresholdsColumn(thresholds: Thresholds, showResult?: boolean) {
             return "-";
         }
 
-        value+= `<= ${th.green} ✅` + (showResult ? (inRange === 1 ? '◀' : ' ◽') : '') + '<br>';
-        value+= `<= ${th.yellow} 🔶` + (showResult ? (inRange === 2 ? '◀' : ' ◽') : '') + '<br>';
-        value+= ` > ${th.yellow} 🔴` + (showResult ? (inRange === 3 ? '◀' : ' ◽') : '');
+        value+= `<= ${th.green} ✅` + (showResult ? (inRange === 1 ? ' 🠴' : ' ') : '') + '<br>';
+        value+= `<= ${th.yellow} 🔶` + (showResult ? (inRange === 2 ? ' 🠴' : ' ') : '') + '<br>';
+        value+= ` > ${th.yellow} 🔴` + (showResult ? (inRange === 3 ? ' 🠴' : ' ') : '');
 
         value += '</small>';
 
