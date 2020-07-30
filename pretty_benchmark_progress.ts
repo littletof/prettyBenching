@@ -3,14 +3,14 @@ import {
   ProgressState,
   BenchmarkRunResult,
 } from "./deps.ts";
+import { Thresholds, BenchIndicator } from "./types.ts";
+import { getTimeColor,getBenchIndicator } from "./common.ts";
 
 import {
-  getTimeColor,
   getTimePadSize,
   usingHrTime,
   padEndVisible,
-  num,
-  getBenchIndicator,
+  num
 } from "./utils.ts";
 import { Colorer } from "./colorer.ts";
 
@@ -19,14 +19,14 @@ const lineLength = 130;
 const c: Colorer = new Colorer();
 
 export interface prettyBenchmarkProgressOptions {
-  thresholds?: { [key: string]: { green: number; yellow: number } };
-  indicators?: { benches: RegExp; modFn?: (str: string) => string }[];
+  thresholds?: Thresholds;
+  indicators?: BenchIndicator[];
   nocolor?: boolean;
 }
 
-interface ProgressOptions {
-  thresholds?: { [key: string]: { green: number; yellow: number } };
-  indicators?: { benches: RegExp; modFn?: (str: string) => string }[];
+interface ProgressOptions { // TODO delete
+  thresholds?: Thresholds;
+  indicators?: BenchIndicator[];
   nocolor: boolean;
 }
 

@@ -1,10 +1,12 @@
 import {
-  padEndVisible,
-  lDiff,
-  matchWithIndex,
   intersect,
   stripColor,
-  disjunct,
+  disjunct
+} from "./common.ts";
+import {
+  padEndVisible,
+  lDiff,
+  matchWithIndex
 } from "./utils.ts";
 
 const separatorToken = "#&imaseparator&#";

@@ -7,11 +7,8 @@ import {
   prettyBenchmarkCardResultOptions,
 } from "./benchmark_result_card.ts";
 
-// deno-lint-ignore no-explicit-any
-type outputFn = (log: string) => any;
-
 interface CommonOptions {
-  outputFn?: outputFn;
+  outputFn?: (log: string) => unknown;
 }
 
 export type prettyBenchmarkResultOptions =

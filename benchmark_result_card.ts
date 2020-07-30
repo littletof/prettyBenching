@@ -1,21 +1,21 @@
+import { BenchmarkResult } from "./deps.ts";
+import { BenchIndicator, Thresholds } from "./types.ts";
+import { getTimeColor,getBenchIndicator, calculateExtraMetrics } from "./common.ts";
+
 import {
-  getTimeColor,
   padEndVisible,
   padStartVisible,
   perc,
-  rtime,
-  getBenchIndicator,
+  rtime
 } from "./utils.ts";
+
 import { TableBuilder } from "./table.ts";
-import {
-  BenchmarkResult,
-} from "./deps.ts";
 import { Colorer } from "./colorer.ts";
 
 export interface prettyBenchmarkCardResultOptions {
   // type: "card"; TODO when multiple options
-  thresholds?: { [key: string]: { green: number; yellow: number } };
-  indicators?: CardIndicators[];
+  thresholds?: Thresholds;
+  indicators?: BenchIndicator[];
   nocolor?: boolean;
   parts?: {
     extraMetrics?: boolean;
@@ -25,15 +25,9 @@ export interface prettyBenchmarkCardResultOptions {
   };
 }
 
-export interface CardIndicators {
-  benches: RegExp;
-  modFn?: (str: string) => string;
-  tableColor?: (str: string) => string;
-}
-
-interface CardResultOptions {
-  thresholds?: { [key: string]: { green: number; yellow: number } };
-  indicators?: CardIndicators[];
+interface CardResultOptions { // TODO Delete
+  thresholds?: Thresholds;
+  indicators?: BenchIndicator[];
   nocolor: boolean;
   parts: {
     extraMetrics?: boolean;
@@ -170,18 +164,7 @@ function prettyBenchmarkMultipleRunCalcedMetrics(
   result: BenchmarkResult,
   options: CardResultOptions,
 ) {
-  const max = Math.max(...result.measuredRunsMs);
-  const min = Math.min(...result.measuredRunsMs);
-  const mean = (max + min) / 2; // not as avg
-
-  const sorted = [...result.measuredRunsMs].sort();
-  const middle = Math.floor(sorted.length / 2);
-  const median = sorted.length == 0
-    ? 0
-    : (sorted.length % 2 == 0 ? sorted[middle]
-    : (sorted[middle - 1] + sorted[middle]) / 2);
-
-  // const deviation = Math.sqrt(sorted.map(x => Math.pow(x-result.measuredRunsAvgMs,2)).reduce((a,b) => a+b)/sorted.length); // TODO find a place stdDeviation
+  const {max, min, mean, median} = calculateExtraMetrics(result);
 
   const minColor = getTimeColor(
     result.name,
@@ -277,11 +260,11 @@ function timeStr(time: number, from: number = 3) {
   return padEndVisible(`${rtime(time, from)} ${c.white("ms")} `, 9 + 4); // TODO gray ms?
 }
 
-function getTableColor(name: string, indicators?: CardIndicators[]) {
+function getTableColor(name: string, indicators?: BenchIndicator[]) {
   if (indicators && indicators.length > 0) {
     const indicator = indicators.find(({ benches }) => benches.test(name));
-    return !!indicator && typeof indicator.tableColor == "function"
-      ? indicator.tableColor
+    return !!indicator && typeof indicator.color == "function"
+      ? indicator.color
       : c.green;
   }
 

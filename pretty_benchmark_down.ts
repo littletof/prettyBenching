@@ -1,4 +1,6 @@
 import { BenchmarkRunResult, BenchmarkResult } from "./deps.ts";
+import { BenchIndicator, Thresholds } from "./types.ts";
+import { stripColor, getInThresholdRange, getBenchIndicator } from "./common.ts";
 
 // TODO historic: better or worse by x percent to last value
 
@@ -10,8 +12,7 @@ export interface prettyBenchmarkDownOptions {
     columns?: ColumnDefinition[];
 }
 
-// TODO move interfaces into a common file
-interface ColumnDefinition {
+export interface ColumnDefinition {
     title: string;
     propertyKey?: string;
     align?: 'left'|'center'|'right';
@@ -19,7 +20,7 @@ interface ColumnDefinition {
     formatter?: (result: BenchmarkResult, columnDef: ColumnDefinition) => string;
 }
 
-interface GroupDefinition {
+export interface GroupDefinition {
     include: RegExp;
     name: string;
     columns?: ColumnDefinition[];
@@ -27,20 +28,11 @@ interface GroupDefinition {
     afterTable?: string;
 }
 
-interface BenchIndicator {
-    benches: RegExp; 
-    modFn?: (str: string) => string;
-}
-
-interface Thresholds {
-    [key: string]: { green: number; yellow: number } 
-}
-
 export function prettyBenchmarkDown(outputFn: (out: string) => void, options?: prettyBenchmarkDownOptions) {
     return (result: BenchmarkRunResult) => _prettyBenchmarkDown(result, outputFn, options);
 }
 
-export function _prettyBenchmarkDown(runResult: BenchmarkRunResult, outputFn: (out: string) => void, options?: prettyBenchmarkDownOptions) {
+function _prettyBenchmarkDown(runResult: BenchmarkRunResult, outputFn: (out: string) => void, options?: prettyBenchmarkDownOptions) {
     let markdown = "";
 
     if(options?.title) {
@@ -125,17 +117,16 @@ export const defaultColumns: ColumnDefinition[] = [
 ];
 
 export function indicatorColumn(indicators: BenchIndicator[]): ColumnDefinition {
-    return {title: '', formatter: (result: BenchmarkResult, cd: ColumnDefinition) => {
-        const indicator = indicators.find(({ benches }) => benches.test(result.name));
-        return (!!indicator && typeof indicator.modFn == "function")
-            ? indicator.modFn('#').replace(/\x1b\[[0-9\;]*m/g, "") // strips terminal color // TODO use consts.ts for # everywhere
-            : " ";
-    }};
+    return {
+        title: '', formatter: (result: BenchmarkResult, cd: ColumnDefinition) => {
+            return stripColor(getBenchIndicator(result.name, indicators));
+        }
+    };
 }
 
 export function thresholdResultColumn(thresholds: Thresholds) {
     return {title: '', formatter: (result: BenchmarkResult, cd: ColumnDefinition) => {
-        const inRange = getInThresholdRange(result, thresholds);
+        const inRange = getInThresholdRange(result.name, result.measuredRunsAvgMs, thresholds);
         
         return ["-", "✅", "🔶", "🔴"][inRange || 0];
     }};
@@ -144,7 +135,7 @@ export function thresholdResultColumn(thresholds: Thresholds) {
 export function thresholdsColumn(thresholds: Thresholds, showResult?: boolean) {
     return {title: 'Thresholds', align: 'right', formatter: (result: BenchmarkResult, cd: ColumnDefinition) => {
         let value = "<small>";
-        const inRange = getInThresholdRange(result, thresholds);
+        const inRange = getInThresholdRange(result.name, result.measuredRunsAvgMs, thresholds);
         const th = thresholds && thresholds[result.name];
 
         if(!th) {
@@ -165,18 +156,6 @@ export function thresholdsColumn(thresholds: Thresholds, showResult?: boolean) {
 export function historyColumn(){
 
 }*/
-
-// TODO util
-function getInThresholdRange(result: BenchmarkResult, thresholds: Thresholds) {
-    const th = thresholds && thresholds[result.name];
-    const time = result.measuredRunsAvgMs;
-    if (!!th) {
-        if (time <= th.green) return 1;
-        if (time <= th.yellow) return 2;
-        if (th.yellow < time) return 3;
-    }
-    return null;
-}
 
 function headerRow(options?: prettyBenchmarkDownOptions, group?: GroupDefinition) {
     let titles = '|';
