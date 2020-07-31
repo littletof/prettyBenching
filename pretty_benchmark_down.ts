@@ -124,7 +124,7 @@ function _prettyBenchmarkDown(
         runResult,
       );
 
-      if(resultGroup) {
+      if (resultGroup) {
         markdown += headerRow(options, g);
         resultGroup.items.forEach((r: BenchmarkResult) => {
           markdown += tableRow(r, options, g);
@@ -135,13 +135,12 @@ function _prettyBenchmarkDown(
 
       markdown += "\n";
 
-      markdown +=
-        stringOrFunction(
-          g.afterTable,
-          resultGroup?.items,
-          g,
-          runResult,
-        ) + "\n";
+      markdown += stringOrFunction(
+        g.afterTable,
+        resultGroup?.items,
+        g,
+        runResult,
+      ) + "\n";
     });
   } else {
     markdown += headerRow(options);
