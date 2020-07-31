@@ -96,6 +96,9 @@ function _prettyBenchmarkDown(
 
     Object.keys(grouppedResults).forEach((k) => {
       const resultGroup = grouppedResults[k];
+      if(resultGroup.name === "unmatched" && resultGroup.items.length === 0) {
+        return;
+      }
 
       markdown += `## ${resultGroup.name}\n\n`;
 
