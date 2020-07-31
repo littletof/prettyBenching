@@ -229,7 +229,7 @@ export function extraMetricsColumns(
           }
 
           const calced = calculateStdDeviation(result);
-          return calced.toFixed(cd.toFixed || 3);
+          return `${calced}`;
         },
       });
     } else {
@@ -243,7 +243,7 @@ export function extraMetricsColumns(
           }
 
           const calced = calculateExtraMetrics(result);
-          return calced[s].toFixed(cd.toFixed || 3);
+          return `${calced[s]}`;
         },
       });
     }
@@ -311,8 +311,8 @@ function tableRow(
       }
     }
 
-    if (!isNaN(value) && !isNaN(c.toFixed!)) {
-      value = value.toFixed(c.toFixed);
+    if (!isNaN(parseFloat(value)) && !isNaN(c.toFixed!)) {
+      value = parseFloat(value).toFixed(c.toFixed);
     }
 
     values += `${value}|`;
