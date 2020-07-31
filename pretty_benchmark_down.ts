@@ -285,9 +285,10 @@ export function historyColumn(){
 
 }*/
 
-// deno-lint-ignore no-explicit-any
 function stringOrFunction(
+  // deno-lint-ignore no-explicit-any
   value?: ((...params: any[]) => string) | string,
+  // deno-lint-ignore no-explicit-any
   ...params: any[]
 ) {
   if (!value) {
