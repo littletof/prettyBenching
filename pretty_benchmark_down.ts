@@ -54,7 +54,7 @@ function _prettyBenchmarkDown(
   }
 
   if (options?.description) {
-    markdown += `${options.description}\n`;
+    markdown += `${options.description}\n\n`;
   }
 
   if (options?.groups && options.groups.length > 0) {
