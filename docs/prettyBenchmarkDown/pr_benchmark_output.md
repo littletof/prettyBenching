@@ -2,7 +2,7 @@
 
 This markdown was generated with the use of `prettyBenchmarkDown`.
 
-Check out how to generate a file like this: $link
+Check out how to generate a file like this: [pr_benchmarks.ts](https://github.com/littletof/prettyBenching/blob/docs/prettyBenchmarkDown/pr_benchmarks.ts)
 
 If you use a function for the `description` or `afterTables`, you can process the results here as well:
 
@@ -71,5 +71,7 @@ You can add `extraMetrics` columns too. In its `metrics` array you can define wh
 This is the `afterTables`. This behaves the same as `description`, it just puts this at the bottom of the markdown.
 Here its defined with a simple string.
 
-Check out the Github Action, which comments a markdown like this on PRs: $link
+Check out the Github Action, which comments a markdown like this on PRs: [pr_benchmarks.yml](https://github.com/littletof/prettyBenching/blob/docs/prettyBenchmarkDown/pr_benchmarks.yml).
+
+You can find an example repo that uses it [here](https://github.com/littletof/pretty-benching-action/pull/2)
 

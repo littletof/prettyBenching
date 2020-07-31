@@ -144,7 +144,7 @@ runBenchmarks(
     {
       title: "An example benchMarkdown",
       description: (runResult: BenchmarkRunResult) =>
-        `This markdown was generated with the use of \`prettyBenchmarkDown\`, the only things changed, are the code blocks, which were inserted afterwards.\nIf you use a function for the \`description\` or \`afterTables\`, you can process the results here as well: \n\n > In this benchmark ${runResult.results.length} benches were run, ${runResult.filtered} were filtered.`,
+        `This markdown was generated with the use of \`prettyBenchmarkDown\`.\nIf you use a function for the \`description\` or \`afterTables\`, you can process the results here as well: \n\n > In this benchmark ${runResult.results.length} benches were run, ${runResult.filtered} were filtered.`,
       afterTables:
         "\n---\n\nThis is the `afterTables`. This behaves the same as \`description\`, it just puts this at the bottom of the markdown.\nHere its defined with a simple string.\n\nCheck out the Github Action, which comments a markdown like this on PRs: $link",
       groups: [
