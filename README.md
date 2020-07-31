@@ -15,7 +15,7 @@ A simple Deno library, that gives you pretty benchmarking progress and results i
 
 [![prettyBenchmarkResults](https://img.shields.io/badge/-%F0%9F%94%B5%20prettyBenchmarkResults-4e4e4e)](#prettyBenchmarkResults)
 
-[![prettyBenchmarkDown](https://img.shields.io/badge/-%F0%9F%94%B5%20prettyBenchmarkDown-4e4e4e)](#prettyBenchmarkDown) [![deno version](https://img.shields.io/badge/Github_Action-4e4e4e?logo=github)](link)
+[![prettyBenchmarkDown](https://img.shields.io/badge/-%F0%9F%94%B5%20prettyBenchmarkDown-4e4e4e)](#prettyBenchmarkDown) [![deno version](https://img.shields.io/badge/Github_Action-4e4e4e?logo=github)](#as-github-action)
 
 [![deno version](https://img.shields.io/badge/ROADMAP-4e4e4e?logo=discover)](#roadmap)
 
@@ -35,13 +35,13 @@ Add the following to your `deps.ts`
 export {
   prettyBenchmarkResult,
   prettyBenchmarkProgress
-} from 'https://deno.land/x/pretty_benching@v0.1.2/mod.ts';
+} from 'https://deno.land/x/pretty_benching@v0.2.0/mod.ts';
 ```
 
 or just simply import it directly:
 
 ```ts
-import { prettyBenchmarkResult, prettyBenchmarkProgress } from 'https://deno.land/x/pretty_benching@v0.1.2/mod.ts';
+import { prettyBenchmarkResult, prettyBenchmarkProgress } from 'https://deno.land/x/pretty_benching@v0.2.0/mod.ts';
 ```
 
 ## Note
@@ -126,7 +126,7 @@ runBenchmarks({silent: true})
 
 The output would look something like this:
 
-![example](https://raw.githubusercontent.com/littletof/prettyBenching/master/docs/imgs/prettyBenchingResult_example.png)
+![<small>example</small>](https://raw.githubusercontent.com/littletof/prettyBenching/master/docs/imgs/prettyBenchingResult_example.png)
 
 ### Thresholds
 
@@ -215,6 +215,8 @@ With `graphBars` you can set how many bars it should show. Default is `5`.
 
 Generates a summary markdown from the results of the Deno `runBenchmarks()` method's result.
 
+An example output: [pr_benchmark_output.md](https://github.com/littletof/prettyBenching/blob/master/docs/prettyBenchmarkDown/pr_benchmark_output.md)
+
 ### Usage
 
 Simply call `prettyBenchmarkDown` with the desired settings.
@@ -245,7 +247,9 @@ Something like this:
 
 You can fully customise the generated `markdown`. Add text, use predefined, or custom columns or group your benchmarks and define these per group.
 
-**⚠TODO** Here you can seen an example that showcases every option.
+Here you can seen an example that showcases every option: [pr_benchmark_output.md](https://github.com/littletof/prettyBenching/blob/master/docs/prettyBenchmarkDown/pr_benchmark_output.md)
+
+It was generated with: [pr_benchmark_output.ts](https://github.com/littletof/prettyBenching/blob/master/docs/prettyBenchmarkDown/pr_benchmark_output.ts)
 
 #### Extra texts
 
@@ -255,32 +259,32 @@ You can fully customise the generated `markdown`. Add text, use predefined, or c
 
 #### Columns
 
-You can customise, what columns you want to see in each table. To see what every column type generates check out the example **TODO LINK + on every column type**
+You can customise, what columns you want to see in each table. To see what every column type generates check out the [<small>example</small>](https://github.com/littletof/prettyBenching/blob/master/docs/prettyBenchmarkDown/pr_benchmark_output.md)
 
 * If `not defined`, the generator uses the default columns defined by the module
 * If `defined`, you take full control, of what columns you want to see. The default columns are exported, and there are other premade columns for you to use.
 
-##### defaultColumns
+##### defaultColumns [<small>example</small>](https://github.com/littletof/prettyBenching/blob/master/docs/prettyBenchmarkDown/pr_benchmark_output.md#default-columns-and-dynamic-text)
 
 It includes `Name`, `Runs`, `Total (ms)` and `Average (ms)` columns, these are the default values of the `BenchmarkRunResult`.
 
-##### indicatorColumn(indicators?: BenchIndicator[])
+##### indicatorColumn(indicators?: BenchIndicator[]) [<small>example</small>](https://github.com/littletof/prettyBenching/blob/master/docs/prettyBenchmarkDown/pr_benchmark_output.md#predefiend-columns)
 
 Defines a column, that contains the indicator for the given bench, if defined. Keep in mind, that it strips any color from the indicator.
 
-##### thresholdsColumn(thresholds: Thresholds, indicateResult?: boolean)
+##### thresholdsColumn(thresholds: Thresholds, indicateResult?: boolean) [<small>example</small>](https://github.com/littletof/prettyBenching/blob/master/docs/prettyBenchmarkDown/pr_benchmark_output.md#predefiend-columns)
 
 Defines a column, that shows the threshold ranges for the given bench, if defined. If you set `indicateResult` to true, it shows in what range the benchmark fell, in the same cell.
 
-##### thresholdResultColumn(thresholds: Thresholds)
+##### thresholdResultColumn(thresholds: Thresholds) [<small>example</small>](https://github.com/littletof/prettyBenching/blob/master/docs/prettyBenchmarkDown/pr_benchmark_output.md#predefiend-columns)
 
 Defines a column, that show into what threhold range the benchmark fell.
 
-##### extraMetricsColumns(options?)
+##### extraMetricsColumns(options?) [<small>example</small>](https://github.com/littletof/prettyBenching/blob/master/docs/prettyBenchmarkDown/pr_benchmark_output.md#predefiend-columns)
 
 Defines columns, that show extra calculated metrics like `min`, `max`, `mean`, `median`, `stdDeviation`. You can define which of these you want, in the options. You can also tell it, to put `-` in the cells, where the benchmark was only run once.
 
-##### Custom columns
+##### Custom columns [<small>example</small>](https://github.com/littletof/prettyBenching/blob/master/docs/prettyBenchmarkDown/pr_benchmark_output.md#custom-columns)
 
 When you need something else, you can define you own columns. You can put custom `ColumnDefinitions` into the `columns` array.
 
@@ -309,11 +313,11 @@ You can also define `description` and `afterTable`, which behave the same like t
 
 If you want, you can have different columns in each group, if you define them in the groups `columns` array.
   
-### As github action
+### As a Github Action
 
-Use this as a github action, eg. comment benchmark results on PRs.
+Use this in a github action, eg. comment benchmark results on PRs.
 
-You can see an example Github Action for this here, and see the generated comments here.
+You can see an example Github Action for this [here](https://github.com/littletof/prettyBenching/blob/master/docs/prettyBenchmarkDown/pr_benchmark.yml) or see it in use in a showcase [repo](https://github.com/littletof/pretty-benching-action/pull/2).
 
 # Roadmap
 

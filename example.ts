@@ -1,19 +1,6 @@
 import {
   prettyBenchmarkProgress,
   prettyBenchmarkResult,
-} from "https://deno.land/x/pretty_benching@v0.1.2/mod.ts";
-
-import {
-  runBenchmarks,
-  bench,
-  BenchmarkResult,
-  BenchmarkRunResult,
-} from "https://deno.land/std@0.62.0/testing/bench.ts";
-
-import * as colors from "https://deno.land/std@0.62.0/fmt/colors.ts";
-
-// TODO fix import
-import {
   prettyBenchmarkDown,
   defaultColumns,
   indicatorColumn,
@@ -22,7 +9,14 @@ import {
   ColumnDefinition,
   extraMetricsColumns,
   GroupDefinition,
-} from "./pretty_benchmark_down.ts";
+} from "https://deno.land/x/pretty_benching@v0.2.0/mod.ts";
+
+import {
+  runBenchmarks,
+  bench,
+} from "https://deno.land/std@0.62.0/testing/bench.ts";
+
+import * as colors from "https://deno.land/std@0.62.0/fmt/colors.ts";
 
 bench({
   name: "Sorting arrays",
