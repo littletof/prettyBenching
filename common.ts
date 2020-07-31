@@ -71,7 +71,7 @@ export function calculateExtraMetrics(result: BenchmarkResult) {
   const middle = Math.floor(sorted.length / 2);
   const median = sorted.length == 0
     ? 0
-    : (sorted.length % 2 == 0 ? sorted[middle]
+    : (sorted.length % 2 !== 0 ? sorted[middle]
     : (sorted[middle - 1] + sorted[middle]) / 2);
 
   return {
