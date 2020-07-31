@@ -222,26 +222,28 @@ export function extraMetricsColumns(
       columns.push({
         title: "std deviation",
         align: "right",
+        toFixed: 3,
         formatter: (result: BenchmarkResult, cd: ColumnDefinition) => {
           if (options?.ignoreSingleRuns && result.runsCount === 1) {
             return "-";
           }
 
           const calced = calculateStdDeviation(result);
-          return calced.toFixed(3);
+          return calced.toFixed(cd.toFixed || 3);
         },
       });
     } else {
       columns.push({
         title: s,
         align: "right",
+        toFixed: 3,
         formatter: (result: BenchmarkResult, cd: ColumnDefinition) => {
           if (options?.ignoreSingleRuns && result.runsCount === 1) {
             return "-";
           }
 
           const calced = calculateExtraMetrics(result);
-          return calced[s].toFixed(3);
+          return calced[s].toFixed(cd.toFixed || 3);
         },
       });
     }
@@ -258,7 +260,7 @@ export function historyColumn(){
 // deno-lint-ignore no-explicit-any
 function stringOrFunction(value?: ((...params: any[]) => string) | string, ...params: any[]) {
   if(!value) {
-    return undefined;
+    return '';
   }
 
   if(typeof value === 'function') {
