@@ -1,36 +1,5 @@
-import { colors } from "./deps.ts";
-const { green, yellow, red, white } = colors;
-
-export function getTimeColor(
-  name: string,
-  time: number,
-  nocolor: boolean,
-  threshold?: { [key: string]: { green: number; yellow: number } },
-) {
-  if (nocolor) return (str: string) => str;
-  const th = threshold && threshold[name];
-  if (!!th) {
-    if (time <= th.green) return green;
-    if (time <= th.yellow) return yellow;
-    if (th.yellow < time) return red;
-  }
-  return yellow;
-}
-
-export function getBenchIndicator(
-  name: string,
-  indicators?: { benches: RegExp; modFn?: (str: string) => string }[],
-) {
-  if (indicators && indicators.length > 0) {
-    const indChar = "#"; // TODO should be ▒ but doesnt work with stdout https://github.com/denoland/deno/issues/6001
-    const indicator = indicators.find(({ benches }) => benches.test(name));
-    return (!!indicator && typeof indicator.modFn == "function")
-      ? indicator.modFn(indChar)
-      : " ";
-  }
-
-  return "";
-}
+import { BenchmarkResult } from "./deps.ts";
+import { stripColor } from "./common.ts";
 
 export function getTimePadSize() {
   return 12; // TODO
@@ -49,11 +18,11 @@ export function isFloat(num: number) {
   return num % 1 !== 0;
 }
 
-export function padEndVisible(str: string, to: number, char: string = " ") {
+export function padEndVisible(str: string, to: number, char = " ") {
   return str.padEnd(to + lDiff(str), char);
 }
 
-export function padStartVisible(str: string, to: number, char: string = " ") {
+export function padStartVisible(str: string, to: number, char = " ") {
   return str.padStart(to + lDiff(str), char);
 }
 
@@ -65,7 +34,7 @@ export function perc(num: number) {
   return (num % 1 !== 0 && num < 99.9995) ? num.toFixed(1) : num.toFixed();
 }
 
-export function rtime(num: number, from: number = 0) {
+export function rtime(num: number, from = 0) {
   const log = Math.max(Math.floor(Math.log10(num)), 0);
   const defPrec = isFloat(num) ? 4 : 0;
   return num.toFixed(Math.max(defPrec - Math.max(log - from, 0), 0));
@@ -76,10 +45,7 @@ export function lDiff(str: string) {
   return str.length - escaped.length;
 }
 
-export function stripColor(str: string) {
-  return str.replace(/\x1b\[[0-9\;]*m/g, "");
-}
-
+/** returns an array, that contains each index where the regexp mathes the string */
 export function matchWithIndex(line: string, regexp: RegExp) {
   const indexes = [];
   let match;
@@ -87,12 +53,4 @@ export function matchWithIndex(line: string, regexp: RegExp) {
     indexes.push(match.index);
   }
   return indexes;
-}
-
-export function intersect(a: unknown[], b: unknown[]) {
-  return a.filter((value) => -1 !== b.indexOf(value));
-}
-
-export function disjunct(base: unknown[], dis: unknown[]) {
-  return base.filter((value) => -1 === dis.indexOf(value));
 }

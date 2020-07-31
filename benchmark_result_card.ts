@@ -1,41 +1,27 @@
+import { BenchmarkResult } from "./deps.ts";
+import { BenchIndicator, Thresholds } from "./types.ts";
 import {
   getTimeColor,
+  getBenchIndicator,
+  calculateExtraMetrics,
+} from "./common.ts";
+
+import {
   padEndVisible,
   padStartVisible,
   perc,
   rtime,
-  getBenchIndicator,
 } from "./utils.ts";
+
 import { TableBuilder } from "./table.ts";
-import {
-  BenchmarkResult,
-} from "./deps.ts";
 import { Colorer } from "./colorer.ts";
 
 export interface prettyBenchmarkCardResultOptions {
   // type: "card"; TODO when multiple options
-  thresholds?: { [key: string]: { green: number; yellow: number } };
-  indicators?: CardIndicators[];
+  thresholds?: Thresholds;
+  indicators?: BenchIndicator[];
   nocolor?: boolean;
   parts?: {
-    extraMetrics?: boolean;
-    threshold?: boolean;
-    graph?: boolean;
-    graphBars?: number;
-  };
-}
-
-export interface CardIndicators {
-  benches: RegExp;
-  modFn?: (str: string) => string;
-  tableColor?: (str: string) => string;
-}
-
-interface CardResultOptions {
-  thresholds?: { [key: string]: { green: number; yellow: number } };
-  indicators?: CardIndicators[];
-  nocolor: boolean;
-  parts: {
     extraMetrics?: boolean;
     threshold?: boolean;
     graph?: boolean;
@@ -49,27 +35,24 @@ let c: Colorer;
 export function getResultCard(
   result: BenchmarkResult,
   colorer: Colorer,
-  {
-    nocolor = false,
-    indicators,
-    thresholds,
-    parts = { graph: true, graphBars: 5 },
-  }: prettyBenchmarkCardResultOptions = {
-    nocolor: false,
-    parts: { graph: true, graphBars: 5 },
-  },
+  options?: prettyBenchmarkCardResultOptions,
 ) {
   c = colorer;
-  const options: CardResultOptions = {
-    parts,
-    nocolor,
-    indicators,
-    thresholds,
+
+  const defaultOptions: prettyBenchmarkCardResultOptions = {
+    parts: { graph: true, graphBars: 5 },
   };
-  const tableColor = getTableColor(result.name, options.indicators);
+
+  // define default options and default parts
+  options = options || defaultOptions;
+  if (!options.parts) {
+    options.parts = defaultOptions.parts;
+  }
+
+  const tableColor = getTableColor(result.name, options?.indicators);
   const tb = new TableBuilder(91, tableColor);
 
-  const needsThreshold = options.parts.threshold && !!options.thresholds &&
+  const needsThreshold = options.parts!.threshold && !!options.thresholds &&
     Object.keys(options.thresholds).length != 0;
 
   prettyBenchmarkHeader(tb, result, options);
@@ -78,10 +61,10 @@ export function getResultCard(
     needsThreshold && prettyBenchmarkThresholdLine(tb, result, options);
   } else {
     prettyBenchmarkMultipleRunMetrics(tb, result, options);
-    options.parts.extraMetrics &&
+    options.parts!.extraMetrics &&
       prettyBenchmarkMultipleRunCalcedMetrics(tb, result, options);
     needsThreshold && prettyBenchmarkThresholdLine(tb, result, options);
-    if (options.parts.graph && result.runsCount >= 10) {
+    if (options.parts!.graph && result.runsCount >= 10) {
       prettyBenchmarkMultipleRunGraph(tb, result, options);
     }
   }
@@ -92,7 +75,7 @@ export function getResultCard(
 function prettyBenchmarkHeader(
   tb: TableBuilder,
   r: BenchmarkResult,
-  options: CardResultOptions,
+  options: prettyBenchmarkCardResultOptions,
 ) {
   const indicator = getBenchIndicator(r.name, options.indicators);
   const indTab = indicator == ""
@@ -105,7 +88,7 @@ function prettyBenchmarkHeader(
 function prettyBenchmarkSingleRunMetrics(
   tb: TableBuilder,
   result: BenchmarkResult,
-  options: CardResultOptions,
+  options: prettyBenchmarkCardResultOptions,
 ) {
   const totalRuns = `Total runs: ${c.yellow("1".padEnd(7))}`;
   const timeColor = getTimeColor(
@@ -125,7 +108,7 @@ function prettyBenchmarkSingleRunMetrics(
 function prettyBenchmarkThresholdLine(
   tb: TableBuilder,
   result: BenchmarkResult,
-  options: CardResultOptions,
+  options: prettyBenchmarkCardResultOptions,
 ) {
   const threshold = options.thresholds && options.thresholds[result.name];
   if (threshold) {
@@ -142,7 +125,7 @@ function prettyBenchmarkThresholdLine(
 function prettyBenchmarkMultipleRunMetrics(
   tb: TableBuilder,
   result: BenchmarkResult,
-  options: CardResultOptions,
+  options: prettyBenchmarkCardResultOptions,
 ) {
   const totalRuns = `Total runs: ${
     padEndVisible(c.yellow((result.runsCount).toString()), 7)
@@ -168,20 +151,9 @@ function prettyBenchmarkMultipleRunMetrics(
 function prettyBenchmarkMultipleRunCalcedMetrics(
   tb: TableBuilder,
   result: BenchmarkResult,
-  options: CardResultOptions,
+  options: prettyBenchmarkCardResultOptions,
 ) {
-  const max = Math.max(...result.measuredRunsMs);
-  const min = Math.min(...result.measuredRunsMs);
-  const mean = (max + min) / 2; // not as avg
-
-  const sorted = [...result.measuredRunsMs].sort();
-  const middle = Math.floor(sorted.length / 2);
-  const median = sorted.length == 0
-    ? 0
-    : (sorted.length % 2 == 0 ? sorted[middle]
-    : (sorted[middle - 1] + sorted[middle]) / 2);
-
-  // const deviation = Math.sqrt(sorted.map(x => Math.pow(x-result.measuredRunsAvgMs,2)).reduce((a,b) => a+b)/sorted.length); // TODO find a place stdDeviation
+  const { max, min, mean, median } = calculateExtraMetrics(result);
 
   const minColor = getTimeColor(
     result.name,
@@ -220,9 +192,9 @@ function prettyBenchmarkMultipleRunCalcedMetrics(
 function prettyBenchmarkMultipleRunGraph(
   tb: TableBuilder,
   result: BenchmarkResult,
-  options: CardResultOptions,
+  options: prettyBenchmarkCardResultOptions,
 ) {
-  const barsCount = options.parts.graphBars || 5;
+  const barsCount = options.parts!.graphBars || 5;
 
   const max = Math.max(...result.measuredRunsMs);
   const min = Math.min(...result.measuredRunsMs);
@@ -273,15 +245,15 @@ function prettyBenchmarkMultipleRunGraph(
   tb.separator();
 }
 
-function timeStr(time: number, from: number = 3) {
+function timeStr(time: number, from = 3) {
   return padEndVisible(`${rtime(time, from)} ${c.white("ms")} `, 9 + 4); // TODO gray ms?
 }
 
-function getTableColor(name: string, indicators?: CardIndicators[]) {
+function getTableColor(name: string, indicators?: BenchIndicator[]) {
   if (indicators && indicators.length > 0) {
     const indicator = indicators.find(({ benches }) => benches.test(name));
-    return !!indicator && typeof indicator.tableColor == "function"
-      ? indicator.tableColor
+    return !!indicator && typeof indicator.color == "function"
+      ? indicator.color
       : c.green;
   }
 

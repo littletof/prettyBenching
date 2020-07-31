@@ -7,9 +7,13 @@ test({
     assert(mod != null);
     assertEquals(typeof mod.prettyBenchmarkResult, "function");
     assertEquals(typeof mod.prettyBenchmarkProgress, "function");
-    // assertEquals(typeof mod.TestCase, "symbol");
-    /* assertEquals(typeof mod.httpErrors, "object");
-      assertEquals(typeof mod.REDIRECT_BACK, "symbol"); */
-    assertEquals(Object.keys(mod).length, 2);
+
+    assertEquals(typeof mod.prettyBenchmarkDown, "function");
+    assertEquals(typeof mod.indicatorColumn, "function");
+    assertEquals(typeof mod.thresholdsColumn, "function");
+    assertEquals(typeof mod.thresholdResultColumn, "function");
+    assertEquals(typeof mod.extraMetricsColumns, "function");
+    assertEquals(typeof mod.defaultColumns, "object");
+    assertEquals(Object.keys(mod).length, 8);
   },
 });

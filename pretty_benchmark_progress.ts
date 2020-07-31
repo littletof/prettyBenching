@@ -3,14 +3,14 @@ import {
   ProgressState,
   BenchmarkRunResult,
 } from "./deps.ts";
+import { Thresholds, BenchIndicator } from "./types.ts";
+import { getTimeColor, getBenchIndicator } from "./common.ts";
 
 import {
-  getTimeColor,
   getTimePadSize,
   usingHrTime,
   padEndVisible,
   num,
-  getBenchIndicator,
 } from "./utils.ts";
 import { Colorer } from "./colorer.ts";
 
@@ -19,30 +19,23 @@ const lineLength = 130;
 const c: Colorer = new Colorer();
 
 export interface prettyBenchmarkProgressOptions {
-  thresholds?: { [key: string]: { green: number; yellow: number } };
-  indicators?: { benches: RegExp; modFn?: (str: string) => string }[];
+  thresholds?: Thresholds;
+  indicators?: BenchIndicator[];
   nocolor?: boolean;
 }
 
-interface ProgressOptions {
-  thresholds?: { [key: string]: { green: number; yellow: number } };
-  indicators?: { benches: RegExp; modFn?: (str: string) => string }[];
-  nocolor: boolean;
-}
-
 export function prettyBenchmarkProgress(
-  { thresholds, indicators, nocolor = false }: prettyBenchmarkProgressOptions =
-    {},
+  options?: prettyBenchmarkProgressOptions,
 ) {
-  if (nocolor) c.setColorEnabled(false);
+  if (options?.nocolor) c.setColorEnabled(false);
 
   return (progress: BenchmarkRunProgress) =>
-    _prettyBenchmarkProgress(progress, { thresholds, indicators, nocolor });
+    _prettyBenchmarkProgress(progress, options);
 }
 
 function _prettyBenchmarkProgress(
   progress: BenchmarkRunProgress,
-  options: ProgressOptions,
+  options?: prettyBenchmarkProgressOptions,
 ) {
   // Started benching
   if (progress.state === ProgressState.BenchmarkingStart) {
@@ -110,7 +103,7 @@ function considerPrecise(result: BenchmarkRunResult) {
 
 function startingBenchmarkLine(
   progress: BenchmarkRunProgress,
-  options: ProgressOptions,
+  options?: prettyBenchmarkProgressOptions,
 ): string {
   const fullName = benchNameFormatted(progress.running!.name, options);
   const fullTimes = `[${
@@ -123,7 +116,7 @@ function startingBenchmarkLine(
 
 function runningBenchmarkLine(
   progress: BenchmarkRunProgress,
-  options: ProgressOptions,
+  options?: prettyBenchmarkProgressOptions,
 ): string {
   const percent = Math.round(
     progress.running!.measuredRunsMs.length / progress.running!.runsCount * 100,
@@ -159,7 +152,7 @@ function runningBenchmarkLine(
 
 function finishedBenchmarkLine(
   progress: BenchmarkRunProgress,
-  options: ProgressOptions,
+  options?: prettyBenchmarkProgressOptions,
 ): string {
   const result = [...progress.results].reverse()[0];
 
@@ -180,7 +173,7 @@ function finishedBenchmarkLine(
   const colorFn = getTimeColor(
     result.name,
     avgTime,
-    options.nocolor,
+    options?.nocolor,
     options?.thresholds,
   );
   const coloredTime = colorFn(paddedAvgTime);
@@ -194,7 +187,7 @@ function finishedBenchmarkLine(
 
 function startBenchingLine(
   progress: BenchmarkRunProgress,
-  options: ProgressOptions,
+  options?: prettyBenchmarkProgressOptions,
 ): string {
   const cyanHeader = `${c.cyan(headerPadding)}`;
   const fullQueued = `Benchmarks queued: [${
@@ -207,7 +200,10 @@ function startBenchingLine(
   return `\n${cyanHeader} Starting benchmarking\n${cyanHeader} ${fullQueued} ${fullFiltered}\n`;
 }
 
-function benchNameFormatted(name: string, options: ProgressOptions) {
-  return `${getBenchIndicator(name, options.indicators)}` +
+function benchNameFormatted(
+  name: string,
+  options?: prettyBenchmarkProgressOptions,
+) {
+  return `${getBenchIndicator(name, options?.indicators)}` +
     `[${c.cyan(name)} ${c.gray(padEndVisible("", 40 - name.length, "-"))}]`;
 }

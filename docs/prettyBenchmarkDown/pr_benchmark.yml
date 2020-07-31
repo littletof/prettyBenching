@@ -1,0 +1,21 @@
+name: Benchmark PR
+on: [pull_request]
+jobs:
+  build:
+    name: ubuntu-latest
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v2
+      - name: Install deno
+        uses: denolib/setup-deno@master
+        with:
+          deno-version: 1.2.1
+      - name: Bench It
+        run: deno run --allow-hrtime ./benchmarks/pr_benchmarks.ts | tee ./benchmarks/pr_benchmark.md
+      - uses: harupy/comment-on-pr@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          filename: ../../benchmarks/pr_benchmark.md

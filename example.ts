@@ -6,9 +6,23 @@ import {
 import {
   runBenchmarks,
   bench,
-} from "https://deno.land/std@0.61.0/testing/bench.ts";
+  BenchmarkResult,
+  BenchmarkRunResult,
+} from "https://deno.land/std@0.62.0/testing/bench.ts";
 
-import * as colors from "https://deno.land/std@0.61.0/fmt/colors.ts";
+import * as colors from "https://deno.land/std@0.62.0/fmt/colors.ts";
+
+// TODO fix import
+import {
+  prettyBenchmarkDown,
+  defaultColumns,
+  indicatorColumn,
+  thresholdResultColumn,
+  thresholdsColumn,
+  ColumnDefinition,
+  extraMetricsColumns,
+  GroupDefinition,
+} from "./pretty_benchmark_down.ts";
 
 bench({
   name: "Sorting arrays",
@@ -85,18 +99,17 @@ const indicators = [
 runBenchmarks(
   { silent: true, skip: /_long/ },
   prettyBenchmarkProgress({ indicators, thresholds }),
-)
-  .then(
-    prettyBenchmarkResult(
-      {
-        thresholds,
-        indicators,
-        parts: {
-          extraMetrics: true,
-          threshold: true,
-          graph: true,
-          graphBars: 5,
-        },
+).then(
+  prettyBenchmarkResult(
+    {
+      thresholds,
+      indicators,
+      parts: {
+        extraMetrics: true,
+        threshold: true,
+        graph: true,
+        graphBars: 5,
       },
-    ),
-  );
+    },
+  ),
+);
