@@ -12,8 +12,8 @@ import {
 
 export interface prettyBenchmarkDownOptions {
   title?: string;
-  description?: string;
-  afterTables?: string;
+  description?: string | ((results: BenchmarkRunResult) => string);
+  afterTables?: string | ((results: BenchmarkRunResult) => string);
   groups?: GroupDefinition[];
   columns?: ColumnDefinition[];
 }
@@ -30,8 +30,8 @@ export interface GroupDefinition {
   include: RegExp;
   name: string;
   columns?: ColumnDefinition[];
-  description?: string;
-  afterTable?: string;
+  description?: string | ((groupResults: BenchmarkResult[], group: GroupDefinition, runResults: BenchmarkRunResult) => string);
+  afterTable?: string | ((groupResults: BenchmarkResult[], group: GroupDefinition, runResults: BenchmarkRunResult) => string);
 }
 
 export function prettyBenchmarkDown(
@@ -53,9 +53,7 @@ function _prettyBenchmarkDown(
     markdown += `# ${options.title}\n\n`;
   }
 
-  if (options?.description) {
-    markdown += `${options.description}\n\n`;
-  }
+  markdown += stringOrFunction(options?.description, runResult) + '\n';  
 
   if (options?.groups && options.groups.length > 0) {
     let grouppedResults: {
@@ -105,9 +103,7 @@ function _prettyBenchmarkDown(
 
       markdown += `## ${resultGroup.name}\n\n`;
 
-      if (resultGroup.description) {
-        markdown += `${resultGroup.description}\n`;
-      }
+      markdown += stringOrFunction(resultGroup.description, resultGroup.items, g, runResult);
 
       markdown += headerRow(options, resultGroup);
       resultGroup.items.forEach((r: BenchmarkResult) => {
@@ -116,9 +112,7 @@ function _prettyBenchmarkDown(
 
       markdown += "\n";
 
-      if (resultGroup.afterTable) {
-        markdown += `${resultGroup.afterTable}\n\n`;
-      }
+      markdown += stringOrFunction(resultGroup.afterTable, resultGroup.items, g, runResult) + '\n';
     });
   } else {
     markdown += headerRow(options);
@@ -128,9 +122,7 @@ function _prettyBenchmarkDown(
     markdown += "\n";
   }
 
-  if (options?.afterTables) {
-    markdown += `${options.afterTables}\n\n`;
-  }
+  markdown += stringOrFunction(options?.afterTables, runResult) + '\n';
 
   outputFn(markdown);
 
@@ -262,6 +254,18 @@ export function extraMetricsColumns(
 export function historyColumn(){
 
 }*/
+
+function stringOrFunction(value?: ((...params: any[]) => string) | string, ...params: any[]) {
+  if(!value) {
+    return undefined;
+  }
+
+  if(typeof value === 'function') {
+    return `${value(...params)}\n`;
+  } else {
+    return `${value}\n`;
+  }
+}
 
 function headerRow(
   options?: prettyBenchmarkDownOptions,

@@ -7,6 +7,7 @@ import {
   runBenchmarks,
   bench,
   BenchmarkResult,
+  BenchmarkRunResult,
 } from "https://deno.land/std@0.62.0/testing/bench.ts";
 
 import * as colors from "https://deno.land/std@0.62.0/fmt/colors.ts";
@@ -20,6 +21,7 @@ import {
   thresholdsColumn,
   ColumnDefinition,
   extraMetricsColumns,
+  GroupDefinition,
 } from "./pretty_benchmark_down.ts";
 
 bench({
@@ -115,8 +117,8 @@ runBenchmarks(
   // .then(prettyBenchmarkDown({title: 'test', description:'Idontknow but anything goes here', footer:'Summa summárum', output: console.log, groups: [{include: /arrays/, name: 'Arrays', description: 'ez array műveletes'}, {include: /[sS]/, name: 'S', description: 'SSSS'}]}));
   .then(prettyBenchmarkDown(console.log, {
     title: "MY example benchMarkdown",
-    description: "long text",
-    afterTables: "---\n This can be a footer or something else",
+    description: (rr: BenchmarkRunResult) => `General description ${rr.results.length} benches, ${rr.filtered} filtered`,
+    afterTables: (rr: BenchmarkRunResult) => `---\nGeneral afterTable ${rr.results.length} benches, ${rr.filtered} filtered`,
     columns: [
       indicatorColumn(indicators),
       ...defaultColumns,
@@ -137,4 +139,11 @@ runBenchmarks(
       // {title: 'tresholds', toFixed: 3, formatter: (result: BenchmarkResult, cd: any) => { return '<small><= 123 ✅<br/><= 654 🔶<br/> > 654 🔴</small>'; }, align: "right"},
       // {title: 'historic', toFixed: 3, formatter: (result: BenchmarkResult, cd: any) => { return Math.random() > 0.5 ? `+10% 🔼`:' -5% 🔰'; }, align: "right"}
     ],
+    groups: [
+      {
+        include: /./, name: 'Functions',
+        description: (gr: BenchmarkResult[], g: GroupDefinition, rr: BenchmarkRunResult) => `Im in \`${g.name}\` description, ${gr.length} benches in this group, ${rr.results.length} overall in run `,
+        afterTable: (gr: BenchmarkResult[], g: GroupDefinition, rr: BenchmarkRunResult) => `Im in \`${g.name}\` afterTable, ${gr.length} benches in this group, ${rr.results.length} overall in run `
+      }
+    ]
   }));
