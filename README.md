@@ -15,7 +15,7 @@ A simple Deno library, that gives you pretty benchmarking progress and results i
 
 [![prettyBenchmarkResults](https://img.shields.io/badge/-%F0%9F%94%B5%20prettyBenchmarkResults-4e4e4e)](#prettyBenchmarkResults)
 
-[![prettyBenchmarkDown](https://img.shields.io/badge/-%F0%9F%94%B5%20prettyBenchmarkDown-4e4e4e)](#prettyBenchmarkDown) [![deno version](https://img.shields.io/badge/Github_Action-4e4e4e?logo=github)](#as-github-action)
+[![prettyBenchmarkDown](https://img.shields.io/badge/-%F0%9F%94%B5%20prettyBenchmarkDown-4e4e4e)](#prettyBenchmarkDown) [![deno version](https://img.shields.io/badge/Github_Action-4e4e4e?logo=github)](#as-a-github-action)
 
 [![deno version](https://img.shields.io/badge/ROADMAP-4e4e4e?logo=discover)](#roadmap)
 
@@ -249,7 +249,7 @@ You can fully customise the generated `markdown`. Add text, use predefined, or c
 
 Here you can seen an example that showcases every option: [pr_benchmark_output.md](https://github.com/littletof/prettyBenching/blob/master/docs/prettyBenchmarkDown/pr_benchmark_output.md)
 
-It was generated with: [pr_benchmark_output.ts](https://github.com/littletof/prettyBenching/blob/master/docs/prettyBenchmarkDown/pr_benchmark_output.ts)
+It was generated with: [pr_benchmarks.ts](https://github.com/littletof/prettyBenching/blob/master/docs/prettyBenchmarkDown/pr_benchmarks.ts)
 
 #### Extra texts
 
@@ -280,7 +280,7 @@ Defines a column, that shows the threshold ranges for the given bench, if define
 
 Defines a column, that show into what threhold range the benchmark fell.
 
-##### extraMetricsColumns(options?) [<small>example</small>](https://github.com/littletof/prettyBenching/blob/master/docs/prettyBenchmarkDown/pr_benchmark_output.md#predefiend-columns)
+##### extraMetricsColumns(options?) [<small>example</small>](https://github.com/littletof/prettyBenching/blob/master/docs/prettyBenchmarkDown/pr_benchmark_output.md#extra-metrics)
 
 Defines columns, that show extra calculated metrics like `min`, `max`, `mean`, `median`, `stdDeviation`. You can define which of these you want, in the options. You can also tell it, to put `-` in the cells, where the benchmark was only run once.
 
