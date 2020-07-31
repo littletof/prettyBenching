@@ -87,18 +87,21 @@ function _prettyBenchmarkDown(
             i.name === r.name && i.totalMs === r.totalMs
           )
         ) {
+          // if isnt already added, add to unmatched group
           unmatched.items.push(r);
         }
       }
     });
 
-    grouppedResults["unmatched"] = unmatched;
+    grouppedResults[unmatched.name] = unmatched;
 
-    Object.keys(grouppedResults).forEach((k) => {
-      const resultGroup = grouppedResults[k];
-      if(k === "unmatched" && resultGroup.items.length === 0) {
-        return;
-      }
+    const optionsGroup = [...options.groups];
+    if(unmatched.items.length > 0) {
+      optionsGroup.push(unmatched);
+    }
+
+    optionsGroup.forEach((g) => { // to keep order works from options.
+      const resultGroup = grouppedResults[g.name];
 
       markdown += `## ${resultGroup.name}\n\n`;
 
@@ -114,7 +117,7 @@ function _prettyBenchmarkDown(
       markdown += "\n";
 
       if (resultGroup.afterTable) {
-        markdown += `${resultGroup.afterTable}\n`;
+        markdown += `${resultGroup.afterTable}\n\n`;
       }
     });
   } else {
@@ -126,7 +129,7 @@ function _prettyBenchmarkDown(
   }
 
   if (options?.afterTables) {
-    markdown += `${options.afterTables}\n`;
+    markdown += `${options.afterTables}\n\n`;
   }
 
   outputFn(markdown);
