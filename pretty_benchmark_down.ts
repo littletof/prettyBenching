@@ -79,13 +79,15 @@ function _prettyBenchmarkDown(
 
     runResult.results.forEach((r) => {
       let matched = false;
-      options.groups?.forEach((g) => {
+      options.groups?.forEach((g, i) => {
         if (r.name.match(g.include)) {
-          if (!grouppedResults[g.name]) {
-            grouppedResults[g.name] = { ...g, items: [] };
+          const group_prop = `${g.name}_${i}`;
+
+          if (!grouppedResults[group_prop]) {
+            grouppedResults[group_prop] = { ...g, items: [] };
           }
 
-          grouppedResults[g.name].items.push(r);
+          grouppedResults[group_prop].items.push(r);
 
           matched = true;
         }
@@ -103,36 +105,40 @@ function _prettyBenchmarkDown(
       }
     });
 
-    grouppedResults[unmatched.name] = unmatched;
+    grouppedResults[`${unmatched.name}_${options.groups.length}`] = unmatched;
 
     const optionsGroup = [...options.groups];
     if (unmatched.items.length > 0) {
       optionsGroup.push(unmatched);
     }
 
-    optionsGroup.forEach((g) => { // to keep order works from options.
-      const resultGroup = grouppedResults[g.name];
+    optionsGroup.forEach((g, i) => { // to keep order works from options.
+      markdown += `## ${g.name}\n\n`;
 
-      markdown += `## ${resultGroup.name}\n\n`;
+      const resultGroup = grouppedResults[`${g.name}_${i}`];
 
       markdown += stringOrFunction(
-        resultGroup.description,
-        resultGroup.items,
+        g.description,
+        resultGroup?.items,
         g,
         runResult,
       );
 
-      markdown += headerRow(options, resultGroup);
-      resultGroup.items.forEach((r: BenchmarkResult) => {
-        markdown += tableRow(r, options, resultGroup);
-      });
+      if(resultGroup) {
+        markdown += headerRow(options, g);
+        resultGroup.items.forEach((r: BenchmarkResult) => {
+          markdown += tableRow(r, options, g);
+        });
+      } else {
+        markdown += "> No benchmarks in this group.\n";
+      }
 
       markdown += "\n";
 
       markdown +=
         stringOrFunction(
-          resultGroup.afterTable,
-          resultGroup.items,
+          g.afterTable,
+          resultGroup?.items,
           g,
           runResult,
         ) + "\n";
