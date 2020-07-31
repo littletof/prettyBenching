@@ -17,6 +17,7 @@ export {
   indicatorColumn,
   thresholdResultColumn,
   thresholdsColumn,
+  extraMetricsColumns,
   prettyBenchmarkDownOptions,
   ColumnDefinition,
   GroupDefinition,

@@ -4,6 +4,8 @@ import {
   stripColor,
   getInThresholdRange,
   getBenchIndicator,
+  calculateExtraMetrics,
+  calculateStdDeviation,
 } from "./common.ts";
 
 // TODO historic: better or worse by x percent to last value
@@ -167,7 +169,10 @@ export function thresholdResultColumn(thresholds: Thresholds) {
   };
 }
 
-export function thresholdsColumn(thresholds: Thresholds, showResult?: boolean) {
+export function thresholdsColumn(
+  thresholds: Thresholds,
+  indicateResult?: boolean,
+) {
   return {
     title: "Thresholds",
     align: "right",
@@ -184,20 +189,67 @@ export function thresholdsColumn(thresholds: Thresholds, showResult?: boolean) {
         return "-";
       }
 
+      const indicator = " 🠴";
+      const placeholder = " ";
+
       value += `<= ${th.green} ✅` +
-        (showResult ? (inRange === 1 ? " 🠴" : " ") : "") +
+        (indicateResult ? (inRange === 1 ? indicator : placeholder) : "") +
         "<br>";
       value += `<= ${th.yellow} 🔶` +
-        (showResult ? (inRange === 2 ? " 🠴" : " ") : "") +
+        (indicateResult ? (inRange === 2 ? indicator : placeholder) : "") +
         "<br>";
       value += ` > ${th.yellow} 🔴` +
-        (showResult ? (inRange === 3 ? " 🠴" : " ") : "");
+        (indicateResult ? (inRange === 3 ? indicator : placeholder) : "");
 
       value += "</small>";
 
       return value;
     },
   };
+}
+
+export function extraMetricsColumns(
+  options?: {
+    metrics?: ("max" | "min" | "mean" | "median" | "stdDeviation")[];
+    ignoreSingleRuns: boolean;
+  },
+): ColumnDefinition[] {
+  const columns: ColumnDefinition[] = [];
+
+  const selected = options?.metrics ||
+    ["min", "max", "mean", "median", "stdDeviation"];
+
+  selected.forEach((s) => {
+    if (s === "stdDeviation") {
+      columns.push({
+        title: "std deviation",
+        align: "right",
+        formatter: (result: BenchmarkResult, cd: ColumnDefinition) => {
+          if (options?.ignoreSingleRuns && result.runsCount === 1) {
+            return "-";
+          }
+
+          const calced = calculateStdDeviation(result);
+          return calced.toFixed(3);
+        },
+      });
+    } else {
+      columns.push({
+        title: s,
+        align: "right",
+        formatter: (result: BenchmarkResult, cd: ColumnDefinition) => {
+          if (options?.ignoreSingleRuns && result.runsCount === 1) {
+            return "-";
+          }
+
+          const calced = calculateExtraMetrics(result);
+          return calced[s].toFixed(3);
+        },
+      });
+    }
+  });
+
+  return columns;
 }
 
 /* TODO

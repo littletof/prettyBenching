@@ -19,6 +19,7 @@ import {
   thresholdResultColumn,
   thresholdsColumn,
   ColumnDefinition,
+  extraMetricsColumns,
 } from "./pretty_benchmark_down.ts";
 
 bench({
@@ -132,6 +133,7 @@ runBenchmarks(
           return result.measuredRunsAvgMs.toFixed(cd.toFixed) + "bambamarha";
         },
       },
+      ...extraMetricsColumns({ ignoreSingleRuns: true }),
       // {title: 'tresholds', toFixed: 3, formatter: (result: BenchmarkResult, cd: any) => { return '<small><= 123 ✅<br/><= 654 🔶<br/> > 654 🔴</small>'; }, align: "right"},
       // {title: 'historic', toFixed: 3, formatter: (result: BenchmarkResult, cd: any) => { return Math.random() > 0.5 ? `+10% 🔼`:' -5% 🔰'; }, align: "right"}
     ],

@@ -12,7 +12,8 @@ test({
     assertEquals(typeof mod.indicatorColumn, "function");
     assertEquals(typeof mod.thresholdsColumn, "function");
     assertEquals(typeof mod.thresholdResultColumn, "function");
+    assertEquals(typeof mod.extraMetricsColumns, "function");
     assertEquals(typeof mod.defaultColumns, "object");
-    assertEquals(Object.keys(mod).length, 7);
+    assertEquals(Object.keys(mod).length, 8);
   },
 });
