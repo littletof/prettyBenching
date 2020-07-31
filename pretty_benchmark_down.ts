@@ -96,7 +96,7 @@ function _prettyBenchmarkDown(
     grouppedResults[unmatched.name] = unmatched;
 
     const optionsGroup = [...options.groups];
-    if(unmatched.items.length > 0) {
+    if (unmatched.items.length > 0) {
       optionsGroup.push(unmatched);
     }
 
