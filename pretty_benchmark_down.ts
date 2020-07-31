@@ -255,6 +255,7 @@ export function historyColumn(){
 
 }*/
 
+// deno-lint-ignore no-explicit-any
 function stringOrFunction(value?: ((...params: any[]) => string) | string, ...params: any[]) {
   if(!value) {
     return undefined;
