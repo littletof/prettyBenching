@@ -30,8 +30,20 @@ export interface GroupDefinition {
   include: RegExp;
   name: string;
   columns?: ColumnDefinition[];
-  description?: string | ((groupResults: BenchmarkResult[], group: GroupDefinition, runResults: BenchmarkRunResult) => string);
-  afterTable?: string | ((groupResults: BenchmarkResult[], group: GroupDefinition, runResults: BenchmarkRunResult) => string);
+  description?:
+    | string
+    | ((
+      groupResults: BenchmarkResult[],
+      group: GroupDefinition,
+      runResults: BenchmarkRunResult,
+    ) => string);
+  afterTable?:
+    | string
+    | ((
+      groupResults: BenchmarkResult[],
+      group: GroupDefinition,
+      runResults: BenchmarkRunResult,
+    ) => string);
 }
 
 export function prettyBenchmarkDown(
@@ -53,7 +65,7 @@ function _prettyBenchmarkDown(
     markdown += `# ${options.title}\n\n`;
   }
 
-  markdown += stringOrFunction(options?.description, runResult) + '\n';  
+  markdown += stringOrFunction(options?.description, runResult) + "\n";
 
   if (options?.groups && options.groups.length > 0) {
     let grouppedResults: {
@@ -103,7 +115,12 @@ function _prettyBenchmarkDown(
 
       markdown += `## ${resultGroup.name}\n\n`;
 
-      markdown += stringOrFunction(resultGroup.description, resultGroup.items, g, runResult);
+      markdown += stringOrFunction(
+        resultGroup.description,
+        resultGroup.items,
+        g,
+        runResult,
+      );
 
       markdown += headerRow(options, resultGroup);
       resultGroup.items.forEach((r: BenchmarkResult) => {
@@ -112,7 +129,13 @@ function _prettyBenchmarkDown(
 
       markdown += "\n";
 
-      markdown += stringOrFunction(resultGroup.afterTable, resultGroup.items, g, runResult) + '\n';
+      markdown +=
+        stringOrFunction(
+          resultGroup.afterTable,
+          resultGroup.items,
+          g,
+          runResult,
+        ) + "\n";
     });
   } else {
     markdown += headerRow(options);
@@ -122,7 +145,7 @@ function _prettyBenchmarkDown(
     markdown += "\n";
   }
 
-  markdown += stringOrFunction(options?.afterTables, runResult) + '\n';
+  markdown += stringOrFunction(options?.afterTables, runResult) + "\n";
 
   outputFn(markdown);
 
@@ -258,12 +281,15 @@ export function historyColumn(){
 }*/
 
 // deno-lint-ignore no-explicit-any
-function stringOrFunction(value?: ((...params: any[]) => string) | string, ...params: any[]) {
-  if(!value) {
-    return '';
+function stringOrFunction(
+  value?: ((...params: any[]) => string) | string,
+  ...params: any[]
+) {
+  if (!value) {
+    return "";
   }
 
-  if(typeof value === 'function') {
+  if (typeof value === "function") {
     return `${value(...params)}\n`;
   } else {
     return `${value}\n`;
