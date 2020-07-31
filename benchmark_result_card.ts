@@ -39,11 +39,13 @@ export function getResultCard(
 ) {
   c = colorer;
 
-  const defaultOptions: prettyBenchmarkCardResultOptions = {parts: { graph: true, graphBars: 5 }};
+  const defaultOptions: prettyBenchmarkCardResultOptions = {
+    parts: { graph: true, graphBars: 5 },
+  };
 
   // define default options and default parts
   options = options || defaultOptions;
-  if(!options.parts) {
+  if (!options.parts) {
     options.parts = defaultOptions.parts;
   }
 

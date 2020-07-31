@@ -86,8 +86,8 @@ test({
 test({
   name: "nocolor",
   fn: async function (): Promise<void> {
-    runBenchmarks({ silent: true }, prettyBenchmarkProgress({nocolor: true}))
-      .then(prettyBenchmarkResult({nocolor: true})).catch(
+    runBenchmarks({ silent: true }, prettyBenchmarkProgress({ nocolor: true }))
+      .then(prettyBenchmarkResult({ nocolor: true })).catch(
         (e) => {
           console.error(colors.red(e.stack));
         },

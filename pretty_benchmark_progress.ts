@@ -25,7 +25,7 @@ export interface prettyBenchmarkProgressOptions {
 }
 
 export function prettyBenchmarkProgress(
-  options?: prettyBenchmarkProgressOptions
+  options?: prettyBenchmarkProgressOptions,
 ) {
   if (options?.nocolor) c.setColorEnabled(false);
 
@@ -200,7 +200,10 @@ function startBenchingLine(
   return `\n${cyanHeader} Starting benchmarking\n${cyanHeader} ${fullQueued} ${fullFiltered}\n`;
 }
 
-function benchNameFormatted(name: string, options?: prettyBenchmarkProgressOptions) {
+function benchNameFormatted(
+  name: string,
+  options?: prettyBenchmarkProgressOptions,
+) {
   return `${getBenchIndicator(name, options?.indicators)}` +
     `[${c.cyan(name)} ${c.gray(padEndVisible("", 40 - name.length, "-"))}]`;
 }
