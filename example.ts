@@ -7,9 +7,9 @@ import {
   runBenchmarks,
   bench,
   BenchmarkResult,
-} from "https://deno.land/std@0.61.0/testing/bench.ts";
+} from "https://deno.land/std@0.62.0/testing/bench.ts";
 
-import * as colors from "https://deno.land/std@0.61.0/fmt/colors.ts";
+import * as colors from "https://deno.land/std@0.62.0/fmt/colors.ts";
 
 // TODO fix import
 import {

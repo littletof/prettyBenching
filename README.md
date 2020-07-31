@@ -4,8 +4,8 @@ A simple Deno library, that gives you pretty benchmarking progress and results i
 
 **⚠ Appeareance is likely to change until v1.0.0 of this lib ⚠**
 
-[![deno version](https://img.shields.io/badge/deno-1.2.0-success?logo=deno)](https://github.com/denoland/deno)
-[![deno/std version](https://img.shields.io/badge/deno/std-0.61.0-success?logo=deno)](https://deno.land/std@0.61.0)
+[![deno version](https://img.shields.io/badge/deno-1.2.1-success?logo=deno)](https://github.com/denoland/deno)
+[![deno/std version](https://img.shields.io/badge/deno/std-0.62.0-success?logo=deno)](https://deno.land/std@0.62.0)
 
 [![Build Status](https://github.com/littletof/prettyBenching/workflows/CI/badge.svg)](https://github.com/littletof/prettyBenching/actions?query=workflow%3ACI)
 ![maintained](https://img.shields.io/maintenance/yes/2021)
