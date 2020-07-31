@@ -1,16 +1,11 @@
 // deno-lint-ignore-file
 
-import { prettyBenchmarkProgress, prettyBenchmarkResult } from "../../mod.ts";
-import {
-  writeJsonSync,
-  writeFileStrSync,
-} from "https://deno.land/std@0.57.0/fs/mod.ts";
+import { prettyBenchmarkProgress } from "../../mod.ts";
 
 import {
   bench,
   runBenchmarks,
   BenchmarkRunProgress,
-  ProgressState,
 } from "../../deps.ts";
 
 bench({
@@ -55,11 +50,11 @@ runBenchmarks({ silent: true }, (progress) => {
   );
 
 function saveresult(result: any) {
-  writeFileStrSync(
+  Deno.writeTextFileSync(
     "./docs/showcase/benchmark_progress_inputs.json",
     prettyJSON(progress),
   );
-  writeFileStrSync(
+  Deno.writeTextFileSync(
     "./docs/showcase/benchmark_result_input.json",
     prettyJSON(result),
   );
