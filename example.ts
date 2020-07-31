@@ -99,56 +99,17 @@ const indicators = [
 runBenchmarks(
   { silent: true, skip: /_long/ },
   prettyBenchmarkProgress({ indicators, thresholds }),
-)
-  /* .then(
-    prettyBenchmarkResult(
-      {
-        thresholds,
-        indicators,
-        parts: {
-          extraMetrics: true,
-          threshold: true,
-          graph: true,
-          graphBars: 5,
-        },
+).then(
+  prettyBenchmarkResult(
+    {
+      thresholds,
+      indicators,
+      parts: {
+        extraMetrics: true,
+        threshold: true,
+        graph: true,
+        graphBars: 5,
       },
-    ),
-  );*/
-  // .then(prettyBenchmarkDown({title: 'test', description:'Idontknow but anything goes here', footer:'Summa summárum', output: console.log, groups: [{include: /arrays/, name: 'Arrays', description: 'ez array műveletes'}, {include: /[sS]/, name: 'S', description: 'SSSS'}]}));
-  .then(prettyBenchmarkDown(console.log, {
-    title: "MY example benchMarkdown",
-    description: (rr: BenchmarkRunResult) =>
-      `General description ${rr.results.length} benches, ${rr.filtered} filtered`,
-    columns: [
-      indicatorColumn(indicators),
-      ...defaultColumns,
-      thresholdResultColumn(thresholds),
-      thresholdsColumn(thresholds),
-      thresholdsColumn(thresholds, true),
-      { title: "test", propertyKey: "runsCount" },
-      { title: "noproperty" },
-      { title: "undefined", propertyKey: "ilyennincs" },
-      {
-        title: "format",
-        toFixed: 3,
-        formatter: (result: BenchmarkResult, cd: ColumnDefinition) => {
-          return result.measuredRunsAvgMs.toFixed(cd.toFixed) + "bambamarha";
-        },
-      },
-      ...extraMetricsColumns({ ignoreSingleRuns: true }),
-      // {title: 'tresholds', toFixed: 3, formatter: (result: BenchmarkResult, cd: any) => { return '<small><= 123 ✅<br/><= 654 🔶<br/> > 654 🔴</small>'; }, align: "right"},
-      // {title: 'historic', toFixed: 3, formatter: (result: BenchmarkResult, cd: any) => { return Math.random() > 0.5 ? `+10% 🔼`:' -5% 🔰'; }, align: "right"}
-    ],
-    groups: [
-      {
-        include: /./,
-        name: "Functions",
-        afterTable: (
-          gr: BenchmarkResult[],
-          g: GroupDefinition,
-          rr: BenchmarkRunResult,
-        ) =>
-          `Im in \`${g.name}\` afterTable, ${gr.length} benches in this group, ${rr.results.length} overall in run `,
-      },
-    ],
-  }));
+    },
+  ),
+);
