@@ -96,7 +96,7 @@ function _prettyBenchmarkDown(
 
     Object.keys(grouppedResults).forEach((k) => {
       const resultGroup = grouppedResults[k];
-      if(resultGroup.name === "unmatched" && resultGroup.items.length === 0) {
+      if(k === "unmatched" && resultGroup.items.length === 0) {
         return;
       }
 
