@@ -2,8 +2,6 @@
 
 A simple Deno library, that gives you pretty benchmarking progress and results in the commandline
 
-**⚠ Appeareance is likely to change until v1.0.0 of this lib ⚠**
-
 [![deno version](https://img.shields.io/badge/deno-1.2.1-success?logo=deno)](https://github.com/denoland/deno)
 [![deno/std version](https://img.shields.io/badge/deno/std-0.62.0-success?logo=deno)](https://deno.land/std@0.62.0)
 
@@ -11,7 +9,15 @@ A simple Deno library, that gives you pretty benchmarking progress and results i
 ![maintained](https://img.shields.io/maintenance/yes/2021)
 [![documentation](https://img.shields.io/badge/%E2%80%8E-docs-blue.svg?logo=deno)](https://doc.deno.land/https/deno.land/x/pretty_benching/mod.ts)
 
-[![deno version](https://img.shields.io/badge/ROADMAP-5e5e5e?logo=discover)](#roadmap)
+## Jump to
+
+[![prettyBenchmarkProgress](https://img.shields.io/badge/-%F0%9F%94%B5%20prettyBenchmarkProgress-4e4e4e)](#prettyBenchmarkProgress)
+
+[![prettyBenchmarkResults](https://img.shields.io/badge/-%F0%9F%94%B5%20prettyBenchmarkResults-4e4e4e)](#prettyBenchmarkResults)
+
+[![prettyBenchmarkDown](https://img.shields.io/badge/-%F0%9F%94%B5%20prettyBenchmarkDown-4e4e4e)](#prettyBenchmarkDown)
+
+[![deno version](https://img.shields.io/badge/ROADMAP-4e4e4e?logo=discover)](#roadmap)
 
 ## Try it out
 
@@ -47,7 +53,7 @@ It doesn't interfere with the Deno's `fmt` color settings.
 
 # prettyBenchmarkProgress
 
-Prints the Deno `runBenchmarks()` methods `progressCb` callback values in a nicely readable format.
+Prints the Deno `runBenchmarks()` method's `progressCb` callback values in a nicely readable format.
 
 ### Usage
 
@@ -98,7 +104,7 @@ const indicators = [
 
 # prettyBenchmarkResults
 
-Prints the Deno `runBenchmarks()` methods result in a nicely readable format.
+Prints the Deno `runBenchmarks()` method's result in a nicely readable format.
 
 ### Usage
 
@@ -204,6 +210,110 @@ Adds a graph, which shows the distribution of the runs of the benchmark.
 The graph shows the results groupped into timeframes, where the groups frame start from the value on the head of its line, and end with excluding the value on the next line.
 
 With `graphBars` you can set how many bars it should show. Default is `5`.
+
+# prettyBenchmarkDown
+
+Generates a summary markdown from the results of the Deno `runBenchmarks()` method's result.
+
+### Usage
+
+Simply call `prettyBenchmarkDown` with the desired settings.
+
+```ts
+// ...add benches...
+
+runBenchmarks()
+.then(prettyBenchmarkDown(console.log))
+.catch((e: any) => {
+  console.error(e.stack);
+});
+```
+
+The first parameter of this function is an output function, where you cen recieve the generated markdown's text. In the example above it just print is to `console`.
+
+Without defining any options, it will generate one `markdown` table with one row for each benchmark.
+Something like this:
+
+> |Name|Runs|Total (ms)|Average (ms)|
+> |:--|--:|--:|--:|
+> |Sorting arrays|4000|1506.683|0.377|
+> |Rotating arrays|1000|1935.981|1.936|
+> |Proving NP==P|1|4194.431|4194.431|
+> |Standing out|1000|369.566|0.370|
+
+### Options
+
+You can fully customise the generated `markdown`. Add text, use predefined, or custom columns or group your benchmarks and define these per group.
+
+**⚠TODO** Here you can seen an example that showcases every option.
+
+#### Extra texts
+
+* `title`: Defines a level 1 title (`# MyTitle`) on the top of the generated markdown
+* `description`: Defines a part, that is put before any result tables. If defined as a function, it recieves the `runBenchmarks` result, so it can be set dinamically. It also accepts a simple string as well.
+* `afterTables`: Defines a part, that is put after all the result tables. If defined as a function, it recieves the `runBenchmarks` result, so it can be set dinamically. It also accepts a simple string as well.
+
+#### Columns
+
+You can customise, what columns you want to see in each table. To see what every column type generates check out the example **TODO LINK + on every column type**
+
+* If `not defined`, the generator uses the default columns defined by the module
+* If `defined`, you take full control, of what columns you want to see. The default columns are exported, and there are other premade columns for you to use.
+
+##### defaultColumns
+
+It includes `Name`, `Runs`, `Total (ms)` and `Average (ms)` columns, these are the default values of the `BenchmarkRunResult`.
+
+##### indicatorColumn(indicators?: BenchIndicator[])
+
+Defines a column, that contains the indicator for the given bench, if defined. Keep in mind, that it strips any color from the indicator.
+
+##### thresholdsColumn(thresholds: Thresholds, indicateResult?: boolean)
+
+Defines a column, that shows the threshold ranges for the given bench, if defined. If you set `indicateResult` to true, it shows in what range the benchmark fell, in the same cell.
+
+##### thresholdResultColumn(thresholds: Thresholds)
+
+Defines a column, that show into what threhold range the benchmark fell.
+
+##### extraMetricsColumns(options?)
+
+Defines columns, that show extra calculated metrics like `min`, `max`, `mean`, `median`, `stdDeviation`. You can define which of these you want, in the options. You can also tell it, to put `-` in the cells, where the benchmark was only run once.
+
+##### Custom columns
+
+When you need something else, you can define you own columns. You can put custom `ColumnDefinitions` into the `columns` array.
+
+* The simplest way, is to give it a `propertyKey`, and than it shows that value of the `BenchmarkResult`. You can use any key here, but you will have to put these values into the results manually. If a `result[propertyKey` is `undefined`, than it puts a `-` into that cell.
+If your returned value is a `number`, than you can use `toFixed` to tell what precision you want to see. (It's ignored if value is not a number)
+
+* If your usecase is more complex, than you can use the `formatter` method, where you get the benchmark result, and you can return any value that you want from that. The predefined column types above use this method as well.
+
+```ts
+interface ColumnDefinition {
+  title: string;
+  propertyKey?: string;
+  align?: "left" | "center" | "right";
+  toFixed?: number;
+  formatter?: (result: BenchmarkResult, columnDef: ColumnDefinition) => string;
+}
+```
+
+#### Groups
+
+You can group your benches, so they are separated in your generated markdown. For this, you need to define `include` RegExp. Right now, every benchmark, that doesnt fit any group will be put into one table at the bottom, so if you dont want some filter them before manually.
+
+In each group you can define a `name` which will be a level 2 heading (`## Name`) before you group.
+
+You can also define `description` and `afterTable`, which behave the same like the ones in the root of options.
+
+If you want, you can have different columns in each group, if you define them in the groups `columns` array.
+  
+### As github action
+
+Use this as a github action, eg. comment benchmark results on PRs.
+
+You can see an example Github Action for this here, and see the generated comments here.
 
 # Roadmap
 
