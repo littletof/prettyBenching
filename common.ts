@@ -6,7 +6,7 @@ const { green, yellow, red, white } = colors;
 export function getTimeColor(
   name: string,
   time: number,
-  nocolor: boolean,
+  nocolor?: boolean,
   thresholds?: Thresholds,
 ) {
   // if nocolor is set, than return a the same string without coloring

@@ -29,45 +29,28 @@ export interface prettyBenchmarkCardResultOptions {
   };
 }
 
-interface CardResultOptions { // TODO Delete
-  thresholds?: Thresholds;
-  indicators?: BenchIndicator[];
-  nocolor: boolean;
-  parts: {
-    extraMetrics?: boolean;
-    threshold?: boolean;
-    graph?: boolean;
-    graphBars?: number;
-  };
-}
-
 const tab = "    ";
 let c: Colorer;
 
 export function getResultCard(
   result: BenchmarkResult,
   colorer: Colorer,
-  {
-    nocolor = false,
-    indicators,
-    thresholds,
-    parts = { graph: true, graphBars: 5 },
-  }: prettyBenchmarkCardResultOptions = {
-    nocolor: false,
-    parts: { graph: true, graphBars: 5 },
-  },
+  options?: prettyBenchmarkCardResultOptions,
 ) {
   c = colorer;
-  const options: CardResultOptions = {
-    parts,
-    nocolor,
-    indicators,
-    thresholds,
-  };
-  const tableColor = getTableColor(result.name, options.indicators);
+
+  const defaultOptions: prettyBenchmarkCardResultOptions = {parts: { graph: true, graphBars: 5 }};
+
+  // define default options and default parts
+  options = options || defaultOptions;
+  if(!options.parts) {
+    options.parts = defaultOptions.parts;
+  }
+
+  const tableColor = getTableColor(result.name, options?.indicators);
   const tb = new TableBuilder(91, tableColor);
 
-  const needsThreshold = options.parts.threshold && !!options.thresholds &&
+  const needsThreshold = options.parts!.threshold && !!options.thresholds &&
     Object.keys(options.thresholds).length != 0;
 
   prettyBenchmarkHeader(tb, result, options);
@@ -76,10 +59,10 @@ export function getResultCard(
     needsThreshold && prettyBenchmarkThresholdLine(tb, result, options);
   } else {
     prettyBenchmarkMultipleRunMetrics(tb, result, options);
-    options.parts.extraMetrics &&
+    options.parts!.extraMetrics &&
       prettyBenchmarkMultipleRunCalcedMetrics(tb, result, options);
     needsThreshold && prettyBenchmarkThresholdLine(tb, result, options);
-    if (options.parts.graph && result.runsCount >= 10) {
+    if (options.parts!.graph && result.runsCount >= 10) {
       prettyBenchmarkMultipleRunGraph(tb, result, options);
     }
   }
@@ -90,7 +73,7 @@ export function getResultCard(
 function prettyBenchmarkHeader(
   tb: TableBuilder,
   r: BenchmarkResult,
-  options: CardResultOptions,
+  options: prettyBenchmarkCardResultOptions,
 ) {
   const indicator = getBenchIndicator(r.name, options.indicators);
   const indTab = indicator == ""
@@ -103,7 +86,7 @@ function prettyBenchmarkHeader(
 function prettyBenchmarkSingleRunMetrics(
   tb: TableBuilder,
   result: BenchmarkResult,
-  options: CardResultOptions,
+  options: prettyBenchmarkCardResultOptions,
 ) {
   const totalRuns = `Total runs: ${c.yellow("1".padEnd(7))}`;
   const timeColor = getTimeColor(
@@ -123,7 +106,7 @@ function prettyBenchmarkSingleRunMetrics(
 function prettyBenchmarkThresholdLine(
   tb: TableBuilder,
   result: BenchmarkResult,
-  options: CardResultOptions,
+  options: prettyBenchmarkCardResultOptions,
 ) {
   const threshold = options.thresholds && options.thresholds[result.name];
   if (threshold) {
@@ -140,7 +123,7 @@ function prettyBenchmarkThresholdLine(
 function prettyBenchmarkMultipleRunMetrics(
   tb: TableBuilder,
   result: BenchmarkResult,
-  options: CardResultOptions,
+  options: prettyBenchmarkCardResultOptions,
 ) {
   const totalRuns = `Total runs: ${
     padEndVisible(c.yellow((result.runsCount).toString()), 7)
@@ -166,7 +149,7 @@ function prettyBenchmarkMultipleRunMetrics(
 function prettyBenchmarkMultipleRunCalcedMetrics(
   tb: TableBuilder,
   result: BenchmarkResult,
-  options: CardResultOptions,
+  options: prettyBenchmarkCardResultOptions,
 ) {
   const { max, min, mean, median } = calculateExtraMetrics(result);
 
@@ -207,9 +190,9 @@ function prettyBenchmarkMultipleRunCalcedMetrics(
 function prettyBenchmarkMultipleRunGraph(
   tb: TableBuilder,
   result: BenchmarkResult,
-  options: CardResultOptions,
+  options: prettyBenchmarkCardResultOptions,
 ) {
-  const barsCount = options.parts.graphBars || 5;
+  const barsCount = options.parts!.graphBars || 5;
 
   const max = Math.max(...result.measuredRunsMs);
   const min = Math.min(...result.measuredRunsMs);
