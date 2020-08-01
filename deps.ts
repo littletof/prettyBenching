@@ -5,6 +5,7 @@ export {
   ProgressState,
   runBenchmarks,
   bench,
+  clearBenchmarks
 } from "https://deno.land/std@0.62.0/testing/bench.ts";
 
 export * as colors from "https://deno.land/std@0.62.0/fmt/colors.ts";

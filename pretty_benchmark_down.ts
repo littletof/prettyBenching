@@ -119,7 +119,7 @@ function _prettyBenchmarkDown(
 
       markdown += stringOrFunction(
         g.description,
-        resultGroup?.items,
+        resultGroup?.items || [],
         g,
         runResult,
       );
@@ -137,7 +137,7 @@ function _prettyBenchmarkDown(
 
       markdown += stringOrFunction(
         g.afterTable,
-        resultGroup?.items,
+        resultGroup?.items || [],
         g,
         runResult,
       ) + "\n";
