@@ -248,7 +248,7 @@ export function extraMetricsColumns(
   selected.forEach((s) => {
     if (s === "stdDeviation") {
       columns.push({
-        title: "std deviation",
+        title: "Std deviation",
         align: "right",
         toFixed: 3,
         formatter: (result: BenchmarkResult, cd: ColumnDefinition) => {
@@ -262,7 +262,7 @@ export function extraMetricsColumns(
       });
     } else {
       columns.push({
-        title: s,
+        title: s.charAt(0).toUpperCase() + s.slice(1),
         align: "right",
         toFixed: 3,
         formatter: (result: BenchmarkResult, cd: ColumnDefinition) => {
