@@ -6,7 +6,7 @@ Check out how to generate a file like this: [pr_benchmarks.ts](https://github.co
 
 If you use a function for the `description` or `afterTables`, you can process the results here as well:
 
- > In this benchmark 7 benches were run, 1 were filtered.
+ > In this benchmark 7 benches were run, 1 filtered.
 
 ## Default columns and dynamic text
 
@@ -48,7 +48,7 @@ You can see, how you can rename columns like with `Thresholds+`
 ## Extra metrics
 
 You can add `extraMetrics` columns too. In its `metrics` array you can define which columns you want. If you set `ignoreSingleRuns` to `true`, it wont show values on rows, where runCount is 1.
-|Name|Runs|Total (ms)|Average (ms)|min|max|mean|median|std deviation|
+|Name|Runs|Total (ms)|Average (ms)|Min|Max|Mean|Median|Std deviation|
 |:--|--:|--:|--:|--:|--:|--:|--:|--:|
 |Sorting arrays|4000|1801.169|0.450|0.305|1.632|0.969|0.401|0.143|
 |Rotating other things|1000|2143.992|2.144|1.757|4.585|3.171|2.082|0.314|

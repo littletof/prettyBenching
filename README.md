@@ -255,7 +255,7 @@ Something like this:
 ```ts
 runBenchmarks()
 .then(prettyBenchmarkDown(
-  (markdown) => { Deno.writeTextFileSync("./benchmark.md", markdown); },
+  (markdown: string) => { Deno.writeTextFileSync("./benchmark.md", markdown); },
   { /* ...options */ }
 ))
 .catch((e: any) => {

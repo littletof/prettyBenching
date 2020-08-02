@@ -262,7 +262,7 @@ export function extraMetricsColumns(
       });
     } else {
       columns.push({
-        title: s.charAt(0).toUpperCase() + s.slice(1),
+        title: s.charAt(0).toUpperCase() + s.slice(1), // capitalise
         align: "right",
         toFixed: 3,
         formatter: (result: BenchmarkResult, cd: ColumnDefinition) => {
