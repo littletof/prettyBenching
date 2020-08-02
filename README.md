@@ -2,8 +2,8 @@
 
 A simple Deno library, that gives you pretty benchmarking progress and results in the commandline
 
-[![deno version](https://img.shields.io/badge/deno-1.2.1-success?logo=deno)](https://github.com/denoland/deno)
-[![deno/std version](https://img.shields.io/badge/deno/std-0.62.0-success?logo=deno)](https://deno.land/std@0.62.0)
+[![deno version](https://img.shields.io/badge/deno-1.2.2-success?logo=deno)](https://github.com/denoland/deno)
+[![deno/std version](https://img.shields.io/badge/deno/std-0.63.0-success?logo=deno)](https://deno.land/std@0.63.0)
 
 [![Build Status](https://github.com/littletof/prettyBenching/workflows/CI/badge.svg)](https://github.com/littletof/prettyBenching/actions?query=workflow%3ACI)
 ![maintained](https://img.shields.io/maintenance/yes/2021)
@@ -35,13 +35,13 @@ Add the following to your `deps.ts`
 export {
   prettyBenchmarkResult,
   prettyBenchmarkProgress
-} from 'https://deno.land/x/pretty_benching@v0.2.0/mod.ts';
+} from 'https://deno.land/x/pretty_benching@v0.2.1/mod.ts';
 ```
 
 or just simply import it directly:
 
 ```ts
-import { prettyBenchmarkResult, prettyBenchmarkProgress } from 'https://deno.land/x/pretty_benching@v0.2.0/mod.ts';
+import { prettyBenchmarkResult, prettyBenchmarkProgress } from 'https://deno.land/x/pretty_benching@v0.2.1/mod.ts';
 ```
 
 ## Note
@@ -170,18 +170,18 @@ You can define what `parts` you want to use in the options, like this:
 
 ```ts
 prettyBenchmarkResult(
-      {
-        nocolor: false,
-        thresholds,
-        indicators,
-        parts: {
-          extraMetrics: true,
-          threshold: true,
-          graph: true,
-          graphBars: 10,
-        },
-      },
-    )
+  {
+    nocolor: false,
+    thresholds,
+    indicators,
+    parts: {
+      extraMetrics: true,
+      threshold: true,
+      graph: true,
+      graphBars: 10,
+    },
+  },
+)
 ```
 
 Using all options:
@@ -196,7 +196,7 @@ Setting this will give you an extra row, which adds extra calculated values like
 
 ##### Threshold `{ threshold: true }`
 
-> Need to have `thresholds` in the root which have a matching threshold for the specific benchmark, otherwise it wont add it to the specific card.
+> Need to have `thresholds` in the root of the `options` object, which have a matching threshold for the specific benchmark, otherwise it wont add it to the specific card.
 
 It simply show what the set thresholds for the benchmark. Can be usefull if `nocolor` is set to true.
 
@@ -215,7 +215,14 @@ With `graphBars` you can set how many bars it should show. Default is `5`.
 
 Generates a summary markdown from the results of the Deno `runBenchmarks()` method's result.
 
-An example output: [pr_benchmark_output.md](https://github.com/littletof/prettyBenching/blob/master/docs/prettyBenchmarkDown/pr_benchmark_output.md)
+>||Name|Runs|Total (ms)|Average (ms)|Thresholds||
+>|:-:|:--|--:|--:|--:|--:|:-:|
+>| |Rotating other things|1000|2143.992|2.144|-|-|
+>|🎹|Rotating arrays|1000|2021.054|2.021|<small><= 3.5 ✅<br><= 4.4 🔶<br> > 4.4 🔴</small>|✅|
+>|%|Proving NP==P|1|4384.908|4384.908|<small><= 4141 ✅<br><= 6000 🔶<br> > 6000 🔴</small>|🔶|
+>|🚀|Standing out|1000|375.708|0.376|<small><= 0.3 ✅<br><= 0.33 🔶<br> > 0.33 🔴</small>|🔴|
+
+A full example output: [pr_benchmark_output.md](https://github.com/littletof/prettyBenching/blob/master/docs/prettyBenchmarkDown/pr_benchmark_output.md)
 
 ### Usage
 
@@ -243,21 +250,35 @@ Something like this:
 > |Proving NP==P|1|4194.431|4194.431|
 > |Standing out|1000|369.566|0.370|
 
+##### Writing to a file
+
+```ts
+runBenchmarks()
+.then(prettyBenchmarkDown(
+  (markdown: string) => { Deno.writeTextFileSync("./benchmark.md", markdown); },
+  { /* ...options */ }
+))
+.catch((e: any) => {
+  console.error(e.stack);
+});
+```
+
+> 🔽 Needs *--allow-write* flag to run
+
 ### Options
 
 You can fully customise the generated `markdown`. Add text, use predefined, or custom columns or group your benchmarks and define these per group.
 
 Here you can seen an example that showcases every option: [pr_benchmark_output.md](https://github.com/littletof/prettyBenching/blob/master/docs/prettyBenchmarkDown/pr_benchmark_output.md)
-
 It was generated with: [pr_benchmarks.ts](https://github.com/littletof/prettyBenching/blob/master/docs/prettyBenchmarkDown/pr_benchmarks.ts)
 
 #### Extra texts
 
-* `title`: Defines a level 1 title (`# MyTitle`) on the top of the generated markdown
-* `description`: Defines a part, that is put before any result tables. If defined as a function, it recieves the `runBenchmarks` result, so it can be set dinamically. It also accepts a simple string as well.
-* `afterTables`: Defines a part, that is put after all the result tables. If defined as a function, it recieves the `runBenchmarks` result, so it can be set dinamically. It also accepts a simple string as well.
+* `options.title`: Defines a level 1 title (`# MyTitle`) on the top of the generated markdown
+* `options.description`: Defines a part, that is put before all of the result tables. If defined as a function, it recieves the `runBenchmarks` result, so it can be set dynamically. It also accepts a simple string as well.
+* `options.afterTables`: Defines a part, that is put after all of the result tables. If defined as a function, it recieves the `runBenchmarks` result, so it can be set dynamically. It also accepts a simple string as well.
 
-#### Columns
+#### Columns ```options.columns```, ```group.columns```
 
 You can customise, what columns you want to see in each table. To see what every column type generates check out the [<small>example</small>](https://github.com/littletof/prettyBenching/blob/master/docs/prettyBenchmarkDown/pr_benchmark_output.md)
 
@@ -266,25 +287,71 @@ You can customise, what columns you want to see in each table. To see what every
 
 ##### defaultColumns [<small>example</small>](https://github.com/littletof/prettyBenching/blob/master/docs/prettyBenchmarkDown/pr_benchmark_output.md#default-columns-and-dynamic-text)
 
+```ts
+columns: [...defaultColumns]
+ ```
+
 It includes `Name`, `Runs`, `Total (ms)` and `Average (ms)` columns, these are the default values of the `BenchmarkRunResult`.
 
-##### indicatorColumn(indicators?: BenchIndicator[]) [<small>example</small>](https://github.com/littletof/prettyBenching/blob/master/docs/prettyBenchmarkDown/pr_benchmark_output.md#predefiend-columns)
+##### indicatorColumn(indicators: BenchIndicator[]) [<small>example</small>](https://github.com/littletof/prettyBenching/blob/master/docs/prettyBenchmarkDown/pr_benchmark_output.md#predefiend-columns)
+
+```ts
+columns: [
+  indicatorColumn(indicators),
+]
+ ```
 
 Defines a column, that contains the indicator for the given bench, if defined. Keep in mind, that it strips any color from the indicator.
 
 ##### thresholdsColumn(thresholds: Thresholds, indicateResult?: boolean) [<small>example</small>](https://github.com/littletof/prettyBenching/blob/master/docs/prettyBenchmarkDown/pr_benchmark_output.md#predefiend-columns)
 
+```ts
+columns: [
+  thresholdsColumn(thresholds), // only shows the threshold ranges
+  thresholdsColumn(thresholds, true), // shows the result in the cell too
+]
+ ```
+
 Defines a column, that shows the threshold ranges for the given bench, if defined. If you set `indicateResult` to true, it shows in what range the benchmark fell, in the same cell.
 
 ##### thresholdResultColumn(thresholds: Thresholds) [<small>example</small>](https://github.com/littletof/prettyBenching/blob/master/docs/prettyBenchmarkDown/pr_benchmark_output.md#predefiend-columns)
+
+```ts
+columns: [
+  thresholdResultColumn(thresholds),
+]
+ ```
 
 Defines a column, that show into what threhold range the benchmark fell.
 
 ##### extraMetricsColumns(options?) [<small>example</small>](https://github.com/littletof/prettyBenching/blob/master/docs/prettyBenchmarkDown/pr_benchmark_output.md#extra-metrics)
 
-Defines columns, that show extra calculated metrics like `min`, `max`, `mean`, `median`, `stdDeviation`. You can define which of these you want, in the options. You can also tell it, to put `-` in the cells, where the benchmark was only run once.
+```ts
+columns: [
+  ...extraMetricsColumns(),
+  ...extraMetricsColumns({ ignoreSingleRuns: true }), // puts '-' in cells, where bench was only run once
+  ...extraMetricsColumns({ metrics: ["max", "min", "mean", "median", "stdDeviation"] }),
+]
+ ```
+
+Defines columns, that show extra calculated metrics like `min`, `max`, `mean`, `median`, `stdDeviation`. You can define which of these you want, in the `metrics` array. You can also tell it, to put `-` in the cells, where the benchmark was only run once with `ignoreSingleRuns`.
 
 ##### Custom columns [<small>example</small>](https://github.com/littletof/prettyBenching/blob/master/docs/prettyBenchmarkDown/pr_benchmark_output.md#custom-columns)
+
+```ts
+columns: [
+  {
+    title: 'CustomTotal',
+    propertyKey: 'totalMs',
+    toFixed: 5,
+    align: 'left'
+  },
+  {
+    title: 'Formatter',
+    formatter: (r: BenchmarkResult, cd: ColumnDefinition) => `${r.name}:${cd.title}`
+  },
+]
+```
 
 When you need something else, you can define you own columns. You can put custom `ColumnDefinitions` into the `columns` array.
 
@@ -303,7 +370,19 @@ interface ColumnDefinition {
 }
 ```
 
-#### Groups
+#### Groups ```options.groups```
+
+```ts
+groups: [
+  {
+    include: /array/,
+    name: "A group for arrays",
+    description: "The array group's description",
+    afterTable: (gr: BenchmarkResult[], g: GroupDefinition, rr: BenchmarkRunResult) => `Dynamic ${g.name}, ${gr.length}, ${rr.results.length}`,
+    columns: [/* ... */]
+  }
+]
+```
 
 You can group your benches, so they are separated in your generated markdown. For this, you need to define `include` RegExp. Right now, every benchmark, that doesnt fit any group will be put into one table at the bottom, so if you dont want some filter them before manually.
 
@@ -312,6 +391,16 @@ In each group you can define a `name` which will be a level 2 heading (`## Name`
 You can also define `description` and `afterTable`, which behave the same like the ones in the root of options.
 
 If you want, you can have different columns in each group, if you define them in the groups `columns` array.
+
+```ts
+interface GroupDefinition {
+  include: RegExp;
+  name: string;
+  columns?: ColumnDefinition[];
+  description?: string | ((groupResults: BenchmarkResult[], group: GroupDefinition,runResults: BenchmarkRunResult ) => string);
+  afterTable?: string | ((groupResults: BenchmarkResult[], group: GroupDefinition, runResults: BenchmarkRunResult ) => string);
+}
+```
   
 ### As a Github Action
 
