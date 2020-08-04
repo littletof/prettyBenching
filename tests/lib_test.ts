@@ -1,4 +1,4 @@
-import { prettyBenchmarkProgress, prettyBenchmarkResult } from "./mod.ts";
+import { prettyBenchmarkProgress, prettyBenchmarkResult } from "../mod.ts";
 import {
   bench,
   runBenchmarks,
@@ -6,12 +6,12 @@ import {
   colors,
   BenchmarkResult,
   BenchmarkRunResult,
-} from "./deps.ts";
+} from "../deps.ts";
 import { test, assert } from "./test_deps.ts";
 import {
   prettyBenchmarkDown,
   GroupDefinition,
-} from "./pretty_benchmark_down.ts";
+} from "../pretty_benchmark_down.ts";
 
 // TODO run tests from recorded results.
 

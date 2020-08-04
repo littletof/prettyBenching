@@ -31,9 +31,10 @@ export function num(num: number, force?: boolean) {
 }
 
 export function perc(num: number) {
-  return (num % 1 !== 0 && num < 99.9995) ? num.toFixed(1) : num.toFixed();
+  return (num % 1 !== 0 && num < 99.95) ? num.toFixed(1) : num.toFixed();
 }
 
+/** returns a float value with dynamic precision. for a (5+from) digit number no floating points, for a (4+form) digit one 1 decimal, ... up to 4 decimals */
 export function rtime(num: number, from = 0) {
   const log = Math.max(Math.floor(Math.log10(num)), 0);
   const defPrec = isFloat(num) ? 4 : 0;
@@ -51,6 +52,12 @@ export function matchWithIndex(line: string, regexp: RegExp) {
   let match;
   while ((match = regexp.exec(line)) != null) {
     indexes.push(match.index);
+
+    if (indexes.length > line.length) {
+      throw Error(
+        "Too many matches. Something bad with the regexp. Did you forgot the global? / /g",
+      );
+    }
   }
   return indexes;
 }
