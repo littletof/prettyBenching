@@ -1,5 +1,5 @@
-import { TestCase, testEach } from "./test_helpers.ts";
-import { assertEquals, test } from "./test_deps.ts";
+import { testEach } from "./test_helpers.ts";
+import { assertEquals } from "./test_deps.ts";
 
 import {
   perc,
