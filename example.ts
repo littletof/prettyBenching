@@ -9,7 +9,7 @@ import {
   ColumnDefinition,
   extraMetricsColumns,
   GroupDefinition,
-} from "https://deno.land/x/pretty_benching@0.2.2/mod.ts";
+} from "https://deno.land/x/pretty_benching@v0.2.2/mod.ts";
 
 import {
   runBenchmarks,
