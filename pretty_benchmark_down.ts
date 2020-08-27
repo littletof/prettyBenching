@@ -10,26 +10,53 @@ import {
 
 // TODO historic: better or worse by x percent to last value
 
+/** Defines how the resulting makrdown should look like. */
 export interface prettyBenchmarkDownOptions {
+  /** Defines a `# title` for the markdown */
   title?: string;
+  /** Defines a section right after the `title`. When a `function` is provided, it receives the runs results */
   description?: string | ((results: BenchmarkRunResult) => string);
+  /** Defines a section at the end of the markdown. When a `function` is provided, it receives the runs results */
   afterTables?: string | ((results: BenchmarkRunResult) => string);
+  /** Defines `groups` into which the benchmarks will be groupped.
+   * Any benchmark result, that wasnt added into any group will be collected into one table called `Ungroupped`. */
   groups?: GroupDefinition[];
+  /** Defines the columns of the markdown tables. */
   columns?: ColumnDefinition[];
 }
 
+/** Defines one column of the markdown table. */
 export interface ColumnDefinition {
+  /** Defines the title of the column */
   title: string;
+  /** Defines which property of the `BenchmarkResult` should be displayed, if no `formatter` is defined.
+   * 
+   * *Note*: custom `propertyKey`-s can be used, but values has to be manually mapped onto each `BenchmarkResult`. */
   propertyKey?: string;
+  /** Defines how the column should be aligned. Defaults to `center` */
   align?: "left" | "center" | "right";
+  /** Calls `number.toFixed(x)` with this value, when defined and the cell value is a `number`.
+   * 
+   * Also used on `formatter` output values. */
   toFixed?: number;
+  /** Allows to calculate custom cell values based on the `BenchmarkResult`, and its own `ColumnDefinition`.
+   * 
+   * The value will be `-` for falsy values, and `*` when no `propertyKey` and `formatter` was provided
+   * 
+   * Its favoured above `propertyKey`, when both is defined.*/
   formatter?: (result: BenchmarkResult, columnDef: ColumnDefinition) => string;
 }
 
+/** Defines a group in the markdown. */
 export interface GroupDefinition {
+  /** Collects the benchmarks into the group, which `name` mathes the `RegExp` */
   include: RegExp;
+  /** Defines the name of the group, which will be a `## Title` in the markdown */
   name: string;
+  /** Defines the columns of the markdown tables in the specific group. Overrides root or default column options. */
   columns?: ColumnDefinition[];
+  /** Defines a section right after the `group title`. When a `function` is provided, it receives the runs results 
+   * for the benchmarks in the group, the group's definition and the overall benchmark results. */
   description?:
     | string
     | ((
@@ -37,6 +64,8 @@ export interface GroupDefinition {
       group: GroupDefinition,
       runResults: BenchmarkRunResult,
     ) => string);
+  /** Defines a section at the end of the `group`. When a `function` is provided, it receives the runs results 
+   * for the benchmarks in the group, the group's definition and the overall benchmark results. */
   afterTable?:
     | string
     | ((
@@ -46,8 +75,25 @@ export interface GroupDefinition {
     ) => string);
 }
 
+/** Returns a function that expects a `BenchmarkRunResult`, which than prints 
+ * the results in a nicely formatted `markdown`, based on the provided `options`.
+ * 
+ * Without `options`, one markdown table will be generated, containing all the bench results.
+ * 
+ * Typical basic usage:
+ * 
+ * ```ts
+ * // add benches, then
+ * runBenchmarks().then(prettyBenchmarkDown(console.log));
+ * // or write to file
+ * runBenchmarks().then(prettyBenchmarkDown((markdown: string) => { Deno.writeTextFileSync("./benchmark.md", markdown); });
+ * ```
+ * .
+ */
 export function prettyBenchmarkDown(
+  /** Defines the output function where the generated markdown string will be forwarded */
   outputFn: (out: string) => void,
+  /** Defines how the output should look like */
   options?: prettyBenchmarkDownOptions,
 ) {
   return (result: BenchmarkRunResult) =>
@@ -157,6 +203,8 @@ function _prettyBenchmarkDown(
   return runResult;
 }
 
+// TODO deprecate and use function instead, like extraMetrics
+/** Contains the default `ColumnDefinitions`, which are `Name`, `Runs`, `Total (ms)` and `Average (ms)` */
 export const defaultColumns: ColumnDefinition[] = [
   { title: "Name", propertyKey: "name", align: "left" },
   { title: "Runs", propertyKey: "runsCount", align: "right" },
@@ -169,6 +217,9 @@ export const defaultColumns: ColumnDefinition[] = [
   },
 ];
 
+/** Defines a column which contains the indicators for the benchmarks, where provided.
+ * 
+ * *Note*: colors are stripped from the indicators in markdown */
 export function indicatorColumn(
   indicators: BenchIndicator[],
 ): ColumnDefinition {
@@ -180,6 +231,7 @@ export function indicatorColumn(
   };
 }
 
+/** Defines a threshold result column, which shows into which range the benchmark fell. Shows `-` when no `Threshold` was provided for the given benchmark. */
 export function thresholdResultColumn(thresholds: Thresholds) {
   return {
     title: "",
@@ -195,6 +247,9 @@ export function thresholdResultColumn(thresholds: Thresholds) {
   };
 }
 
+/** Defines a threshold result column, which shows the threshold ranges for the benchmark. Shows `-` when no `Threshold` was provided for the given benchmark.
+ * 
+ * If `indicateResult` is set, it shows in the same cell into which range the benchmark fell.*/
 export function thresholdsColumn(
   thresholds: Thresholds,
   indicateResult?: boolean,
@@ -234,10 +289,19 @@ export function thresholdsColumn(
   };
 }
 
+/** Defines **multiple** columns, which contain extra calculated values, like `max`, `min`, `mean`, `median`, `stdDeviation`. 
+ * 
+ * Can be used like:
+ * ```ts
+ * columns: [...extraMetricsColumns()]
+ * ```
+ * . */
 export function extraMetricsColumns(
   options?: {
+    /** Defines which metrics it should include */
     metrics?: ("max" | "min" | "mean" | "median" | "stdDeviation")[];
-    ignoreSingleRuns: boolean;
+    /** If set, `-` will be placed into cells, where the benchmark was only run once. */
+    ignoreSingleRuns?: boolean;
   },
 ): ColumnDefinition[] {
   const columns: ColumnDefinition[] = [];
@@ -339,7 +403,7 @@ function tableRow(
         value = "*"; // this means no formatter function and no propertyKey was defined.
       } else {
         // deno-lint-ignore no-explicit-any
-        value = (result as any)[c.propertyKey] || "-";
+        value = (result as any)[c.propertyKey] || "-"; // TODO only for `undefined` and `null`?
       }
     }
 

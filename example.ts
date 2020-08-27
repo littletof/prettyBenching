@@ -17,6 +17,7 @@ import {
 } from "https://deno.land/std@0.66.0/testing/bench.ts";
 
 import * as colors from "https://deno.land/std@0.66.0/fmt/colors.ts";
+import { BenchIndicator } from "./types.ts";
 
 bench({
   name: "Sorting arrays",
@@ -81,12 +82,12 @@ const thresholds = {
   "Rotating arrays": { green: 2.5, yellow: 3.4 },
 };
 
-const indicators = [
-  { benches: /NP/, modFn: colors.white, tableColor: colors.blue },
+const indicators: BenchIndicator[] = [
+  { benches: /NP/, modFn: colors.white, color: colors.blue },
   {
     benches: /Standing/,
     modFn: () => colors.bgRed("%"),
-    tableColor: colors.magenta,
+    color: colors.magenta,
   },
 ];
 

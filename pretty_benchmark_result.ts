@@ -8,16 +8,30 @@ import {
 } from "./benchmark_result_card.ts";
 
 interface CommonOptions {
+  /** Overrides the default output function, which is `console.log`. */
   outputFn?: (log: string) => unknown;
 }
 
+/** Defines how the resulting output should look like. */
 export type prettyBenchmarkResultOptions =
   & CommonOptions
   & (prettyBenchmarkCardResultOptions);
 
 const c: Colorer = new Colorer();
 
+/** Returns a function that expects a `BenchmarkRunResult`, which than prints 
+ * the results in a nicely formatted way, based on the provided `options`.
+ * 
+ * Typical basic usage:
+ * 
+ * ```ts
+ * // add benches, then
+ * runBenchmarks().then(prettyBenchmarkResult());
+ * ```
+ * .
+ */
 export function prettyBenchmarkResult(
+  /** Defines how the output should look like */
   options?: prettyBenchmarkResultOptions,
 ) {
   return (result: BenchmarkRunResult) =>
