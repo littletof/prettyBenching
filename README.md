@@ -155,7 +155,7 @@ You can pass this object to `prettyBenchmarkProgress` too.
 const indicators = [
   {
     benches: /multiple-runs/,
-    tableColor: colors.magenta,
+    color: colors.magenta,
     modFn: () => "🚀",
   }
 ];
