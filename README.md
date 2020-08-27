@@ -445,8 +445,8 @@ You can see an example Github Action for this [here](https://github.com/littleto
 - [x] Separate `prettyBenchmarkResults` and `prettyBenchmarkProgress` into independently importable modules.
 - [x] Add the ability to follow the change on how the outputs look like.
 - [x] Refactor how optional `options` are handled
+- [x] Write JSDocs
 - [ ] Proper tests
-- [ ] Write JSDocs
 - [ ] Refactor README
 - [ ] Add showcase module, which helps to have consistent docs images
 - [ ] Make module contributor friendly
