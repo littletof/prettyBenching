@@ -10,16 +10,17 @@ import {
 
 // TODO historic: better or worse by x percent to last value
 
-/** Defines how the resulting makrdown should look like. */
+/** Defines how the generated markdown should look like. */
 export interface prettyBenchmarkDownOptions {
   /** Defines a `# title` for the markdown */
   title?: string;
-  /** Defines a section right after the `title`. When a `function` is provided, it receives the runs results */
+  /** Defines a section right after the `title`. When a `function` is provided, it receives the run's results */
   description?: string | ((results: BenchmarkRunResult) => string);
-  /** Defines a section at the end of the markdown. When a `function` is provided, it receives the runs results */
+  /** Defines a section at the end of the markdown. When a `function` is provided, it receives the run's results */
   afterTables?: string | ((results: BenchmarkRunResult) => string);
-  /** Defines `groups` into which the benchmarks will be groupped.
-   * Any benchmark result, that wasnt added into any group will be collected into one table called `Ungroupped`. */
+  /** Defines `groups`, into which the benchmarks will be groupped.
+   * Any benchmark result, that wasn't added into any group will be collected into one table called `Ungroupped`.
+   * One benchmark can be in multiple groups. */
   groups?: GroupDefinition[];
   /** Defines the columns of the markdown tables. */
   columns?: ColumnDefinition[];
@@ -53,9 +54,9 @@ export interface GroupDefinition {
   include: RegExp;
   /** Defines the name of the group, which will be a `## Title` in the markdown */
   name: string;
-  /** Defines the columns of the markdown tables in the specific group. Overrides root or default column options. */
+  /** Defines the columns of the markdown table in the specific group. Overrides root and default column options. */
   columns?: ColumnDefinition[];
-  /** Defines a section right after the `group title`. When a `function` is provided, it receives the runs results 
+  /** Defines a section right after the `group title`. When a `function` is provided, it receives the run's results 
    * for the benchmarks in the group, the group's definition and the overall benchmark results. */
   description?:
     | string
@@ -64,7 +65,7 @@ export interface GroupDefinition {
       group: GroupDefinition,
       runResults: BenchmarkRunResult,
     ) => string);
-  /** Defines a section at the end of the `group`. When a `function` is provided, it receives the runs results 
+  /** Defines a section at the end of the `group`. When a `function` is provided, it receives the run's results 
    * for the benchmarks in the group, the group's definition and the overall benchmark results. */
   afterTable?:
     | string
@@ -91,7 +92,7 @@ export interface GroupDefinition {
  * .
  */
 export function prettyBenchmarkDown(
-  /** Defines the output function where the generated markdown string will be forwarded */
+  /** Defines the output function which will be called with the generated string markdown output.*/
   outputFn: (out: string) => void,
   /** Defines how the output should look like */
   options?: prettyBenchmarkDownOptions,
@@ -403,7 +404,7 @@ function tableRow(
         value = "*"; // this means no formatter function and no propertyKey was defined.
       } else {
         // deno-lint-ignore no-explicit-any
-        value = (result as any)[c.propertyKey] || "-"; // TODO only for `undefined` and `null`?
+        value = (result as any)[c.propertyKey] || "-"; // TODO fix: "-" only when `undefined`
       }
     }
 

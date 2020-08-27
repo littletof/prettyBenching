@@ -21,13 +21,13 @@ export interface prettyBenchmarkCardResultOptions {
   // type: "card"; TODO when multiple options
   /** If provided, the measured values will be colored accordingly in the card. Also needed, if `parts.threshold` is set to `true` */
   thresholds?: Thresholds;
-  /** If provided, the indicators will be placed, and the cards will be colored accordingly for the specific benches */
+  /** If provided, the indicators will be placed for the specific benches */
   indicators?: BenchIndicator[];
   /** Strips all default colors from the output. 
    * 
    * *Note*: it doesnt strip the colors that come through user defined `thresholds` and `indicators`  */
   nocolor?: boolean;
-  /** Overrides the default card parts, which is ```{graph: true, graphBars: 5}```  */
+  /** Overrides the default card `parts` option, which is ```{graph: true, graphBars: 5}```  */
   parts?: {
     /** Adds extra calculated metrics line to the card, which consists of `min`, `max`, `mean as ((min+max)/2)` and `median` */
     extraMetrics?: boolean;
