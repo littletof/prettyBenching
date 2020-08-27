@@ -16,15 +16,26 @@ import {
 import { TableBuilder } from "./table.ts";
 import { Colorer } from "./colorer.ts";
 
+/** Defines the options for card formatted results */
 export interface prettyBenchmarkCardResultOptions {
   // type: "card"; TODO when multiple options
+  /** If provided, the measured values will be colored accordingly in the card. Also needed, if `parts.threshold` is set to `true` */
   thresholds?: Thresholds;
+  /** If provided, the indicators will be placed for the specific benches */
   indicators?: BenchIndicator[];
+  /** Strips all default colors from the output. 
+   * 
+   * *Note*: it doesnt strip the colors that come through user defined `thresholds` and `indicators`  */
   nocolor?: boolean;
+  /** Overrides the default card `parts` option, which is ```{graph: true, graphBars: 5}```  */
   parts?: {
+    /** Adds extra calculated metrics line to the card, which consists of `min`, `max`, `mean as ((min+max)/2)` and `median` */
     extraMetrics?: boolean;
+    /** Add a line, where the threshold ranges are shown. Only shown, when a `Threshold` was provided for the specific benchmark. */
     threshold?: boolean;
+    /** Add a graph, that shows the distribution of the runs. It's only shown above `9` runs */
     graph?: boolean;
+    /** Defines how many groups the distribution graph should use. */
     graphBars?: number;
   };
 }
