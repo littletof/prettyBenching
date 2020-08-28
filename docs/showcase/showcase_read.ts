@@ -3,12 +3,12 @@
 import { prettyBenchmarkProgress, prettyBenchmarkResult } from "../../mod.ts";
 import {
   readJsonSync,
-} from "https://deno.land/std@0.63.0/fs/mod.ts";
-import { join } from "https://deno.land/std@0.63.0/path/mod.ts";
+} from "https://deno.land/std@0.66.0/fs/mod.ts";
+import { join } from "https://deno.land/std@0.66.0/path/mod.ts";
 import {
   BenchmarkRunProgress,
   ProgressState,
-} from "https://deno.land/std@0.63.0/testing/bench.ts";
+} from "https://deno.land/std@0.66.0/testing/bench.ts";
 
 const pathBase = join(".", "docs", "showcase");
 

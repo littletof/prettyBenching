@@ -9,14 +9,14 @@ import {
   ColumnDefinition,
   extraMetricsColumns,
   GroupDefinition,
-} from "https://deno.land/x/pretty_benching@v0.2.1/mod.ts";
+} from "https://deno.land/x/pretty_benching@v0.2.2/mod.ts";
 
 import {
   runBenchmarks,
   bench,
-} from "https://deno.land/std@0.63.0/testing/bench.ts";
+} from "https://deno.land/std@0.66.0/testing/bench.ts";
 
-import * as colors from "https://deno.land/std@0.63.0/fmt/colors.ts";
+import * as colors from "https://deno.land/std@0.66.0/fmt/colors.ts";
 
 bench({
   name: "Sorting arrays",

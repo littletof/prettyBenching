@@ -2,12 +2,14 @@
 
 A simple Deno library, that gives you pretty benchmarking progress and results in the commandline
 
-[![deno version](https://img.shields.io/badge/deno-1.2.2-success?logo=deno)](https://github.com/denoland/deno)
-[![deno/std version](https://img.shields.io/badge/deno/std-0.63.0-success?logo=deno)](https://deno.land/std@0.63.0)
+[![version](https://img.shields.io/badge/0.2.2-brightgreen?logo=v&logoColor=white&labelColor=gray)](https://deno.land/x/pretty_benching@v0.2.2)
+
+[![deno version](https://img.shields.io/badge/deno%201.3.1-success?logo=deno&logoColor=black&labelColor=white&color=black)](https://github.com/denoland/deno)
+[![deno/std version](https://img.shields.io/badge/deno/std%200.66.0-success?logo=deno&logoColor=black&labelColor=white&color=black)](https://deno.land/std@0.66.0)
+[![documentation](https://img.shields.io/badge/docs-blue?logo=deno&logoColor=black&labelColor=white&color=blue)](https://doc.deno.land/https/deno.land/x/pretty_benching/mod.ts)
 
 [![Build Status](https://github.com/littletof/prettyBenching/workflows/CI/badge.svg)](https://github.com/littletof/prettyBenching/actions?query=workflow%3ACI)
 ![maintained](https://img.shields.io/maintenance/yes/2021)
-[![documentation](https://img.shields.io/badge/%E2%80%8E-docs-blue.svg?logo=deno)](https://doc.deno.land/https/deno.land/x/pretty_benching/mod.ts)
 
 ## Jump to
 
@@ -35,13 +37,13 @@ Add the following to your `deps.ts`
 export {
   prettyBenchmarkResult,
   prettyBenchmarkProgress
-} from 'https://deno.land/x/pretty_benching@v0.2.1/mod.ts';
+} from 'https://deno.land/x/pretty_benching@v0.2.2/mod.ts';
 ```
 
 or just simply import it directly:
 
 ```ts
-import { prettyBenchmarkResult, prettyBenchmarkProgress } from 'https://deno.land/x/pretty_benching@v0.2.1/mod.ts';
+import { prettyBenchmarkResult, prettyBenchmarkProgress } from 'https://deno.land/x/pretty_benching@v0.2.2/mod.ts';
 ```
 
 ## Note

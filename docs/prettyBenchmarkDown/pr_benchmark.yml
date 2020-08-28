@@ -11,9 +11,12 @@ jobs:
       - name: Install deno
         uses: denolib/setup-deno@master
         with:
-          deno-version: 1.2.2
+          deno-version: 1.3.1
       - name: Bench It
         run: deno run --allow-hrtime ./benchmarks/pr_benchmarks.ts | tee ./benchmarks/pr_benchmark.md
+      # Feel free to remove this 'Add link' step
+      - name: Add link
+        run: echo "<p align=\"right\"><a href=\"https://github.com/littletof/prettyBenching\">@prettyBenching</a></p>" | tee -a ./benchmarks/pr_benchmark.md
       - uses: harupy/comment-on-pr@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
