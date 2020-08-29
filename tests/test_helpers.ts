@@ -4,7 +4,7 @@ export interface TestCase<T = unknown, K = unknown> {
   input: T;
   result?: K;
   // deno-lint-ignore-next-line no-explicit-any
-  exception?: { error?: any; msg?: any };
+  exception?: { error?: any; msg?: string };
   desc?: string;
 }
 
@@ -16,7 +16,7 @@ export function testEach<T, K>(
 ) {
   input.forEach((input, i) => {
     Deno.test({
-      name: `${name} [${i}]`,
+      name: `${name} [${i + 1}]`,
       fn() {
         if (input.exception) {
           assertThrows(

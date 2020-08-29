@@ -41,6 +41,10 @@ export function rtime(num: number, from = 0) {
   return num.toFixed(Math.max(defPrec - Math.max(log - from, 0), 0));
 }
 
+/** How many chars will the string shrink in the console, when rendered, compared to original length
+ *  An common emoji is 2 chars, and is 2 chars wide when rendered, so lDiff is 0 for it.
+ * Of course there are exceptions to this like the alombic.
+ */
 export function lDiff(str: string) {
   const escaped = stripColor(str);
   return str.length - escaped.length;

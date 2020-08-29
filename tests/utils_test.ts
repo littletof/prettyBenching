@@ -7,7 +7,11 @@ import {
   rtime,
   matchWithIndex,
   num,
+  lDiff,
+  padStartVisible,
+  padEndVisible,
 } from "../utils.ts";
+import { colors } from "../deps.ts";
 
 testEach<number, string>("utils.perc", [
   { input: 0.10098, result: "0.1", desc: "should convert to 1dec precision" },
@@ -86,6 +90,162 @@ testEach<number, string>("utils.num", [
   assertEquals(num(testCase.input), testCase.result, testCase.desc);
 });
 
-// TODO lDiff
-// TODO padEndVisible
-// TODO padStartVisible
+testEach<string, number>("utils.lDiff", [
+  { input: "[", result: 0 },
+  { input: "[[", result: 0 },
+  { input: ".[", result: 0 },
+  { input: colors.red(""), result: 10 },
+  { input: colors.red("test"), result: 10 },
+  { input: colors.blue(colors.red("")), result: 20 },
+  { input: colors.blue(colors.red("test")), result: 20 },
+
+  { input: colors.blue("another" + colors.red("test")), result: 20 },
+  {
+    input: colors.blue(colors.green("green") + colors.red("test")),
+    result: 30,
+  },
+  {
+    input: colors.blue(colors.green("green") + "and some" + colors.red("test")),
+    result: 30,
+  },
+
+  { input: "#", result: 0 },
+  {
+    input: "⚗",
+    result: 0,
+    desc: "some chars are icons without any extra char",
+  },
+  {
+    input: "⚗\uFE0E",
+    result: 0,
+    desc: "should calc extra char so it behaves like emojis",
+  },
+  { input: "⚗\uFE0E⚗\uFE0E", result: 0 },
+  { input: "‼️", result: 0, desc: "this has \uFE0E hidden char too." },
+  { input: "\u{1F9EA}", result: 0 },
+  { input: "🧪⚗️🈴🚀🦕⚗", result: 0 },
+  { input: "\u{1F9EA}⚗️🈴🚀🦕⚗\uFE0E", result: 0 },
+  { input: "\u{1F9EA}⚗️🈴🚀🦕⚗\uFE0E⚗\uFE0E", result: 0 },
+  { input: colors.green("⚗\uFE0E"), result: 10 },
+  { input: colors.green("‼️‼️"), result: 10 },
+  { input: colors.green("\u{1F9EA}⚗️🈴🚀🦕⚗\uFE0E"), result: 10 },
+  { input: colors.green("⚗\uFE0E ") + colors.red(" ⚗\uFE0E"), result: 20 },
+  {
+    input: colors.green("\u{1F9EA}⚗️🈴🚀🦕⚗\uFE0E") + "-⚗\uFE0E-" +
+      colors.blue("\u{1F9EA}⚗️🈴🚀🦕⚗\uFE0E"),
+    result: 20,
+  },
+], (testCase) => {
+  assertEquals(lDiff(testCase.input), testCase.result /* , testCase.desc */);
+});
+
+testEach<{ str: string; to: number }, string>("utils.padStartVisible", [
+  { input: { str: "", to: 4 }, result: "...." },
+  { input: { str: "#", to: 4 }, result: "...#" },
+  { input: { str: "⚗", to: 4 }, result: "...⚗" },
+  { input: { str: "⚗\uFE0E", to: 4 }, result: "..⚗\uFE0E" },
+  { input: { str: "⚗\uFE0E⚗\uFE0E", to: 4 }, result: "⚗\uFE0E⚗\uFE0E" },
+  { input: { str: "‼️", to: 4 }, result: "..‼️" },
+  { input: { str: "\u{1F9EA}", to: 4 }, result: "..\u{1F9EA}" }, // 6
+  { input: { str: "\u{1F9EA}⚗️🈴🚀🦕⚗", to: 9 }, result: "\u{1F9EA}⚗️🈴🚀🦕⚗" },
+  { input: { str: "\u{1F9EA}⚗️🈴🚀🦕⚗", to: 15 }, result: "....\u{1F9EA}⚗️🈴🚀🦕⚗" },
+  {
+    input: { str: "\u{1F9EA}⚗️🈴🚀🦕⚗\uFE0E", to: 15 },
+    result: "...\u{1F9EA}⚗️🈴🚀🦕⚗\uFE0E",
+  },
+  {
+    input: { str: "\u{1F9EA}⚗️🈴🚀🦕⚗\uFE0E⚗\uFE0E", to: 15 },
+    result: ".\u{1F9EA}⚗️🈴🚀🦕⚗\uFE0E⚗\uFE0E",
+  },
+  {
+    input: { str: colors.green("⚗\uFE0E"), to: 4 },
+    result: ".." + colors.green("⚗\uFE0E"),
+  }, // 11
+  {
+    input: { str: colors.green("‼️‼️"), to: 5 },
+    result: "." + colors.green("‼️‼️"),
+  },
+  {
+    input: { str: colors.green("\u{1F9EA}⚗️🈴🚀🦕⚗\uFE0E"), to: 15 },
+    result: "..." + colors.green("\u{1F9EA}⚗️🈴🚀🦕⚗\uFE0E"),
+  },
+  {
+    input: { str: colors.green("⚗\uFE0E_") + colors.red(".⚗\uFE0E"), to: 7 },
+    result: "." + colors.green("⚗\uFE0E_") + colors.red(".⚗\uFE0E"),
+  },
+  {
+    input: {
+      str: colors.green("\u{1F9EA}⚗️🈴🚀🦕⚗\uFE0E") + "-⚗\uFE0E-" +
+        colors.blue("\u{1F9EA}⚗️🈴🚀🦕⚗\uFE0E"),
+      to: 31,
+    },
+    result: "..." + colors.green("\u{1F9EA}⚗️🈴🚀🦕⚗\uFE0E") + "-⚗\uFE0E-" +
+      colors.blue("\u{1F9EA}⚗️🈴🚀🦕⚗\uFE0E"),
+  },
+], (testCase) => {
+  assertEquals(
+    padStartVisible(testCase.input.str, testCase.input.to, "."),
+    testCase.result,
+    testCase.desc,
+  );
+});
+
+testEach<{ str: string; to: number }, string>("utils.padEndVisible", [
+  { input: { str: "", to: 4 }, result: "...." },
+  { input: { str: "%", to: 4 }, result: "%..." },
+  {
+    input: { str: Array(8).fill("=").join(""), to: 11 },
+    result: "========...",
+  },
+  {
+    input: { str: colors.green(Array(8).fill("=").join("")), to: 11 },
+    result: colors.green("========") + "...",
+  },
+  { input: { str: "#", to: 4 }, result: "#..." },
+  { input: { str: "⚗", to: 4 }, result: "⚗..." },
+  { input: { str: "⚗\uFE0E", to: 4 }, result: "⚗\uFE0E.." }, // 6
+  { input: { str: "⚗\uFE0E⚗\uFE0E", to: 5 }, result: "⚗\uFE0E⚗\uFE0E." },
+  { input: { str: "‼️", to: 4 }, result: "‼️.." },
+  { input: { str: "\u{1F9EA}", to: 4 }, result: "\u{1F9EA}.." },
+  { input: { str: "\u{1F9EA}⚗️🈴🚀🦕⚗", to: 9 }, result: "\u{1F9EA}⚗️🈴🚀🦕⚗" },
+  { input: { str: "\u{1F9EA}⚗️🈴🚀🦕⚗", to: 15 }, result: "\u{1F9EA}⚗️🈴🚀🦕⚗...." },
+  {
+    input: { str: "\u{1F9EA}⚗️🈴🚀🦕⚗\uFE0E", to: 15 },
+    result: "\u{1F9EA}⚗️🈴🚀🦕⚗\uFE0E...",
+  },
+  {
+    input: { str: "\u{1F9EA}⚗️🈴🚀🦕⚗\uFE0E⚗\uFE0E", to: 15 },
+    result: "\u{1F9EA}⚗️🈴🚀🦕⚗\uFE0E⚗\uFE0E.",
+  },
+  {
+    input: { str: colors.green("⚗\uFE0E"), to: 4 },
+    result: colors.green("⚗\uFE0E") + "..",
+  }, // 14
+  {
+    input: { str: colors.green("‼️‼️"), to: 5 },
+    result: colors.green("‼️‼️") + ".",
+  },
+  {
+    input: { str: colors.green("\u{1F9EA}⚗️🈴🚀🦕⚗\uFE0E"), to: 15 },
+    result: colors.green("\u{1F9EA}⚗️🈴🚀🦕⚗\uFE0E") + "...",
+  },
+  {
+    input: { str: colors.green("⚗\uFE0E_") + colors.red(".⚗\uFE0E"), to: 7 },
+    result: colors.green("⚗\uFE0E_") + colors.red(".⚗\uFE0E") + ".",
+  },
+  {
+    input: {
+      str: colors.green("\u{1F9EA}⚗️🈴🚀🦕⚗\uFE0E") + "-⚗\uFE0E-" +
+        colors.blue("\u{1F9EA}⚗️🈴🚀🦕⚗\uFE0E"),
+      to: 31,
+    },
+    result: colors.green("\u{1F9EA}⚗️🈴🚀🦕⚗\uFE0E") + "-⚗\uFE0E-" +
+      colors.blue("\u{1F9EA}⚗️🈴🚀🦕⚗\uFE0E") + "...",
+  },
+], (testCase) => {
+  assertEquals(
+    padEndVisible(testCase.input.str, testCase.input.to, "."),
+    testCase.result,
+    testCase.desc,
+  );
+});
