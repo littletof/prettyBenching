@@ -404,7 +404,8 @@ function tableRow(
         value = "*"; // this means no formatter function and no propertyKey was defined.
       } else {
         // deno-lint-ignore no-explicit-any
-        value = (result as any)[c.propertyKey] || "-"; // TODO fix: "-" only when `undefined`
+        const vc = (result as any)[c.propertyKey];
+        value = typeof vc !== "undefined" ? vc : "-";
       }
     }
 
