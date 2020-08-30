@@ -1,7 +1,7 @@
 import {
   prettyBenchmarkProgress,
   prettyBenchmarkResult,
-} from "https://deno.land/x/pretty_benching@v0.2.2/mod.ts";
+} from "https://deno.land/x/pretty_benching@v0.2.3/mod.ts";
 
 import {
   runBenchmarks,
