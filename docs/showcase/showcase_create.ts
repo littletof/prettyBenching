@@ -9,47 +9,31 @@ import {
 } from "../../deps.ts";
 
 bench({
-  name: "Sorting arrays",
-  runs: 200,
+  name: "finished",
+  runs: 100,
   func(b): void {
     b.start();
-    new Array(10000).fill(Math.random()).sort();
+    for (let i = 0; i < 1e6; i++);
     b.stop();
   },
 });
 
 bench({
-  name: "Rotating arrays",
-  runs: 20,
-  func(b): void {
-    b.start();
-    let a = new Array(500);
-    for (let i = 0; i < 500; i++) {
-      a.pop();
-      a = a.reverse();
-    }
-    b.stop();
-  },
-});
-
-bench({
-  name: "Proving NP==P",
+  name: "benchmark-start",
   runs: 1,
   func(b): void {
     b.start();
-    for (let i = 0; i < 1e9 / 5; i++) {
-      const NPeP = Math.random() === Math.random();
-    }
+    for (let i = 0; i < 1e6; i++);
     b.stop();
   },
 });
 
 bench({
-  name: "Standing out",
-  runs: 20,
+  name: "multiple-runs",
+  runs: 100,
   func(b): void {
     b.start();
-    new Array(10000).fill(Math.random()).sort();
+    for (let i = 0; i < 1e8; i++);
     b.stop();
   },
 });
