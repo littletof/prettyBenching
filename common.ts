@@ -51,6 +51,7 @@ export function getBenchIndicator(
 
 /** strips terminal color */
 export function stripColor(str: string) {
+  // deno-lint-ignore no-control-regex
   return str.replace(/\x1b\[[0-9\;]*m/g, "");
 }
 
