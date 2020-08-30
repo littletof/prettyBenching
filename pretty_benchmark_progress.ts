@@ -209,7 +209,7 @@ function startBenchingLine(
 ): string {
   const cyanHeader = `${c.cyan(headerPadding)}`;
   const fullQueued = `Benchmarks queued: [${
-    c.yellow(progress.queued.length.toString().padStart(5))
+    c.yellow(progress.queued!.length.toString().padStart(5)) // TODO queued being optional was introduced in std 0.67.0. It shouldnt be optional.
   }]`;
   const fullFiltered = c.gray(
     ` filtered: [${progress.filtered.toString().padStart(5)}]`,

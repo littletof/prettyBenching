@@ -1,22 +1,14 @@
 import {
   prettyBenchmarkProgress,
   prettyBenchmarkResult,
-  prettyBenchmarkDown,
-  defaultColumns,
-  indicatorColumn,
-  thresholdResultColumn,
-  thresholdsColumn,
-  ColumnDefinition,
-  extraMetricsColumns,
-  GroupDefinition,
 } from "https://deno.land/x/pretty_benching@v0.2.2/mod.ts";
 
 import {
   runBenchmarks,
   bench,
-} from "https://deno.land/std@0.66.0/testing/bench.ts";
+} from "https://deno.land/std@0.67.0/testing/bench.ts";
 
-import * as colors from "https://deno.land/std@0.66.0/fmt/colors.ts";
+import * as colors from "https://deno.land/std@0.67.0/fmt/colors.ts";
 import { BenchIndicator } from "./types.ts";
 
 bench({
