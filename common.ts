@@ -23,7 +23,7 @@ export function getInThresholdRange(
   name: string,
   time: number,
   thresholds?: Thresholds,
-) {
+): null | 1 | 2 | 3 {
   const th = thresholds && thresholds[name];
 
   if (th) {

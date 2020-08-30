@@ -36,14 +36,15 @@ Add the following to your `deps.ts`
 ```ts
 export {
   prettyBenchmarkResult,
-  prettyBenchmarkProgress
+  prettyBenchmarkProgress,
+  prettyBenchmarkDown
 } from 'https://deno.land/x/pretty_benching@v0.2.2/mod.ts';
 ```
 
 or just simply import it directly:
 
 ```ts
-import { prettyBenchmarkResult, prettyBenchmarkProgress } from 'https://deno.land/x/pretty_benching@v0.2.2/mod.ts';
+import { prettyBenchmarkResult, prettyBenchmarkProgress, prettyBenchmarkDown } from 'https://deno.land/x/pretty_benching@v0.2.2/mod.ts';
 ```
 
 ## Note
@@ -154,7 +155,7 @@ You can pass this object to `prettyBenchmarkProgress` too.
 const indicators = [
   {
     benches: /multiple-runs/,
-    tableColor: colors.magenta,
+    color: colors.magenta,
     modFn: () => "🚀",
   }
 ];
@@ -357,7 +358,7 @@ columns: [
 
 When you need something else, you can define you own columns. You can put custom `ColumnDefinitions` into the `columns` array.
 
-* The simplest way, is to give it a `propertyKey`, and than it shows that value of the `BenchmarkResult`. You can use any key here, but you will have to put these values into the results manually. If a `result[propertyKey` is `undefined`, than it puts a `-` into that cell.
+* The simplest way, is to give it a `propertyKey`, and than it shows that value of the `BenchmarkResult`. You can use any key here, but you will have to put these values into the results manually. If a `result[propertyKey]` is `undefined`, than it puts a `-` into that cell.
 If your returned value is a `number`, than you can use `toFixed` to tell what precision you want to see. (It's ignored if value is not a number)
 
 * If your usecase is more complex, than you can use the `formatter` method, where you get the benchmark result, and you can return any value that you want from that. The predefined column types above use this method as well.
@@ -444,8 +445,8 @@ You can see an example Github Action for this [here](https://github.com/littleto
 - [x] Separate `prettyBenchmarkResults` and `prettyBenchmarkProgress` into independently importable modules.
 - [x] Add the ability to follow the change on how the outputs look like.
 - [x] Refactor how optional `options` are handled
+- [x] Write JSDocs
 - [ ] Proper tests
-- [ ] Write JSDocs
 - [ ] Refactor README
 - [ ] Add showcase module, which helps to have consistent docs images
 - [ ] Make module contributor friendly

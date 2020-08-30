@@ -13,6 +13,8 @@ import {
   GroupDefinition,
 } from "../pretty_benchmark_down.ts";
 
+import { Thresholds, BenchIndicator } from "./types.ts";
+
 // TODO run tests from recorded results.
 
 bench({
@@ -61,7 +63,7 @@ dummyBench("single");
 dummyBench("multiple", 2);
 dummyBench("multiple", 1000);
 
-const thresholds = {
+const thresholds: Thresholds = {
   "for100ForIncrementX1e6": { green: 0.85, yellow: 1 },
   "for100ForIncrementX1e8": { green: 84, yellow: 93 },
   "forIncrementX1e9": { green: 900, yellow: 800 },
@@ -78,7 +80,6 @@ test({
           console.error(colors.red(e.stack));
         },
       );
-    assert(true);
   },
 });
 
@@ -91,7 +92,6 @@ test({
           console.error(colors.red(e.stack));
         },
       );
-    assert(true);
   },
 });
 
@@ -104,7 +104,6 @@ test({
           console.error(colors.red(e.stack));
         },
       );
-    assert(true);
   },
 });
 
@@ -118,7 +117,7 @@ test({
     dummyBench("Bench3");
 
     runBenchmarks({ silent: true })
-      .then(prettyBenchmarkDown(() => {}, {
+      .then(prettyBenchmarkDown(() => {/* do not print */}, {
         groups: [
           {
             include: /noBenchLikeThis/,
@@ -131,7 +130,6 @@ test({
           },
         ],
       }));
-    assert(true);
   },
 });
 

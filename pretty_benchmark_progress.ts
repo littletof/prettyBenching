@@ -18,13 +18,31 @@ const headerPadding = "▒▒▒▒▒▒▒▒";
 const lineLength = 130;
 const c: Colorer = new Colorer();
 
+/** Defines how the resulting output should look like. */
 export interface prettyBenchmarkProgressOptions {
+  /** If provided, the results will be colored accordingly */
   thresholds?: Thresholds;
+  /** If provided, the indicators will be placed before the specific benches */
   indicators?: BenchIndicator[];
+  /** Strips all default colors from the output. 
+   * 
+   * *Note*: it doesnt strip the colors that come through user defined `thresholds` and `indicators`  */
   nocolor?: boolean;
 }
 
+/** Returns a function that expects `BenchmarkRunProgress` object, which than prints 
+ * the benchmarking progress in a nicely formatted way, based on the provided `options`.
+ * 
+ * Typical basic usage:
+ * 
+ * ```ts
+ * // add benches, then
+ * runBenchmarks({silent: true}, prettyBenchmarkProgress());
+ * ```
+ * .
+ */
 export function prettyBenchmarkProgress(
+  /** Defines how the output should look like */
   options?: prettyBenchmarkProgressOptions,
 ) {
   if (options?.nocolor) c.setColorEnabled(false);
