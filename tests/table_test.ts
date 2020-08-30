@@ -151,5 +151,5 @@ testEach<{ w: number; ops: (tb: TableBuilder) => void }, string>(
     const colored = testCase.result?.replaceAll(/([┌┬─┐│└┴─┘├┼┤])/g, colors.green('$1'));
     console.log(colored);
     assertEquals(outCol, colored); */
-  }
+  },
 );
