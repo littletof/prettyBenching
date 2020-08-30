@@ -154,6 +154,10 @@ export class TableBuilder {
   }
 
   private getWSeparatorPositions(line: string) {
+    /* stash 
+    return matchWithIndex(line, /│/g).map(i => {
+      return i - lDiff(line.slice(0, i));
+    }); */
     return matchWithIndex(line, /│/g);
   }
 }

@@ -1,5 +1,5 @@
 import { test, assert, assertEquals } from "./test_deps.ts";
-import * as mod from "./mod.ts";
+import * as mod from "../mod.ts";
 
 test({
   name: "public API assertions",
