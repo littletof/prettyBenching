@@ -8,6 +8,7 @@ export interface prettyBenchmarkHistoricOptions {
     onlyHrTime: boolean,
     extra: (result: BenchmarkResult) => unknown // T here precalc and save extra metrics
     saveIndividualRuns: boolean;
+    minRequiredRuns: number; // error if run below x
     // save precalced -> inside extra
 }
 
@@ -17,7 +18,9 @@ export class prettyBenchmarkHistoric { // only work with JSON no file handling
     private init() {}
     private load() {} // contruct dates
 
-    addResults(){}
+    addResults(results: BenchmarkRunResult, options?: {id?: string}){
+        return this;
+    }
 
     getDeltaFrom(results: BenchmarkRunResult){}
 
@@ -30,6 +33,11 @@ export class prettyBenchmarkHistoric { // only work with JSON no file handling
 
     }
 
+    getThresholds() {
+        // return green below alltime avgs min
+        // return yellow above alltime avgs max + x perc.
+        // return none is 0/1/x preceeding historic
+    }
 }
 // error if same name multiple times in 1 run.
 
@@ -37,7 +45,7 @@ export interface historicData {
     benchmarks: {
         [key: string]: {
             name: string;
-            id: string;
+            id: string; // to identify specific run
             extra: unknown; // T
             date: Date;
 
@@ -47,6 +55,13 @@ export interface historicData {
         }
     },
     lastBenchmark: Date;
+}
+
+export interface delta {
+    [key: string]: {
+        avg: {perc: number, ms: number}
+        [key: string]: {perc: number, ms: number} // if can find key in extra calc for it. getDeltaForSingle
+    }
 }
 
 function historicColumn(historic: prettyBenchmarkHistoric, options?: {key: string}): any {
@@ -61,6 +76,6 @@ function example() {
     .then(prettyBenchmarkResult()) // to determine
     .then(prettyBenchmarkDown(console.log, {columns: [...historicColumn(historic)]})) // historicColumn
     .then((results: BenchmarkRunResult) => {
-        Deno.writeTextFileSync("./benchmarks/historic.json", JSON.stringify(historic.getData()))
+        Deno.writeTextFileSync("./benchmarks/historic.json", JSON.stringify(historic.addResults(results).getData()))
     })
 }
