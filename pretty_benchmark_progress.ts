@@ -26,6 +26,8 @@ export interface prettyBenchmarkProgressOptions {
   thresholds?: Thresholds;
   /** If provided, the indicators will be placed before the specific benches */
   indicators?: BenchIndicator[];
+
+  extra?: (result: BenchmarkResult) => string; // TODO doc + proper name
   /** Strips all default colors from the output. 
    * 
    * *Note*: it doesnt strip the colors that come through user defined `thresholds` and `indicators`  */
@@ -91,11 +93,15 @@ function _prettyBenchmarkProgress(
   // Bench run result
   if (progress.state === ProgressState.BenchResult) {
     const line = finishedBenchmarkLine(progress, options);
+    const appended = typeof options?.extra === "function"
+      ? options.extra([...progress.results].reverse()[0])
+      : "";
     /* Deno.stdout.writeSync(
       new TextEncoder().encode(`\r${padEndVisible(line, 140)}\n`),
       ); */
-      out(`${up1Line}\r${line}`);
-      return;
+    // console.log(`${up1Line}\r`+ line + `[${(Math.random() > 0.5 ? `${colors.red('▲ +3% (25ms)')}` : `${colors.green('▼ -5% (50ms)')}`)}]`);
+    out(`${up1Line}\r${line}${appended}`);
+    return;
   }
 
   // Finished benching
