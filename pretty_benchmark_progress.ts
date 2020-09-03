@@ -2,6 +2,7 @@ import {
   BenchmarkRunProgress,
   ProgressState,
   BenchmarkRunResult,
+  BenchmarkResult,
 } from "./deps.ts";
 import { Thresholds, BenchIndicator } from "./types.ts";
 import { getTimeColor, getBenchIndicator } from "./common.ts";
@@ -11,6 +12,7 @@ import {
   usingHrTime,
   padEndVisible,
   num,
+  padStartVisible,
 } from "./utils.ts";
 import { Colorer } from "./colorer.ts";
 
@@ -28,6 +30,8 @@ export interface prettyBenchmarkProgressOptions {
    * 
    * *Note*: it doesnt strip the colors that come through user defined `thresholds` and `indicators`  */
   nocolor?: boolean;
+  /** Overrides the default output function, which is `console.log`. */
+  outputFn?: (log: string) => unknown;
 }
 
 /** Returns a function that expects `BenchmarkRunProgress` object, which than prints 
@@ -55,10 +59,15 @@ function _prettyBenchmarkProgress(
   progress: BenchmarkRunProgress,
   options?: prettyBenchmarkProgressOptions,
 ) {
+  const up1Line = "\x1B[1A";
+  const out = typeof options?.outputFn === "function"
+    ? options.outputFn
+    : console.log;
+
   // Started benching
   if (progress.state === ProgressState.BenchmarkingStart) {
     const line = startBenchingLine(progress, options);
-    console.log(line);
+    out(line);
     return;
   }
 
@@ -66,41 +75,44 @@ function _prettyBenchmarkProgress(
   if (progress.state === ProgressState.BenchStart) {
     const line = startingBenchmarkLine(progress, options);
     // const line = runningBenchmarkLine(progress, options);
-    Deno.stdout.writeSync(new TextEncoder().encode(`${line}\t`));
+    // Deno.stdout.writeSync(new TextEncoder().encode(`${line}\t`));
+    out(`${line}\t`);
     return;
   }
 
   // Multiple run bench partial result
   if (progress.state === ProgressState.BenchPartialResult) {
     const line = runningBenchmarkLine(progress, options);
-    Deno.stdout.writeSync(new TextEncoder().encode(`\r${line}\t`));
+    // Deno.stdout.writeSync(new TextEncoder().encode(`\r${line}\t`));
+    out(`${up1Line}\r${line}\t`);
     return;
   }
 
   // Bench run result
   if (progress.state === ProgressState.BenchResult) {
     const line = finishedBenchmarkLine(progress, options);
-    Deno.stdout.writeSync(
+    /* Deno.stdout.writeSync(
       new TextEncoder().encode(`\r${padEndVisible(line, 140)}\n`),
-    );
-    return;
+      ); */
+      out(`${up1Line}\r${line}`);
+      return;
   }
 
   // Finished benching
   if (progress.state === ProgressState.BenchmarkingEnd) {
     if (progress.running) {
-      console.log("\n"); // Double empty line
-      console.log(
+      out("\n"); // Double empty line
+      out(
         c.red(
           `${headerPadding} Benchmarking failed\n${headerPadding} An error was thrown while running benchmark [${progress.running.name}]\n`,
         ),
       );
       return;
     }
-    console.log(); // Empty line
+    out(""); // Empty line
     considerPrecise(progress);
     const cyanHeader = `${c.cyan(headerPadding)}`;
-    console.log(`${cyanHeader} Benchmarking finished\n`);
+    out(`${cyanHeader} Benchmarking finished\n`);
     return;
   }
 }
@@ -197,10 +209,11 @@ function finishedBenchmarkLine(
   const coloredTime = colorFn(paddedAvgTime);
   const fullAverage = `Avg: [${coloredTime}${c.gray("ms")}]`;
 
-  return padEndVisible(
+  /*return padEndVisible(
     `Benched ${fullName} ${fullCount} ${fullTotalTime} ${fullAverage}`,
     lineLength,
-  );
+  );*/
+  return `Benched ${fullName} ${fullCount} ${fullTotalTime} ${fullAverage}`;
 }
 
 function startBenchingLine(
@@ -222,6 +235,6 @@ function benchNameFormatted(
   name: string,
   options?: prettyBenchmarkProgressOptions,
 ) {
-  return `${getBenchIndicator(name, options?.indicators)}` +
+  return `${padStartVisible(getBenchIndicator(name, options?.indicators), 2)}` +
     `[${c.cyan(name)} ${c.gray(padEndVisible("", 40 - name.length, "-"))}]`;
 }
