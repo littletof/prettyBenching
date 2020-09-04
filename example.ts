@@ -1,7 +1,8 @@
 import {
   prettyBenchmarkProgress,
   prettyBenchmarkResult,
-} from "./mod.ts"; //"https://deno.land/x/pretty_benching@v0.2.3/mod.ts";
+  BenchIndicator,
+} from "https://deno.land/x/pretty_benching@v0.2.3/mod.ts";
 
 import {
   runBenchmarks,
@@ -9,7 +10,6 @@ import {
 } from "https://deno.land/std@0.67.0/testing/bench.ts";
 
 import * as colors from "https://deno.land/std@0.67.0/fmt/colors.ts";
-import { BenchIndicator } from "./types.ts";
 
 bench({
   name: "Sorting arrays",

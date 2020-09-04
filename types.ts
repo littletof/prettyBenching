@@ -7,7 +7,9 @@ export interface BenchIndicator {
    * *Note*: If color functions are used, the `nocolor` option doesnt affect them
    * @param str: The default indicator char
    */
-  modFn?: (str: string) => string;
+  modFn?: (
+    str: string,
+  ) => string | { indicator: string; visibleLength: number };
   /** Defines a color that should be assosiated with the matching benches. A simple std color function should be provided.
    * 
    * *Note*: If color functions are used, the `nocolor` option doesnt affect them
