@@ -17,7 +17,6 @@ import {
 import { Colorer } from "./colorer.ts";
 
 const headerPadding = "▒▒▒▒▒▒▒▒";
-const lineLength = 130;
 const c: Colorer = new Colorer();
 
 /** Defines how the resulting output should look like. */
@@ -74,8 +73,6 @@ function _prettyBenchmarkProgress(
   // Starting bench run
   if (progress.state === ProgressState.BenchStart) {
     const line = startingBenchmarkLine(progress, options);
-    // const line = runningBenchmarkLine(progress, options);
-    // Deno.stdout.writeSync(new TextEncoder().encode(`${line}\t`));
     out(`${line}\t`);
     return;
   }
@@ -83,7 +80,6 @@ function _prettyBenchmarkProgress(
   // Multiple run bench partial result
   if (progress.state === ProgressState.BenchPartialResult) {
     const line = runningBenchmarkLine(progress, options);
-    // Deno.stdout.writeSync(new TextEncoder().encode(`\r${line}\t`));
     out(`${up1Line}\r${line}\t`);
     return;
   }
@@ -91,9 +87,6 @@ function _prettyBenchmarkProgress(
   // Bench run result
   if (progress.state === ProgressState.BenchResult) {
     const line = finishedBenchmarkLine(progress, options);
-    /* Deno.stdout.writeSync(
-      new TextEncoder().encode(`\r${padEndVisible(line, 140)}\n`),
-      ); */
     out(`${up1Line}\r${line}`);
     return;
   }
@@ -141,7 +134,6 @@ function startingBenchmarkLine(
   }]`;
 
   return `Running ${fullName} a total of ${fullTimes} times`;
-  // return padEndVisible(`Running ${fullName} ${fullTimes} runs queued`, lineLength);
 }
 
 function runningBenchmarkLine(
@@ -209,10 +201,6 @@ function finishedBenchmarkLine(
   const coloredTime = colorFn(paddedAvgTime);
   const fullAverage = `Avg: [${coloredTime}${c.gray("ms")}]`;
 
-  /*return padEndVisible(
-    `Benched ${fullName} ${fullCount} ${fullTotalTime} ${fullAverage}`,
-    lineLength,
-  );*/
   return `Benched ${fullName} ${fullCount} ${fullTotalTime} ${fullAverage}`;
 }
 
@@ -235,6 +223,20 @@ function benchNameFormatted(
   name: string,
   options?: prettyBenchmarkProgressOptions,
 ) {
+  let ob = "[";
+  let clb = "]";
+  if (options?.indicators) {
+    const indicator = options.indicators.find(({ benches }) =>
+      benches.test(name)
+    );
+    if (typeof indicator?.color === "function") {
+      ob = indicator.color(ob);
+      clb = indicator.color(clb);
+    }
+  }
+
   return `${getPaddedIndicator(name, 2, options?.indicators)}` +
-    `[${c.cyan(name)} ${c.gray(padEndVisible("", 40 - name.length, "-"))}]`;
+    `${ob}${c.cyan(name)} ${
+      c.gray(padEndVisible("", 40 - name.length, "-"))
+    }${clb}`;
 }
