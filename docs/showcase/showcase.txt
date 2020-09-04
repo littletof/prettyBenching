@@ -1,8 +1,10 @@
 
 ▒▒▒▒▒▒▒▒ Starting benchmarking
 ▒▒▒▒▒▒▒▒ Benchmarks queued: [    3]  filtered: [    0]
-Benched  [finished --------------------------------] Runs: [    100] Total time: [     42.9500ms] Avg: [      0.4295ms]                     
-Running  [benchmark-start -------------------------] a total of [      1] times	Running %[multiple-runs ---------------------------] [    52/   100] [======================52=%                      ]	
+
+[1ABenched   [finished --------------------------------] Runs: [    100] Total time: [     42.9500ms] Avg: [      0.4295ms]
+Running   [benchmark-start -------------------------] a total of [      1] times	
+[1ARunning  %[multiple-runs ---------------------------] [    52/   100] [======================52=%                      ]	
 
 ▒▒▒▒▒▒▒▒ Benchmarking finished
 
