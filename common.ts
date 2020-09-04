@@ -1,5 +1,6 @@
 import { colors, BenchmarkResult } from "./deps.ts";
 import { Thresholds, BenchIndicator } from "./types.ts";
+import { padStartVisible } from "./utils.ts";
 
 const { green, yellow, red, white } = colors;
 
@@ -34,7 +35,7 @@ export function getInThresholdRange(
   return null;
 }
 
-export function getBenchIndicator(
+/* export function getBenchIndicator(
   name: string,
   indicators?: BenchIndicator[],
 ) {
@@ -47,6 +48,57 @@ export function getBenchIndicator(
   }
 
   return ""; // no indicators were defined
+} */
+
+/** Gets the correct indicator for the named bench */
+export function getIndicator(
+  name: string,
+  indicators?: BenchIndicator[],
+) {
+  if (indicators && indicators.length > 0) {
+    const indChar = "▒▒";
+    const indicator = indicators.find(({ benches }) => benches.test(name));
+    if (indicator) {
+      if (typeof indicator.modFn == "function") {
+        const modded = indicator.modFn(indChar);
+        return modded; // str or object
+      } else {
+        return false; // has indicator but no modFn
+      }
+    }
+  }
+
+  return undefined;
+}
+
+/** Handles the padding of indicators to specific lengths */
+export function getPaddedIndicator(
+  name: string,
+  toLength: number,
+  indicators?: BenchIndicator[],
+  noIndicator: string = " ".repeat(toLength),
+) {
+  const indicator = getIndicator(name, indicators);
+  if (indicator) {
+    let newIndicator = "";
+
+    if (
+      typeof indicator === "object" && indicator.indicator &&
+      !isNaN(indicator.visibleLength)
+    ) {
+      newIndicator = padStartVisible(
+        `${indicator.indicator}`,
+        toLength +
+          (stripColor(indicator.indicator).length - indicator.visibleLength),
+      );
+    } else { //simple string
+      newIndicator = padStartVisible(`${indicator}`, toLength);
+    }
+
+    return newIndicator;
+  }
+
+  return noIndicator;
 }
 
 /** strips terminal color */

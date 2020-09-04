@@ -3,9 +3,9 @@ import { BenchIndicator, Thresholds } from "./types.ts";
 import {
   stripColor,
   getInThresholdRange,
-  getBenchIndicator,
   calculateExtraMetrics,
   calculateStdDeviation,
+  getPaddedIndicator,
 } from "./common.ts";
 
 // TODO historic: better or worse by x percent to last value
@@ -227,7 +227,7 @@ export function indicatorColumn(
   return {
     title: "",
     formatter: (result: BenchmarkResult, cd: ColumnDefinition) => {
-      return stripColor(getBenchIndicator(result.name, indicators));
+      return stripColor(getPaddedIndicator(result.name, 0, indicators));
     },
   };
 }

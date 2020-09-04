@@ -5,7 +5,7 @@ import {
   BenchmarkResult,
 } from "./deps.ts";
 import { Thresholds, BenchIndicator } from "./types.ts";
-import { getTimeColor, getBenchIndicator } from "./common.ts";
+import { getTimeColor, getPaddedIndicator } from "./common.ts";
 
 import {
   getTimePadSize,
@@ -94,8 +94,8 @@ function _prettyBenchmarkProgress(
     /* Deno.stdout.writeSync(
       new TextEncoder().encode(`\r${padEndVisible(line, 140)}\n`),
       ); */
-      out(`${up1Line}\r${line}`);
-      return;
+    out(`${up1Line}\r${line}`);
+    return;
   }
 
   // Finished benching
@@ -235,6 +235,6 @@ function benchNameFormatted(
   name: string,
   options?: prettyBenchmarkProgressOptions,
 ) {
-  return `${padStartVisible(getBenchIndicator(name, options?.indicators), 2)}` +
+  return `${getPaddedIndicator(name, 2, options?.indicators)}` +
     `[${c.cyan(name)} ${c.gray(padEndVisible("", 40 - name.length, "-"))}]`;
 }

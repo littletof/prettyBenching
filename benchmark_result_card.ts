@@ -2,8 +2,8 @@ import { BenchmarkResult } from "./deps.ts";
 import { BenchIndicator, Thresholds } from "./types.ts";
 import {
   getTimeColor,
-  getBenchIndicator,
   calculateExtraMetrics,
+  getPaddedIndicator,
 } from "./common.ts";
 
 import {
@@ -41,6 +41,7 @@ export interface prettyBenchmarkCardResultOptions {
 }
 
 const tab = "    ";
+const indPlaceholder = "˘˘˘˘";
 let c: Colorer;
 
 export function getResultCard(
@@ -80,7 +81,19 @@ export function getResultCard(
     }
   }
 
-  return tb.build();
+  let table = tb.build();
+
+  // replace the indicator placeholder with the correct indicator
+  table = table.replace(
+    indPlaceholder,
+    getPaddedIndicator(
+      result.name,
+      indPlaceholder.length - 1,
+      options?.indicators,
+    ) + " ",
+  );
+
+  return table;
 }
 
 function prettyBenchmarkHeader(
@@ -88,11 +101,7 @@ function prettyBenchmarkHeader(
   r: BenchmarkResult,
   options: prettyBenchmarkCardResultOptions,
 ) {
-  const indicator = getBenchIndicator(r.name, options.indicators);
-  const indTab = indicator == ""
-    ? tab
-    : padStartVisible(`${indicator} `, tab.length);
-  tb.line(`${indTab}${`Benchmark name: ${c.cyan(r.name)}`}`);
+  tb.line(`${indPlaceholder}${`Benchmark name: ${c.cyan(r.name)}`}`);
   tb.separator();
 }
 
