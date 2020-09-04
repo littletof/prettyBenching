@@ -5,7 +5,7 @@ import {
   BenchmarkResult,
 } from "./deps.ts";
 import { Thresholds, BenchIndicator } from "./types.ts";
-import { getTimeColor, getBenchIndicator } from "./common.ts";
+import { getTimeColor, getPaddedIndicator } from "./common.ts";
 
 import {
   getTimePadSize,
@@ -235,7 +235,7 @@ function benchNameFormatted(
     }
   }
 
-  return `${padStartVisible(getBenchIndicator(name, options?.indicators), 2)}` +
+  return `${getPaddedIndicator(name, 2, options?.indicators)}` +
     `${ob}${c.cyan(name)} ${
       c.gray(padEndVisible("", 40 - name.length, "-"))
     }${clb}`;
