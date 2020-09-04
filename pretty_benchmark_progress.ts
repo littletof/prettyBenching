@@ -89,11 +89,11 @@ function _prettyBenchmarkProgress(
   // Bench run result
   if (progress.state === ProgressState.BenchResult) {
     const line = finishedBenchmarkLine(progress, options);
-    /* const appended = typeof options?.extra === "function"
+    const appended = typeof options?.extra === "function"
       ? options.extra([...progress.results].reverse()[0])
       : "";
-    out(`${up1Line}\r${line}${appended}`); */
-    out(`${up1Line}\r${line}`);
+    out(`${up1Line}\r${line}${appended}`);
+    // out(`${up1Line}\r${line}`);
     return;
   }
 
