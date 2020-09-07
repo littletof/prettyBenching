@@ -1,7 +1,7 @@
 import { runBenchmarks, BenchmarkResult, BenchmarkRunResult, bench, BenchmarkRunProgress } from "https://deno.land/std@0.67.0/testing/bench.ts";
 import { prettyBenchmarkProgress } from "./pretty_benchmark_progress.ts";
 import { prettyBenchmarkResult } from "./pretty_benchmark_result.ts";
-import { prettyBenchmarkDown } from "./pretty_benchmark_down.ts";
+import { prettyBenchmarkDown, ColumnDefinition } from "./pretty_benchmark_down.ts";
 import { colors } from "./deps.ts";
 
 export interface prettyBenchmarkHistoricOptions {
@@ -152,8 +152,64 @@ export interface delta {
     [key: string]: {percent: number, ms: number} // if can find key in extra calc for it. getDeltaForSingle
 }
 
-function historicColumn(historic: prettyBenchmarkHistoric, options?: {key: string}): any {
+function historicColumn(historic: prettyBenchmarkHistoric, options?: {key: string}): ColumnDefinition {
+    return {title: "Change", formatter: (result, cd) => {
+        const delta = historic.getDeltaForSingle(result);
+        if(delta) {
+            const perc = (delta.measuredRunsAvgMs.percent * 100).toFixed(0);
+            const diff = (Math.abs(delta.measuredRunsAvgMs.ms)).toFixed(2);
+            
+            if(delta.measuredRunsAvgMs.ms > 0) {
+                return `🔺 +${perc}% (${diff}ms)`;
+            } else {
+                return `🟢 ${perc}% (${diff}ms)`;
+            }
+        }
+        return "";
+    }};
+}
 
+function historicRow(historic: prettyBenchmarkHistoric, options?: {key: string}): ColumnDefinition[] {
+    const benchmarks = historic.getData()?.benchmarks;
+    if(benchmarks) {
+        const dates: {[key: string]: {benches: {[key: string]: any}, id?: string}} = {};
+        Object.keys(benchmarks).forEach(k => {
+            const bench = benchmarks[k];
+
+            bench.history.forEach(h => {
+                if(!dates[new Date(h.date).toString()]) {
+                    dates[new Date(h.date).toString()] = {benches: {}, id: h.id};
+                }
+
+                dates[new Date(h.date).toString()].benches[bench.name] = {
+                    avg: h.measuredRunsAvgMs, // TODO rename avg
+                    name: bench.name
+                };
+            });
+            // group them based on date
+        });
+
+        const gend: ColumnDefinition[] = Object.keys(dates).sort().map(k => {
+            return {
+                title: dates[k].id ?? new Date(k).toString(), // TODO handle invalid Dates
+                formatter: (result: BenchmarkResult) => {
+                    if(!dates[k].benches[result.name]) {
+                        return '-';
+                    }
+                    return dates[k].benches[result.name].avg || "-";
+                }
+            }
+        });
+
+        gend.push({
+            title: 'Current avg (ms)',
+            propertyKey: 'measuredRunsAvgMs'
+        });
+
+        return gend;
+    }
+    
+    return [];
 }
 
 function historicProgressExtra(historic: prettyBenchmarkHistoric) {
@@ -164,9 +220,9 @@ function historicProgressExtra(historic: prettyBenchmarkHistoric) {
             const diff = (Math.abs(delta.measuredRunsAvgMs.ms)).toFixed(2);
             
             if(delta.measuredRunsAvgMs.ms > 0) {
-                return ` [${colors.red(`▲ +${perc}% (${diff}ms)`)}]`;
+                return ` [${colors.red(` ▲ +${perc}% (${diff}ms)`)}]`;
             } else {
-                return ` [${colors.green(`▼ ${perc}% (${diff}ms)`)}]`;
+                return ` [${colors.green(` ▼ ${perc}% (${diff}ms)`)}]`;
             }
         }
         return "";
@@ -213,6 +269,8 @@ function example() {
     });
 
     runBenchmarks({silent: true}, prettyBenchmarkProgress({extra: historicProgressExtra(historic)}))
+        // TODO defaultColumns to func, dont get avg, total, just name, maybe runs
+        .then(prettyBenchmarkDown(md => {Deno.writeTextFileSync("./benchmarks/hmd.md", md)}, {columns: [{title: 'Name', propertyKey: 'name'}, ...historicRow(historic), historicColumn(historic)]})) // historicColumn
         .then((results: BenchmarkRunResult) => {
             // console.log(historic.getDeltasFrom(results));
 
@@ -223,7 +281,7 @@ function example() {
      
     runBenchmarks({silent: true}, prettyBenchmarkProgress()) // into "extra"
         .then(prettyBenchmarkResult()) // to determine
-        .then(prettyBenchmarkDown(console.log, {columns: [...historicColumn(historic)]})) // historicColumn
+        .then(prettyBenchmarkDown(console.log, {columns: [historicColumn(historic)]})) // historicColumn
         .then((results: BenchmarkRunResult) => {
             Deno.writeTextFileSync("./benchmarks/historic.json", JSON.stringify(historic.addResults(results).getData()))
         });
