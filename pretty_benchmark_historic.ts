@@ -4,7 +4,7 @@ import { prettyBenchmarkResult } from "./pretty_benchmark_result.ts";
 import { prettyBenchmarkDown, ColumnDefinition } from "./pretty_benchmark_down.ts";
 import { colors } from "./deps.ts";
 
-export interface prettyBenchmarkHistoricOptions {
+export interface prettyBenchmarkHistoryOptions {
     strict?: boolean,
     onlyHrTime?: boolean,
     extra?: (result: BenchmarkResult) => unknown // T here precalc and save extra metrics
@@ -13,12 +13,12 @@ export interface prettyBenchmarkHistoricOptions {
     // save precalced -> inside extra
 }
 
-export class prettyBenchmarkHistoric { // only work with JSON no file handling
+export class prettyBenchmarkHistory { // only work with JSON no file handling
     
-    private historicData?: historicData;
-    private options?: prettyBenchmarkHistoricOptions;
+    private historicBenchmarkData?: historicBenchmarkData;
+    private options?: prettyBenchmarkHistoryOptions;
     
-    constructor(options?: prettyBenchmarkHistoricOptions, prev?: historicData) {
+    constructor(options?: prettyBenchmarkHistoryOptions, prev?: historicBenchmarkData) {
         this.options = options;
 
         if(prev) {
@@ -29,12 +29,12 @@ export class prettyBenchmarkHistoric { // only work with JSON no file handling
     }
     
     private init() {
-        this.historicData = { benchmarks: {} };
+        this.historicBenchmarkData = { benchmarks: {} };
     }
 
-    private load(prev: historicData) {
+    private load(prev: historicBenchmarkData) {
         //TODO contruct dates
-        this.historicData = prev;
+        this.historicBenchmarkData = prev;
     } 
 
     addResults(measured: BenchmarkRunResult, options?: {id?: string}){
@@ -45,14 +45,14 @@ export class prettyBenchmarkHistoric { // only work with JSON no file handling
 
         measured.results.forEach(r => {
             
-            if(!this.historicData!.benchmarks[r.name]) {
-                this.historicData!.benchmarks[r.name] = {
+            if(!this.historicBenchmarkData!.benchmarks[r.name]) {
+                this.historicBenchmarkData!.benchmarks[r.name] = {
                     name: r.name,
                     history: []
                 }
             }
 
-            this.historicData!.benchmarks[r.name].history.push({
+            this.historicBenchmarkData!.benchmarks[r.name].history.push({
                 id: options?.id,
                 date,
                 measuredRunsAvgMs: r.measuredRunsAvgMs,
@@ -87,12 +87,12 @@ export class prettyBenchmarkHistoric { // only work with JSON no file handling
             throw new Error(`No benchmark named ${name} was in results`);
         } */
 
-        if(!this.historicData?.benchmarks[result.name]) {
+        if(!this.historicBenchmarkData?.benchmarks[result.name]) {
             // throw new Error(`No benchmark is known named ${name}`);
             return false; // no prev history for this benchmark
         }
 
-        const benchmark = this.historicData.benchmarks[result.name];
+        const benchmark = this.historicBenchmarkData.benchmarks[result.name];
         const prev = benchmark.history[benchmark.history.length-1];
         const current = result;
 
@@ -115,9 +115,11 @@ export class prettyBenchmarkHistoric { // only work with JSON no file handling
 
     }
 
+    // TODO getSpecific run results (by id/date), like in historicRow
+
     getData() { // return json
         // TODO deepCopy
-        return this.historicData;
+        return this.historicBenchmarkData;
     }
 
     getThresholds() {
@@ -128,20 +130,22 @@ export class prettyBenchmarkHistoric { // only work with JSON no file handling
 }
 // error if same name multiple times in 1 run.
 
-export interface historicData {
+export interface BenchmarkRunHistory { // TODO historyItem
+    id?: string; // to identify specific run
+    extra?: unknown; // T
+    date: Date;
+
+    measuredRunsAvgMs: number;
+    totalMs: number;
+    runsCount: number;
+    measuredRunsMs?: number[];
+}
+
+export interface historicBenchmarkData {
     benchmarks: {
         [key: string]: {
             name: string;
-            history: {
-                id?: string; // to identify specific run
-                extra?: unknown; // T
-                date: Date;
-
-                measuredRunsAvgMs: number;
-                totalMs: number;
-                runsCount: number;
-                measuredRunsMs?: number[];
-            }[]
+            history: BenchmarkRunHistory[];
         }
     },
     lastBenchmark?: Date;
@@ -152,7 +156,7 @@ export interface delta {
     [key: string]: {percent: number, ms: number} // if can find key in extra calc for it. getDeltaForSingle
 }
 
-function historicColumn(historic: prettyBenchmarkHistoric, options?: {key: string}): ColumnDefinition {
+function historicColumn(historic: prettyBenchmarkHistory, options?: {key: string}): ColumnDefinition {
     return {title: "Change", formatter: (result, cd) => {
         const delta = historic.getDeltaForSingle(result);
         if(delta) {
@@ -169,7 +173,7 @@ function historicColumn(historic: prettyBenchmarkHistoric, options?: {key: strin
     }};
 }
 
-function historicRow(historic: prettyBenchmarkHistoric, options?: {key: string}): ColumnDefinition[] {
+function historicRow(historic: prettyBenchmarkHistory, options?: {key?: string, titleFormatter?: (date: Date, id?: string) => string}): ColumnDefinition[] {
     const benchmarks = historic.getData()?.benchmarks;
     if(benchmarks) {
         const dates: {[key: string]: {benches: {[key: string]: any}, id?: string}} = {};
@@ -177,11 +181,13 @@ function historicRow(historic: prettyBenchmarkHistoric, options?: {key: string})
             const bench = benchmarks[k];
 
             bench.history.forEach(h => {
-                if(!dates[new Date(h.date).toString()]) {
-                    dates[new Date(h.date).toString()] = {benches: {}, id: h.id};
+                const dateString = JSON.stringify(new Date(h.date));
+
+                if(!dates[dateString]) {
+                    dates[dateString] = {benches: {}, id: h.id};
                 }
 
-                dates[new Date(h.date).toString()].benches[bench.name] = {
+                dates[dateString].benches[bench.name] = {
                     avg: h.measuredRunsAvgMs, // TODO rename avg
                     name: bench.name
                 };
@@ -189,22 +195,30 @@ function historicRow(historic: prettyBenchmarkHistoric, options?: {key: string})
             // group them based on date
         });
 
+        const d = (d: Date) => {
+            //return `${d.getFullYear()}.${d.getMonth()}.${d.getDate()}<br/>${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`;
+            return d.toISOString().split("T").join('<br/>').replace(/Z/, "");// .slice(0,10)
+        };
+
         const gend: ColumnDefinition[] = Object.keys(dates).sort().map(k => {
+            const parsedDate = new Date(JSON.parse(k));
             return {
-                title: dates[k].id ?? new Date(k).toString(), // TODO handle invalid Dates
+                title: (options?.titleFormatter ? options.titleFormatter(parsedDate, dates[k].id) : dates[k].id ?? d(parsedDate)),
                 formatter: (result: BenchmarkResult) => {
                     if(!dates[k].benches[result.name]) {
                         return '-';
                     }
                     return dates[k].benches[result.name].avg || "-";
-                }
+                },
+                toFixed: 4
             }
         });
 
-        gend.push({
+        /* gend.push({
             title: 'Current avg (ms)',
-            propertyKey: 'measuredRunsAvgMs'
-        });
+            propertyKey: 'measuredRunsAvgMs',
+            toFixed: 4
+        }); */
 
         return gend;
     }
@@ -212,7 +226,7 @@ function historicRow(historic: prettyBenchmarkHistoric, options?: {key: string})
     return [];
 }
 
-function historicProgressExtra(historic: prettyBenchmarkHistoric) {
+function historicProgressExtra(historic: prettyBenchmarkHistory) {
     return (result: BenchmarkResult) => {
         const delta = historic.getDeltaForSingle(result);
         if(delta) {
@@ -239,7 +253,7 @@ function example() {
         console.warn('⚠ cant read file');
     }
 
-    const historic = new prettyBenchmarkHistoric({ saveIndividualRuns: false }, prevString);
+    const historic = new prettyBenchmarkHistory({ saveIndividualRuns: false }, prevString);
 
     // console.log(JSON.stringify(historic.getData()));
 
@@ -270,7 +284,7 @@ function example() {
 
     runBenchmarks({silent: true}, prettyBenchmarkProgress({extra: historicProgressExtra(historic)}))
         // TODO defaultColumns to func, dont get avg, total, just name, maybe runs
-        .then(prettyBenchmarkDown(md => {Deno.writeTextFileSync("./benchmarks/hmd.md", md)}, {columns: [{title: 'Name', propertyKey: 'name'}, ...historicRow(historic), historicColumn(historic)]})) // historicColumn
+        .then(prettyBenchmarkDown(md => {Deno.writeTextFileSync("./benchmarks/hmd.md", md)}, {columns: [{title: 'Name', propertyKey: 'name'}, ...historicRow(historic),{title: 'Average (ms)', propertyKey: 'measuredRunsAvgMs', toFixed: 4}, historicColumn(historic)]})) // historicColumn
         .then((results: BenchmarkRunResult) => {
             // console.log(historic.getDeltasFrom(results));
 
