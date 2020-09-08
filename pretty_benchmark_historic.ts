@@ -3,22 +3,23 @@ import { prettyBenchmarkProgress } from "./pretty_benchmark_progress.ts";
 import { prettyBenchmarkResult } from "./pretty_benchmark_result.ts";
 import { prettyBenchmarkDown, ColumnDefinition } from "./pretty_benchmark_down.ts";
 import { colors } from "./deps.ts";
+import { BenchIndicator } from "./types.ts";
 
-export interface prettyBenchmarkHistoryOptions {
+export interface prettyBenchmarkHistoryOptions<T = unknown> {
     strict?: boolean,
     onlyHrTime?: boolean,
-    extra?: (result: BenchmarkResult) => unknown // T here precalc and save extra metrics
+    extra?: (result: BenchmarkResult) => T // T here precalc and save extra metrics
     saveIndividualRuns?: boolean;
     minRequiredRuns?: number; // error if run below x
     // save precalced -> inside extra
 }
 
-export class prettyBenchmarkHistory { // only work with JSON no file handling
+export class prettyBenchmarkHistory<T = unknown> { // only work with JSON no file handling
     
     private historicBenchmarkData?: historicBenchmarkData;
-    private options?: prettyBenchmarkHistoryOptions;
+    private options?: prettyBenchmarkHistoryOptions<T>;
     
-    constructor(options?: prettyBenchmarkHistoryOptions, prev?: historicBenchmarkData) {
+    constructor(options?: prettyBenchmarkHistoryOptions<T>, prev?: historicBenchmarkData) {
         this.options = options;
 
         if(prev) {
@@ -97,6 +98,7 @@ export class prettyBenchmarkHistory { // only work with JSON no file handling
         const current = result;
 
         if(key && key !== "measuredRunsAvgMs" && !(prev.extra as any)?.[key]) {
+            // TODO calc extra for new with extraFn from options
             throw new Error("No key like that"); // TODO this is bad, because current wont have extra, nothing to check against
         }
 
@@ -115,7 +117,7 @@ export class prettyBenchmarkHistory { // only work with JSON no file handling
 
     }
 
-    // TODO getSpecific run results (by id/date), like in historicRow
+    // TODO getSpecific run results (by id/date), like in historicRow. will be needed for thresholdcalc too
 
     getData() { // return json
         // TODO deepCopy
@@ -141,7 +143,7 @@ export interface BenchmarkRunHistory { // TODO historyItem
     measuredRunsMs?: number[];
 }
 
-export interface historicBenchmarkData {
+export interface historicBenchmarkData { // TODO maybe run based array would be better, not bench based??
     benchmarks: {
         [key: string]: {
             name: string;
@@ -156,7 +158,7 @@ export interface delta {
     [key: string]: {percent: number, ms: number} // if can find key in extra calc for it. getDeltaForSingle
 }
 
-function historicColumn(historic: prettyBenchmarkHistory, options?: {key: string}): ColumnDefinition {
+function historicColumn(historic: prettyBenchmarkHistory, options?: {key: string}): ColumnDefinition { // TODO use key
     return {title: "Change", formatter: (result, cd) => {
         const delta = historic.getDeltaForSingle(result);
         if(delta) {
@@ -257,6 +259,9 @@ function example() {
 
     // console.log(JSON.stringify(historic.getData()));
 
+    const inds: BenchIndicator[] = [
+        {benches: /historic/, modFn: _ => "👃"}
+    ] 
 
     bench({
         name: "historic",
@@ -282,7 +287,7 @@ function example() {
         runs: 1000
     });
 
-    runBenchmarks({silent: true}, prettyBenchmarkProgress({extra: historicProgressExtra(historic)}))
+    runBenchmarks({silent: true}, prettyBenchmarkProgress({extra: historicProgressExtra(historic), indicators: inds}))
         // TODO defaultColumns to func, dont get avg, total, just name, maybe runs
         .then(prettyBenchmarkDown(md => {Deno.writeTextFileSync("./benchmarks/hmd.md", md)}, {columns: [{title: 'Name', propertyKey: 'name'}, ...historicRow(historic),{title: 'Average (ms)', propertyKey: 'measuredRunsAvgMs', toFixed: 4}, historicColumn(historic)]})) // historicColumn
         .then((results: BenchmarkRunResult) => {

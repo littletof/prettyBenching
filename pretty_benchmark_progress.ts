@@ -241,6 +241,7 @@ function benchNameFormatted(
     }
   }
 
+  // TODO options?.indicators ? 2 : 0 // instead of always 2
   return `${getPaddedIndicator(name, 2, options?.indicators)}` +
     `${ob}${c.cyan(name)} ${
       c.gray(padEndVisible("", 40 - name.length, "-"))
