@@ -4,7 +4,7 @@ import { prettyBenchmarkResult } from "./pretty_benchmark_result.ts";
 import { prettyBenchmarkDown, ColumnDefinition } from "./pretty_benchmark_down.ts";
 import { colors } from "./deps.ts";
 import { BenchIndicator } from "./types.ts";
-import { stripColor } from "./common.ts";
+import { stripColor, calculateExtraMetrics, calculateStdDeviation } from "./common.ts";
 
 export interface prettyBenchmarkHistoryOptions<T = unknown> {
     strict?: boolean, // error on runCount change, benchmark set change
@@ -17,13 +17,12 @@ export interface prettyBenchmarkHistoryOptions<T = unknown> {
 
 export class prettyBenchmarkHistory<T = unknown> { // only work with JSON no file handling
     
-    private historicBenchmarkData: historicBenchmarkData;
+    private historicBenchmarkData!: historicBenchmarkData<T>;
     private options?: prettyBenchmarkHistoryOptions<T>;
     
-    constructor(options?: prettyBenchmarkHistoryOptions<T>, prev?: historicBenchmarkData) {
+    constructor(options?: prettyBenchmarkHistoryOptions<T>, prev?: historicBenchmarkData<T>) {
         this.options = options;
-
-        this.historicBenchmarkData = { benchmarks: {} }; // TODO just so ? is not needed. fixit. 
+ 
         if(prev) {
             this.load(prev); // TODO validate prev with options too?!
         } else {
@@ -35,7 +34,7 @@ export class prettyBenchmarkHistory<T = unknown> { // only work with JSON no fil
         this.historicBenchmarkData = { benchmarks: {} };
     }
 
-    private load(prev: historicBenchmarkData) {
+    private load(prev: historicBenchmarkData<T>) {
         //TODO contruct dates
         this.historicBenchmarkData = prev;
     } 
@@ -82,6 +81,8 @@ export class prettyBenchmarkHistory<T = unknown> { // only work with JSON no fil
                 if(newBenches.length !== 0) {
                     throw new Error(`Adding new benches is not allowed in strict mode. New benches: [${newBenches.map(b => b.name)}]`)
                 }
+
+                // TODO somehow check extras
             }
         }
 
@@ -100,19 +101,20 @@ export class prettyBenchmarkHistory<T = unknown> { // only work with JSON no fil
                 measuredRunsAvgMs: r.measuredRunsAvgMs,
                 totalMs: r.totalMs,
                 runsCount: r.runsCount,
-                measuredRunsMs: this.options?.saveIndividualRuns ? r.measuredRunsMs : undefined 
+                measuredRunsMs: this.options?.saveIndividualRuns ? r.measuredRunsMs : undefined,
+                extra: this.options?.extra && this.options?.extra(r)
             })
         });
 
         return this;
     }
 
-    getDeltasFrom(results: BenchmarkRunResult): {[key: string]: delta} {
+    getDeltasFrom(results: BenchmarkRunResult, key?: "measuredRunsAvgMs" | keyof T): {[key: string]: delta} {
 
         const deltas: {[key: string]: delta} = {};
 
         results.results.forEach(r => {
-            const d = this.getDeltaForSingle(r);
+            const d = this.getDeltaForSingle(r, key);
             if(d){
                 deltas[r.name] = d;
             }
@@ -121,7 +123,7 @@ export class prettyBenchmarkHistory<T = unknown> { // only work with JSON no fil
         return deltas;
     }
 
-    getDeltaForSingle(result: BenchmarkResult, key?: string): delta | false {
+    getDeltaForSingle(result: BenchmarkResult, key?: "measuredRunsAvgMs" | keyof T): delta | false {
         // error if key not in results
         // error / nodelta if key is not in historic
 
@@ -137,13 +139,16 @@ export class prettyBenchmarkHistory<T = unknown> { // only work with JSON no fil
         const benchmark = this.historicBenchmarkData.benchmarks[result.name];
         const prev = benchmark.history[benchmark.history.length-1];
         const current = result;
+        const currentExtras = this.options?.extra && this.options?.extra(result);
 
-        if(key && key !== "measuredRunsAvgMs" && !(prev.extra as any)?.[key]) {
+        if(key && key !== "measuredRunsAvgMs" && (!prev.extra || !prev.extra[key] || !currentExtras || !currentExtras[key])) {
             // TODO calc extra for new with extraFn from options
             throw new Error("No key like that"); // TODO this is bad, because current wont have extra, nothing to check against
+        } else if(key && key !== "measuredRunsAvgMs" && (typeof prev.extra![key] !== "number"  || typeof currentExtras![key] !== "number")) {
+            throw new Error(`Type of value selected by key ${key} must be number`);
         }
 
-        if(!key) {
+        if(!key || key === "measuredRunsAvgMs") { // TODO totalMs
             const diff = current.measuredRunsAvgMs - prev.measuredRunsAvgMs;
             const percDiff = diff / prev.measuredRunsAvgMs;
 
@@ -153,7 +158,15 @@ export class prettyBenchmarkHistory<T = unknown> { // only work with JSON no fil
                 measuredRunsAvgMs: {percent: percDiff, ms: diff}
             }
         } else {
-            return false;  // TODO handle from extra
+            const diff = (currentExtras!)[key] as unknown as number - (prev.extra![key] as unknown as number);
+            const percDiff = diff / (prev.extra![key] as unknown as number);
+
+            // console.log(prev.measuredRunsAvgMs, current.measuredRunsAvgMs, diff);
+
+            return {
+                measuredRunsAvgMs: {percent: 0, ms: 0},
+                [key]: {percent: percDiff, ms: diff}
+            }
         }
 
     }
@@ -175,11 +188,10 @@ export class prettyBenchmarkHistory<T = unknown> { // only work with JSON no fil
         // return none is 0/1/x preceeding historic
     }
 }
-// error if same name multiple times in 1 run.
 
-export interface BenchmarkRunHistory { // TODO historyItem
+export interface BenchmarkRunHistory<T = unknown> { // TODO historyItem
     id?: string; // to identify specific run
-    extra?: unknown; // T
+    extra?: T;
     date: Date;
 
     measuredRunsAvgMs: number;
@@ -188,11 +200,11 @@ export interface BenchmarkRunHistory { // TODO historyItem
     measuredRunsMs?: number[];
 }
 
-export interface historicBenchmarkData { // TODO maybe run based array would be better, not bench based??
+export interface historicBenchmarkData<T = unknown> { // TODO maybe run based array would be better, not bench based??
     benchmarks: {
         [key: string]: {
             name: string;
-            history: BenchmarkRunHistory[];
+            history: BenchmarkRunHistory<T>[];
         }
     },
     lastBenchmark?: Date;
@@ -343,7 +355,7 @@ function example() {
         console.warn('⚠ cant read file');
     }
 
-    const historic = new prettyBenchmarkHistory({ saveIndividualRuns: false, minRequiredRuns: 100, onlyHrTime: true, strict: true }, prevString);
+    const historic = new prettyBenchmarkHistory({ saveIndividualRuns: false, minRequiredRuns: 100, onlyHrTime: true, strict: true, extra: (r: BenchmarkResult) => ({r: r.name, ...calculateExtraMetrics(r), std: calculateStdDeviation(r)}) }, prevString);
 
     // console.log(JSON.stringify(historic.getData()));
 
@@ -356,7 +368,11 @@ function example() {
         .then(prettyBenchmarkDown(md => {Deno.writeTextFileSync("./benchmarks/hmd.md", md)}, {columns: [{title: 'Name', propertyKey: 'name'}, ...historicRow(historic),{title: 'Average (ms)', propertyKey: 'measuredRunsAvgMs', toFixed: 4}, historicColumn(historic)]})) // historicColumn
         .then((results: BenchmarkRunResult) => {
 
+
+            console.log(historic.getDeltasFrom(results, "max"))
+
             historic.addResults(results);
+            // console.log(historic.getDataString());
 
             // console.log(historic.getDeltasFrom(results));
 
