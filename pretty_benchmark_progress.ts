@@ -26,7 +26,10 @@ export interface prettyBenchmarkProgressOptions {
   /** If provided, the indicators will be placed before the specific benches */
   indicators?: BenchIndicator[];
 
-  extra?: (result: BenchmarkResult) => string; // TODO doc + proper name
+  extra?: (
+    result: BenchmarkResult,
+    options?: prettyBenchmarkProgressOptions,
+  ) => string; // TODO doc + proper name
   /** Strips all default colors from the output. 
    * 
    * *Note*: it doesnt strip the colors that come through user defined `thresholds` and `indicators`  */
@@ -90,7 +93,7 @@ function _prettyBenchmarkProgress(
   if (progress.state === ProgressState.BenchResult) {
     const line = finishedBenchmarkLine(progress, options);
     const appended = typeof options?.extra === "function"
-      ? options.extra([...progress.results].reverse()[0])
+      ? options.extra([...progress.results].reverse()[0], options)
       : "";
     out(`${up1Line}\r${line}${appended}`);
     // out(`${up1Line}\r${line}`);

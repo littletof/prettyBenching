@@ -1,29 +1,31 @@
-import { runBenchmarks, BenchmarkResult, BenchmarkRunResult, bench, BenchmarkRunProgress } from "https://deno.land/std@0.67.0/testing/bench.ts";
-import { prettyBenchmarkProgress } from "./pretty_benchmark_progress.ts";
+import { runBenchmarks, BenchmarkResult, BenchmarkRunResult, bench } from "https://deno.land/std@0.67.0/testing/bench.ts";
+import { prettyBenchmarkProgress, prettyBenchmarkProgressOptions } from "./pretty_benchmark_progress.ts";
 import { prettyBenchmarkResult } from "./pretty_benchmark_result.ts";
 import { prettyBenchmarkDown, ColumnDefinition } from "./pretty_benchmark_down.ts";
 import { colors } from "./deps.ts";
 import { BenchIndicator } from "./types.ts";
+import { stripColor } from "./common.ts";
 
 export interface prettyBenchmarkHistoryOptions<T = unknown> {
-    strict?: boolean,
+    strict?: boolean, // error on runCount change, benchmark set change
     onlyHrTime?: boolean,
     extra?: (result: BenchmarkResult) => T // T here precalc and save extra metrics
     saveIndividualRuns?: boolean;
-    minRequiredRuns?: number; // error if run below x
+    minRequiredRuns?: number;
     // save precalced -> inside extra
 }
 
 export class prettyBenchmarkHistory<T = unknown> { // only work with JSON no file handling
     
-    private historicBenchmarkData?: historicBenchmarkData;
+    private historicBenchmarkData: historicBenchmarkData;
     private options?: prettyBenchmarkHistoryOptions<T>;
     
     constructor(options?: prettyBenchmarkHistoryOptions<T>, prev?: historicBenchmarkData) {
         this.options = options;
 
+        this.historicBenchmarkData = { benchmarks: {} }; // TODO just so ? is not needed. fixit. 
         if(prev) {
-            this.load(prev);
+            this.load(prev); // TODO validate prev with options too?!
         } else {
             this.init();
         }
@@ -39,10 +41,49 @@ export class prettyBenchmarkHistory<T = unknown> { // only work with JSON no fil
     } 
 
     addResults(measured: BenchmarkRunResult, options?: {id?: string}){
-
         const date = new Date();
 
-        // TODO if same name twice -> error
+        const duplicateNames = measured.results.filter(r => measured.results.filter(rc => rc.name === r.name).length > 1);
+        if(duplicateNames.length !== 0) {
+            throw new Error(`Multiple benchmarks with the same name: [${[...new Set(duplicateNames.map(b => b.name)).values()].join(", ")}]. Names must be unique.`)
+        }
+
+        if(this.options?.minRequiredRuns){
+            const notEnoughRuns = measured.results.filter(r => r.runsCount < this.options?.minRequiredRuns! || r.measuredRunsMs.length < this.options?.minRequiredRuns!);
+            if(notEnoughRuns.length !== 0) {
+                throw new Error(`minRequiredRuns was set to ${this.options?.minRequiredRuns} runs in the options. [${notEnoughRuns.map(r => `"${r.name}" (${r.runsCount})`).join(', ')}] fails this.`);
+            }
+        }
+
+        if(this.options?.onlyHrTime) {
+            const isHrTime = (ms: number) => ms%1 !== 0;
+            if(measured.results.some(r => !isHrTime(r.totalMs))) {  // TODO check on a subset of measurements too.
+                throw new Error(`onlyHrTime was set to true. Seems like you are trying to add results, that were measured without the flag.`); // TODO proper msg
+            }
+        }
+
+        if(this.options?.strict) {
+            const hasDataAlready = Object.keys(this.historicBenchmarkData.benchmarks).length !== 0;
+            if(hasDataAlready) { // strict has no effect on first set of results.
+                const prevBenchmarks = Object.keys(this.historicBenchmarkData.benchmarks);
+                prevBenchmarks.forEach(pb => { // TODO collect all, and throw that
+                    const benchInNew = measured.results.find(r => r.name === pb);
+                    if(!benchInNew) {
+                        throw new Error(`Missing ${pb} benchmark in the new set, which is not allowed in strict mode.`);
+                    }
+
+                    const prevRuns = this.historicBenchmarkData.benchmarks[pb].history[0].runsCount;
+                    if(prevRuns !== benchInNew.runsCount) { // TODO change how we get historic runcount
+                        throw new Error(`[${pb}] runs count ${prevRuns} doesnt match with the new runs count ${benchInNew.runsCount}, which is not allowed in strict mode.`);
+                    }
+                });
+
+                const newBenches = measured.results.filter(r => prevBenchmarks.indexOf(r.name) === -1);
+                if(newBenches.length !== 0) {
+                    throw new Error(`Adding new benches is not allowed in strict mode. New benches: [${newBenches.map(b => b.name)}]`)
+                }
+            }
+        }
 
         measured.results.forEach(r => {
             
@@ -124,6 +165,10 @@ export class prettyBenchmarkHistory<T = unknown> { // only work with JSON no fil
         return this.historicBenchmarkData;
     }
 
+    getDataString() {
+        return JSON.stringify(this.getData(), null, 2);
+    }
+
     getThresholds() {
         // return green below alltime avgs min
         // return yellow above alltime avgs max + x perc.
@@ -166,9 +211,9 @@ function historicColumn(historic: prettyBenchmarkHistory, options?: {key: string
             const diff = (Math.abs(delta.measuredRunsAvgMs.ms)).toFixed(2);
             
             if(delta.measuredRunsAvgMs.ms > 0) {
-                return `🔺 +${perc}% (${diff}ms)`;
+                return `🔺 ${`+${perc}`.padStart(4," ")}% (${diff.padStart(7, " ")}ms)`;
             } else {
-                return `🟢 ${perc}% (${diff}ms)`;
+                return `🟢  ${perc.padStart(4, " ")}% (${diff.padStart(7, " ")}ms)`;
             }
         }
         return "";
@@ -229,39 +274,30 @@ function historicRow(historic: prettyBenchmarkHistory, options?: {key?: string, 
 }
 
 function historicProgressExtra(historic: prettyBenchmarkHistory) {
-    return (result: BenchmarkResult) => {
+    return (result: BenchmarkResult, options?: prettyBenchmarkProgressOptions) => {
         const delta = historic.getDeltaForSingle(result);
         if(delta) {
             const perc = (delta.measuredRunsAvgMs.percent * 100).toFixed(0);
             const diff = (Math.abs(delta.measuredRunsAvgMs.ms)).toFixed(2);
             
+            let deltaString;
             if(delta.measuredRunsAvgMs.ms > 0) {
-                return ` [${colors.red(` ▲ +${perc}% (${diff}ms)`)}]`;
+                deltaString = ` [${colors.red(` ▲ ${`+${perc}`.padStart(4)}% (${diff.padStart(7)}ms)`)}]`;
             } else {
-                return ` [${colors.green(` ▼ ${perc}% (${diff}ms)`)}]`;
+                deltaString = ` [${colors.green(` ▼ ${perc.padStart(4)}% (${diff.padStart(7)}ms)`)}]`;
             }
+
+            if(options?.nocolor) {
+                deltaString = stripColor(deltaString);
+            }
+
+            return deltaString;
         }
         return "";
     };
 }
 
 function example() {
-
-    
-    let prevString;
-    try {
-        prevString = JSON.parse(Deno.readTextFileSync('./benchmarks/historic.json'));
-    } catch {
-        console.warn('⚠ cant read file');
-    }
-
-    const historic = new prettyBenchmarkHistory({ saveIndividualRuns: false }, prevString);
-
-    // console.log(JSON.stringify(historic.getData()));
-
-    const inds: BenchIndicator[] = [
-        {benches: /historic/, modFn: _ => "👃"}
-    ] 
 
     bench({
         name: "historic",
@@ -286,14 +322,45 @@ function example() {
         },
         runs: 1000
     });
+/*
+    bench({
+        name: "MZ/X",
+        func(b) {
+            b.start();
+            for (let i = 0; i < 1e5; i++) {
+                const NPeP = Math.random() === Math.random();
+            }
+            b.stop();
+        },
+        runs: 100
+    }); */
 
-    runBenchmarks({silent: true}, prettyBenchmarkProgress({extra: historicProgressExtra(historic), indicators: inds}))
+    
+    let prevString;
+    try {
+        prevString = JSON.parse(Deno.readTextFileSync('./benchmarks/historic.json'));
+    } catch {
+        console.warn('⚠ cant read file');
+    }
+
+    const historic = new prettyBenchmarkHistory({ saveIndividualRuns: false, minRequiredRuns: 100, onlyHrTime: true, strict: true }, prevString);
+
+    // console.log(JSON.stringify(historic.getData()));
+
+    const inds: BenchIndicator[] = [
+        {benches: /historic/, modFn: _ => "👃"}
+    ];
+
+    runBenchmarks({silent: true}, prettyBenchmarkProgress({extra: historicProgressExtra(historic), indicators: inds, nocolor: false}))
         // TODO defaultColumns to func, dont get avg, total, just name, maybe runs
         .then(prettyBenchmarkDown(md => {Deno.writeTextFileSync("./benchmarks/hmd.md", md)}, {columns: [{title: 'Name', propertyKey: 'name'}, ...historicRow(historic),{title: 'Average (ms)', propertyKey: 'measuredRunsAvgMs', toFixed: 4}, historicColumn(historic)]})) // historicColumn
         .then((results: BenchmarkRunResult) => {
+
+            historic.addResults(results);
+
             // console.log(historic.getDeltasFrom(results));
 
-            // Deno.writeTextFileSync("./benchmarks/historic.json", JSON.stringify(historic.addResults(results).getData()))
+            // Deno.writeTextFileSync("./benchmarks/historic.json", historic.addResults(results).getDataString())
         });
 
     return;
