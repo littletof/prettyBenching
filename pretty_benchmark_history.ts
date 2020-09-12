@@ -1,8 +1,8 @@
-import { BenchmarkResult, BenchmarkRunResult, bench, runBenchmarks } from "./deps.ts";
+import { BenchmarkResult, BenchmarkRunResult, bench, runBenchmarks, colors } from "./deps.ts";
 import { BenchIndicator } from "./types.ts";
-import { prettyBenchmarkProgress } from "./pretty_benchmark_progress.ts";
-import { prettyBenchmarkDown } from "./pretty_benchmark_down.ts";
-import { calculateExtraMetrics, calculateStdDeviation } from "./common.ts";
+import { prettyBenchmarkProgress, prettyBenchmarkProgressOptions } from "./pretty_benchmark_progress.ts";
+import { prettyBenchmarkDown, ColumnDefinition } from "./pretty_benchmark_down.ts";
+import { calculateExtraMetrics, calculateStdDeviation, stripColor } from "./common.ts";
 
 export interface prettyBenchmarkHistoryOptions<T = unknown, K = unknown> {
     runExtras?: (runResult: BenchmarkRunResult) => K;
@@ -18,7 +18,7 @@ export interface BenchmarkHistory/*?Data?*/<T = unknown, K = unknown> {// TODO o
     // options?
 }
 
-// TODO BenchmarkHistoryRunSet
+// TODO name BenchmarkHistoryRunSet
 export interface BenchmarkHistoryItem<T = unknown, K = unknown> { // TODO this should be better because its grouped by runs, easier to remove old ones, or the last one for some reason
     date: Date; // TODO handle only strings?
     id?: string;
@@ -41,6 +41,8 @@ export interface Delta {
     percent: number;
     amount: number;
 }
+
+type DeltaKey<T = unknown> = (keyof T | "measuredRunsAvgMs" | "totalMs");
 
 export class prettyBenchmarkHistory<T = unknown> {
     private data!: BenchmarkHistory<T>;
@@ -93,7 +95,7 @@ export class prettyBenchmarkHistory<T = unknown> {
         return this;
     }
 
-    getDeltasFrom(results: BenchmarkRunResult, keys: (keyof T | "measuredRunsAvgMs" | "totalMs")[] = ["measuredRunsAvgMs"]): {[key: string]: {[key: string]: Delta}} {
+    getDeltasFrom(results: BenchmarkRunResult, keys: DeltaKey<T>[] = ["measuredRunsAvgMs", "totalMs"]): {[key: string]: {[key: string]: Delta}} {
 
         const deltas: {[key: string]: {[key:string]: Delta}} = {};
 
@@ -107,7 +109,7 @@ export class prettyBenchmarkHistory<T = unknown> {
         return deltas;
     }
 
-    getDeltaForBenchmark(result: BenchmarkResult, keys: (keyof T | "measuredRunsAvgMs" | "totalMs")[] = ["measuredRunsAvgMs"]) {
+    getDeltaForBenchmark(result: BenchmarkResult, keys: DeltaKey<T>[] = ["measuredRunsAvgMs", "totalMs"]) {
         const prevResults = this.data.history.filter(h => h.benchmarks[result.name]);
         const lastResult = prevResults.length > 0 ? prevResults[prevResults.length-1].benchmarks[result.name] : undefined;
 
@@ -117,7 +119,12 @@ export class prettyBenchmarkHistory<T = unknown> {
 
         const currentResultExtras = this.options?.benchExtras && this.options.benchExtras(result);
 
+        // deno-lint-ignore no-explicit-any
         const calcDelta = (current: any, prev: any, key: any) => {
+            if(typeof current[key] !== "number" || typeof prev[key] !== "number") {
+                throw new Error(`Type of value selected by key ${key} must be number`);
+            }
+
             const diff = current[key] - prev[key];
             const percDiff = diff / prev[key];
 
@@ -127,10 +134,9 @@ export class prettyBenchmarkHistory<T = unknown> {
             }
         }
 
-
-        if(keys.length === 0) {
+        /* if(keys.length === 0) {
             keys = ["measuredRunsAvgMs"];
-        }
+        } */
         const deltas: {[key:string]: Delta} = {};
 
         keys.forEach(key => {
@@ -150,7 +156,6 @@ export class prettyBenchmarkHistory<T = unknown> {
         });
 
         return deltas;
-
     }
 
     getData() {
@@ -161,6 +166,49 @@ export class prettyBenchmarkHistory<T = unknown> {
     getDataString() {
         return JSON.stringify(this.getData(), null, 2);
     }
+}
+
+export function historicProgressExtra(history: prettyBenchmarkHistory) { // TODO fn name
+    return (result: BenchmarkResult, options?: prettyBenchmarkProgressOptions) => {
+        const delta = history.getDeltaForBenchmark(result);
+        let deltaString = `${colors.gray(" ▪   no history   ▪ ".padEnd(20))}`;// "";//` [${colors.brightBlue(" ▪ ".padEnd(20, "-"))}]`;
+        if(delta) {
+            const perc = (delta.measuredRunsAvgMs.percent * 100).toFixed(0);
+            const diff = (Math.abs(delta.measuredRunsAvgMs.amount)).toFixed(2);
+            
+            if(delta.measuredRunsAvgMs.amount > 0) {
+                deltaString = `${colors.red(` ▲ ${`+${perc}`.padStart(4)}% (${diff.padStart(7)}ms)`)}`;
+            } else {
+                deltaString = `${colors.green(` ▼ ${perc.padStart(4)}% (${diff.padStart(7)}ms)`)}`;
+            }
+        }
+
+        if(options?.nocolor) {
+            deltaString = stripColor(deltaString);
+        }
+
+        return ` [${deltaString}]`;
+    };
+}
+
+export function historyColumn<T = unknown>(history: prettyBenchmarkHistory<T>, options?: {key: DeltaKey<T>}): ColumnDefinition { // TODO fn name
+    return {title: "Change in avg.", formatter: (result, cd) => {
+
+        const workingKey = options?.key || "measuredRunsAvgMs";
+
+        const delta = history.getDeltaForBenchmark(result, [workingKey]);
+        if(delta) {
+            const perc = (delta[workingKey as string].percent * 100).toFixed(0);
+            const diff = (Math.abs(delta[workingKey as string].amount)).toFixed(2);
+            
+            if(delta[workingKey as string].amount > 0) {
+                return `🔺 ${`+${perc}`.padStart(4," ")}% (${diff.padStart(7, " ")}ms)`;
+            } else {
+                return `🟢  ${perc.padStart(4, " ")}% (${diff.padStart(7, " ")}ms)`;
+            }
+        }
+        return "-";
+    }};
 }
 
 function example() {
@@ -179,6 +227,17 @@ function example() {
 
     bench({
         name: "x3#14",
+        func(b) {
+            b.start();
+            for (let i = 0; i < 1e5; i++) {
+                const NPeP = Math.random() === Math.random();
+            }
+            b.stop();
+        },
+        runs: 1000
+    });
+    bench({
+        name: "MZ/X",
         func(b) {
             b.start();
             for (let i = 0; i < 1e5; i++) {
@@ -211,14 +270,14 @@ function example() {
         {benches: /historic/, modFn: _ => "👃"}
     ];
 
-    runBenchmarks({silent: true}, prettyBenchmarkProgress({indicators: inds, nocolor: false}))
+    runBenchmarks({silent: true}, prettyBenchmarkProgress({extra: historicProgressExtra(historic),indicators: inds, nocolor: false}))
         // TODO defaultColumns to func, dont get avg, total, just name, maybe runs
-        // .then(prettyBenchmarkDown(md => {Deno.writeTextFileSync("./benchmarks/hmdx.md", md)}, {columns: [{title: 'Name', propertyKey: 'name'}, ...historicRow(historic),{title: 'Average (ms)', propertyKey: 'measuredRunsAvgMs', toFixed: 4}, historicColumn(historic)]})) // historicColumn
+        .then(prettyBenchmarkDown(md => {Deno.writeTextFileSync("./benchmarks/hmdx.md", md)}, {columns: [{title: 'Name', propertyKey: 'name'}, /* ...historicRow(historic), */ {title: 'Average (ms)', propertyKey: 'measuredRunsAvgMs', toFixed: 4}, historyColumn(historic)]})) // historicColumn
         .then((results: BenchmarkRunResult) => {
 
 
             // console.log(historic.getDeltasFrom(results, "max"))
-            console.log(historic.getDeltasFrom(results, ["max", "std", "nincs" as any]))
+            console.log(historic.getDeltasFrom(results))
             historic.addResults(results);
             // console.log(historic.getDataString());
             
