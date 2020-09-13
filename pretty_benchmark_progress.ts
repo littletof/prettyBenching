@@ -24,11 +24,11 @@ export interface prettyBenchmarkProgressOptions {
   thresholds?: Thresholds;
   /** If provided, the indicators will be placed before the specific benches */
   indicators?: BenchIndicator[];
-
+  /** Adds the returned string at the end of each finished benchmark row */
   rowExtras?: (
     result: BenchmarkResult,
     options: prettyBenchmarkProgressOptions,
-  ) => string; // TODO doc + proper name
+  ) => string;
   /** Strips all default colors from the output. 
    * 
    * *Note*: it doesnt strip the colors that come through user defined `thresholds` and `indicators`  */

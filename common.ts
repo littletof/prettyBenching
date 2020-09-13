@@ -35,21 +35,6 @@ export function getInThresholdRange(
   return null;
 }
 
-/* export function getBenchIndicator(
-  name: string,
-  indicators?: BenchIndicator[],
-) {
-  if (indicators && indicators.length > 0) {
-    const indChar = "#"; // TODO should be ▒ but doesnt work with stdout https://github.com/denoland/deno/issues/6001
-    const indicator = indicators.find(({ benches }) => benches.test(name));
-    return (!!indicator && typeof indicator.modFn == "function")
-      ? indicator.modFn(indChar)
-      : " "; // there are indicators defined, but not for this bench
-  }
-
-  return ""; // no indicators were defined
-} */
-
 /** Gets the correct indicator for the named bench */
 export function getIndicator(
   name: string,

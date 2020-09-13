@@ -3,6 +3,7 @@ import { calculateExtraMetrics, calculateStdDeviation, stripColor } from "./comm
 import { BenchIndicator, Thresholds, Threshold } from "./types.ts";
 import { rtime } from "./utils.ts";
 // TODO move these to separate file
+// TODO export calcStd, calcExtraMetrics
 import { prettyBenchmarkProgress, prettyBenchmarkProgressOptions } from "./pretty_benchmark_progress.ts";
 import { prettyBenchmarkResult, prettyBenchmarkResultOptions } from "./pretty_benchmark_result.ts";
 import { prettyBenchmarkDown, ColumnDefinition } from "./pretty_benchmark_down.ts";
@@ -18,13 +19,12 @@ export interface prettyBenchmarkHistoryOptions<T = unknown, K = unknown> {
 
 export type strictHistoryRules = { noRemoval?: boolean; noAddition?: boolean; noRunsCountChange?: boolean; };
 
-export interface BenchmarkHistory/*?Data?*/<T = unknown, K = unknown> {
+export interface BenchmarkHistory<T = unknown, K = unknown> {
     history: BenchmarkHistoryItem<T, K>[];
 }
 
-// TODO name BenchmarkHistoryRunSet
 export interface BenchmarkHistoryItem<T = unknown, K = unknown> {
-    date: string;// Date; // TODO handle only strings?
+    date: string;
     id?: string;
     runExtras?: K;
 
@@ -67,7 +67,6 @@ export class prettyBenchmarkHistory<T = unknown, K=unknown> {
     }
 
     private load(prev: BenchmarkHistory<T, K>) {
-        // TODO consider validating prev with options too?!
         this.data = prev;
     }
 
@@ -128,7 +127,7 @@ export class prettyBenchmarkHistory<T = unknown, K=unknown> {
                     }
                 }
 
-                // TODO consider checking changes in extras
+                // TODO consider: checking changes in extras
 
                 if(errors.length !== 0) {
                     throw new Error(`Errors while trying to add new results to history: \n${errors.join("\n")}`);
@@ -148,13 +147,15 @@ export class prettyBenchmarkHistory<T = unknown, K=unknown> {
         });
 
         this.data.history.push({
-            date: date.toString(), // TODO rethink if sotring as string is good
+            date: date.toString(),
             id: options?.id,
             runExtras: this.options?.runExtras &&this.options.runExtras(runResults),
             benchmarks: benchmarks,
         });
 
-        // TODO sort history again;
+        this.data.history = this.data.history.sort((a, b) => {
+            return new Date(a.date).getTime() - new Date(b.date).getTime();
+        });
 
         return this;
     }
@@ -219,9 +220,9 @@ export class prettyBenchmarkHistory<T = unknown, K=unknown> {
         return deltas;
     }
 
-    getData() {
-        // TODO deep copy
-        return this.data;
+    getData(): BenchmarkHistory<T, K> {
+        // no complex objects so should be enough
+        return JSON.parse(JSON.stringify(this.data));
     }
 
     getDataString() {
@@ -232,8 +233,6 @@ export class prettyBenchmarkHistory<T = unknown, K=unknown> {
         return [...new Set(this.data.history.map(h => Object.keys(h.benchmarks)).flat())];
     }
 }
-
-// TODO export calcStd, calcExtraMetrics
 
 export function calculateThresholds<T, K>(history: prettyBenchmarkHistory<T, K>, options?: { minProceedingRuns?: number, calculate?: (runs: BenchmarkHistoryItem<T,K>[]) => Threshold}): Thresholds {
     const benchmarkNames = history.getBenchmarkNames();
@@ -260,7 +259,7 @@ export function calculateThresholds<T, K>(history: prettyBenchmarkHistory<T, K>,
     return thresholds;
 }
 
-export function deltaProgressRowExtra(history: prettyBenchmarkHistory) { // TODO fn name
+export function deltaProgressRowExtra(history: prettyBenchmarkHistory) {
     return (result: BenchmarkResult, options?: prettyBenchmarkProgressOptions) => {
         let deltaString = getCliDeltaString(history, result);
 
@@ -272,7 +271,7 @@ export function deltaProgressRowExtra(history: prettyBenchmarkHistory) { // TODO
     };
 }
 
-export function deltaResultInfoCell(history: prettyBenchmarkHistory) { // TODO fn name
+export function deltaResultInfoCell(history: prettyBenchmarkHistory) {
     return (result: BenchmarkResult, options?: prettyBenchmarkResultOptions) => {
         let deltaString = getCliDeltaString(history, result);
 
@@ -323,12 +322,12 @@ export function deltaColumn<T = unknown>(history: prettyBenchmarkHistory<T>, opt
 }
 
 export function historyColumns<T = unknown>(history: prettyBenchmarkHistory<T>, options?: {key?: DeltaKey<T>, titleFormatter?: (date: Date, id?: string) => string}): ColumnDefinition[] {
-    if(history.getData().history.length === 0){ // TODO naming is bad like this: history.getData().history
+    if(history.getData().history.length === 0){
         return [];
     }
 
     const dateFormatter = (d: Date) => {
-        return d.toISOString().split("T").join('<br/>').replace(/Z/, ""); // TODO rework
+        return d.toISOString().split("T").join('<br/>').replace(/Z/, "");
     };
 
     return history.getData().history.map(run => {        
@@ -349,7 +348,6 @@ export function historyColumns<T = unknown>(history: prettyBenchmarkHistory<T>, 
                     return run.benchmarks[result.name].extras?.[workingKey] || "-";
                 }
             }
-            
         };
     });
 }
