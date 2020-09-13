@@ -1,19 +1,22 @@
 import { BenchmarkResult, BenchmarkRunResult, bench, runBenchmarks, colors } from "./deps.ts";
-import { BenchIndicator } from "./types.ts";
-import { prettyBenchmarkProgress, prettyBenchmarkProgressOptions } from "./pretty_benchmark_progress.ts";
-import { prettyBenchmarkDown, ColumnDefinition } from "./pretty_benchmark_down.ts";
 import { calculateExtraMetrics, calculateStdDeviation, stripColor } from "./common.ts";
+import { BenchIndicator, Thresholds } from "./types.ts";
 import { rtime } from "./utils.ts";
+// TODO move these to separate file
+import { prettyBenchmarkProgress, prettyBenchmarkProgressOptions } from "./pretty_benchmark_progress.ts";
 import { prettyBenchmarkResult, prettyBenchmarkResultOptions } from "./pretty_benchmark_result.ts";
+import { prettyBenchmarkDown, ColumnDefinition } from "./pretty_benchmark_down.ts";
 
 export interface prettyBenchmarkHistoryOptions<T = unknown, K = unknown> {
     runExtras?: (runResult: BenchmarkRunResult) => K;
     benchExtras?: (result: BenchmarkResult) => T;
-    onlyHrTime?: boolean; // TODO to allowLowPrecisionTime
-    strict?: boolean; // TODO separate into allowRemoval, allowRunsCountChange, allowNew
+    easeOnlyHrTime?: boolean;
+    strict?: boolean | strictHistoryRules;
     minRequiredRuns?: number;
     saveIndividualRuns?: boolean;
 }
+
+export type strictHistoryRules = { noRemoval?: boolean; noAddition?: boolean; noRunsCountChange?: boolean; };
 
 export interface BenchmarkHistory/*?Data?*/<T = unknown, K = unknown> {
     history: BenchmarkHistoryItem<T, K>[];
@@ -64,14 +67,74 @@ export class prettyBenchmarkHistory<T = unknown> {
     }
 
     private load(prev: BenchmarkHistory<T>) {
-        // TODO validate prev with options too?!
+        // TODO consider validating prev with options too?!
         this.data = prev;
     }
 
     addResults(runResults: BenchmarkRunResult, options?: {id?: string, date?: Date}) {
         const date = options?.date ?? new Date();
 
-        // TODO checks
+        const duplicateNames = runResults.results.filter(r => runResults.results.filter(rc => rc.name === r.name).length > 1);
+        if(duplicateNames.length !== 0) {
+            throw new Error(`Names must be unique to be able to store them. Colliding names: [${[...new Set(duplicateNames.map(b => b.name)).values()].join(", ")}].`)
+        }
+
+        if(this.options?.minRequiredRuns){
+            const notEnoughRuns = runResults.results.filter(r => r.runsCount < this.options?.minRequiredRuns! || r.measuredRunsMs.length < this.options?.minRequiredRuns!);
+            if(notEnoughRuns.length !== 0) {
+                throw new Error(`Minimum required runs (${this.options?.minRequiredRuns}) was not fullfilled by benchmarks: [${notEnoughRuns.map(r => `"${r.name}" (${r.runsCount})`).join(', ')}]. The minimum required runs can be set with 'minRequiredRuns' option.`);
+            }
+        }
+
+        if(!this.options?.easeOnlyHrTime) {
+            const isHrTime = (ms: number) => ms%1 !== 0;
+            if(runResults.results.some(r => !isHrTime(r.totalMs))) {  // TODO consider: check on a subset of measurements too.
+                throw new Error(`Seems like you are trying to add results, that were measured without the --allow-hrtime flag. You can bypass this check with the 'easeOnlyHrTime' option.`); // TODO proper msg
+            }
+        }
+
+        if(this.options?.strict) {
+            const strictIsBooleanTrue = typeof this.options?.strict === "boolean" && this.options?.strict;
+
+            const hasDataAlready = Object.keys(this.data.history).length !== 0;
+            if(hasDataAlready) { // strict has no effect on first set of results.
+                const errors = [];
+
+                const prevBenchmarks = this.getBenchmarkNames();
+
+                prevBenchmarks.forEach(pb => {
+                    const benchInResults = runResults.results.find(r => r.name === pb);
+                    if(strictIsBooleanTrue || (this.options?.strict as strictHistoryRules).noRemoval){
+                        if(!benchInResults) {
+                            errors.push(`Missing benchmark named "${pb}" in current results. Set 'strict' or 'strict.noRemoval' option to false to bypass this check.`);
+                        }
+                    }
+
+                    if(strictIsBooleanTrue || (this.options?.strict as strictHistoryRules).noRunsCountChange){
+                        const prevRuns = this.data.history.filter(h => h.benchmarks[pb]);
+                        if(benchInResults && prevRuns.length > 0) {
+                            const lastRun = prevRuns.reverse()[0].benchmarks[pb];
+                            if(lastRun.runsCount !== benchInResults.runsCount) {
+                                errors.push(`Runs count of benchmark "${pb}" (${benchInResults.runsCount}) doesnt match the previous runs count (${lastRun.runsCount}). Set 'strict' or 'strict.noRunsCountChange' option to false to bypass this check.`);
+                            }
+                        }
+                    }
+                });
+
+                if(strictIsBooleanTrue || (this.options?.strict as strictHistoryRules).noAddition){
+                    const newBenches = runResults.results.filter(r => prevBenchmarks.indexOf(r.name) === -1);
+                    if(newBenches.length !== 0) {
+                        errors.push(`Adding new benches is not allowed after the initial set of benchmarks. New benches: [${newBenches.map(b => b.name)}]. Set 'strict' or 'strict.noAddition' option to false to bypass this check.`);
+                    }
+                }
+
+                // TODO consider checking changes in extras
+
+                if(errors.length !== 0) {
+                    throw new Error(`Errors while trying to add new results to history: \n${errors.join("\n")}`);
+                }
+            }
+        }
 
         const benchmarks: {[key: string]:  BenchmarkHistoryRunItem<T>} = {};
         runResults.results.forEach(r => {
@@ -163,6 +226,16 @@ export class prettyBenchmarkHistory<T = unknown> {
 
     getDataString() {
         return JSON.stringify(this.getData(), null, 2);
+    }
+
+    getThresholds(): Thresholds {        
+        const benchmarkNames = this.getBenchmarkNames();
+        // TODO logic
+        return {};
+    }
+
+    getBenchmarkNames() {
+        return [...new Set(this.data.history.map(h => Object.keys(h.benchmarks)).flat())];
     }
 }
 
@@ -319,8 +392,8 @@ function example() {
     const history = new prettyBenchmarkHistory({ 
         saveIndividualRuns: false,
         minRequiredRuns: 100,
-        onlyHrTime: true,
-        strict: true,
+        easeOnlyHrTime: false,
+        strict: {noAddition: false, noRunsCountChange: false, noRemoval: false},
         benchExtras: (r: BenchmarkResult) => ({r: r.name, ...calculateExtraMetrics(r), std: calculateStdDeviation(r)}),
         runExtras: (rr: BenchmarkRunResult) => ({dv: Deno.version, f: rr.filtered})
     }, prevString);
@@ -330,17 +403,18 @@ function example() {
     const inds: BenchIndicator[] = [
         {benches: /historic/, modFn: _ => "👃"}
     ];
+    const thds = history.getThresholds();
 
-    runBenchmarks({silent: true}, prettyBenchmarkProgress({rowExtras: historicProgressExtra(history),indicators: inds, nocolor: false}))
+    runBenchmarks({silent: true}, prettyBenchmarkProgress({rowExtras: historicProgressExtra(history),indicators: inds, nocolor: false, thresholds: thds}))
         // TODO defaultColumns to func, dont get avg, total, just name, maybe runs
         .then(prettyBenchmarkDown(md => {Deno.writeTextFileSync("./benchmarks/hmdx.md", md)}, {columns: [{title: 'Name', propertyKey: 'name'}, ...historyColumns(history), {title: 'Average (ms)', propertyKey: 'measuredRunsAvgMs', toFixed: 4}, deltaColumn(history)]})) // historicColumn
-        .then(prettyBenchmarkResult({infoCell: deltaResultInfoCell(history), nocolor: false}))
+        .then(prettyBenchmarkResult({infoCell: deltaResultInfoCell(history), nocolor: false, thresholds: thds, parts: {threshold: true, graph: true}}))
         .then((results: BenchmarkRunResult) => {
 
 
             // console.log(historic.getDeltasFrom(results, "max"))
             history.addResults(results);
-            // console.log(historic.getDataString());
+            // console.log(history.getDataString());
             
             // console.log(historic.getDeltasFrom(results));
             
