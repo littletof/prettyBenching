@@ -178,7 +178,7 @@ export function historicProgressExtra(history: prettyBenchmarkHistory) { // TODO
     };
 }
 
-export function historicResultExtra(history: prettyBenchmarkHistory) { // TODO fn name
+export function deltaResultInfoCell(history: prettyBenchmarkHistory) { // TODO fn name
     return (result: BenchmarkResult, options?: prettyBenchmarkResultOptions) => {
         let deltaString = getCliDeltaString(history, result);
 
@@ -234,7 +234,7 @@ export function historyColumns<T = unknown>(history: prettyBenchmarkHistory<T>, 
     }
 
     const dateFormatter = (d: Date) => {
-        return d.toISOString().split("T").join('<br/>').replace(/Z/, "");
+        return d.toISOString().split("T").join('<br/>').replace(/Z/, ""); // TODO rework
     };
 
     return history.getData().history.map(run => {        
@@ -258,7 +258,6 @@ export function historyColumns<T = unknown>(history: prettyBenchmarkHistory<T>, 
             
         };
     });
-
 }
 
 function example() {
@@ -335,7 +334,7 @@ function example() {
     runBenchmarks({silent: true}, prettyBenchmarkProgress({rowExtras: historicProgressExtra(history),indicators: inds, nocolor: false}))
         // TODO defaultColumns to func, dont get avg, total, just name, maybe runs
         .then(prettyBenchmarkDown(md => {Deno.writeTextFileSync("./benchmarks/hmdx.md", md)}, {columns: [{title: 'Name', propertyKey: 'name'}, ...historyColumns(history), {title: 'Average (ms)', propertyKey: 'measuredRunsAvgMs', toFixed: 4}, deltaColumn(history)]})) // historicColumn
-        .then(prettyBenchmarkResult({infoCell: historicResultExtra(history)}))
+        .then(prettyBenchmarkResult({infoCell: deltaResultInfoCell(history), nocolor: false}))
         .then((results: BenchmarkRunResult) => {
 
 
