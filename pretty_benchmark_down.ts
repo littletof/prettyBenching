@@ -8,8 +8,6 @@ import {
   getPaddedIndicator,
 } from "./common.ts";
 
-// TODO historic: better or worse by x percent to last value
-
 /** Defines how the generated markdown should look like. */
 export interface prettyBenchmarkDownOptions {
   /** Defines a `# title` for the markdown */
@@ -344,11 +342,6 @@ export function extraMetricsColumns(
 
   return columns;
 }
-
-/* TODO
-export function historyColumn(){
-
-}*/
 
 function stringOrFunction(
   // deno-lint-ignore no-explicit-any

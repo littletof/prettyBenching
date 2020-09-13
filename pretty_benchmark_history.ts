@@ -15,13 +15,12 @@ export interface prettyBenchmarkHistoryOptions<T = unknown, K = unknown> {
     saveIndividualRuns?: boolean;
 }
 
-export interface BenchmarkHistory/*?Data?*/<T = unknown, K = unknown> {// TODO object so expandable without breaking API
+export interface BenchmarkHistory/*?Data?*/<T = unknown, K = unknown> {
     history: BenchmarkHistoryItem<T, K>[];
-    // options?
 }
 
 // TODO name BenchmarkHistoryRunSet
-export interface BenchmarkHistoryItem<T = unknown, K = unknown> { // TODO this should be better because its grouped by runs, easier to remove old ones, or the last one for some reason
+export interface BenchmarkHistoryItem<T = unknown, K = unknown> {
     date: string;// Date; // TODO handle only strings?
     id?: string;
     runExtras?: K;
@@ -193,7 +192,7 @@ export function historicResultExtra(history: prettyBenchmarkHistory) { // TODO f
 
 function getCliDeltaString(history: prettyBenchmarkHistory, result: BenchmarkResult) {
     const delta = history.getDeltaForBenchmark(result);
-    let deltaString = `${colors.gray(" ▪   no history  ▪ ".padEnd(19))}`;// "";//` [${colors.brightBlue(" ▪ ".padEnd(20, "-"))}]`;
+    let deltaString = `${colors.gray(" ▪   no history  ▪ ".padEnd(19))}`;
     if(delta) {
         const perc = (delta.measuredRunsAvgMs.percent * 100).toFixed(0);
         const diff = rtime(Math.abs(delta.measuredRunsAvgMs.amount));
@@ -208,10 +207,10 @@ function getCliDeltaString(history: prettyBenchmarkHistory, result: BenchmarkRes
     return deltaString;
 }
 
-export function historyColumn<T = unknown>(history: prettyBenchmarkHistory<T>, options?: {key: DeltaKey<T>}): ColumnDefinition { // TODO fn name
+export function deltaColumn<T = unknown>(history: prettyBenchmarkHistory<T>, options?: {key: DeltaKey<T>}): ColumnDefinition {
     const workingKey = options?.key || "measuredRunsAvgMs";
 
-    return {title: `Delta in ${options?.key || "avg."}`, formatter: (result, cd) => {
+    return {title: `Change in ${options?.key || "average"}`, formatter: (result, cd) => {
         const delta = history.getDeltaForBenchmark(result, [workingKey]);
         if(delta) {
             const perc = (delta[workingKey as string].percent * 100).toFixed(0);
@@ -229,7 +228,7 @@ export function historyColumn<T = unknown>(history: prettyBenchmarkHistory<T>, o
     }};
 }
 
-export function historicRow<T = unknown>(history: prettyBenchmarkHistory<T>, options?: {key?: DeltaKey<T>, titleFormatter?: (date: Date, id?: string) => string}): ColumnDefinition[] {
+export function historyColumns<T = unknown>(history: prettyBenchmarkHistory<T>, options?: {key?: DeltaKey<T>, titleFormatter?: (date: Date, id?: string) => string}): ColumnDefinition[] {
     if(history.getData().history.length === 0){ // TODO naming is bad like this: history.getData().history
         return [];
     }
@@ -318,7 +317,7 @@ function example() {
         console.warn('⚠ cant read file');
     }
 
-    const historic = new prettyBenchmarkHistory({ 
+    const history = new prettyBenchmarkHistory({ 
         saveIndividualRuns: false,
         minRequiredRuns: 100,
         onlyHrTime: true,
@@ -333,15 +332,15 @@ function example() {
         {benches: /historic/, modFn: _ => "👃"}
     ];
 
-    runBenchmarks({silent: true}, prettyBenchmarkProgress({extra: historicProgressExtra(historic),indicators: inds, nocolor: false}))
+    runBenchmarks({silent: true}, prettyBenchmarkProgress({rowExtras: historicProgressExtra(history),indicators: inds, nocolor: false}))
         // TODO defaultColumns to func, dont get avg, total, just name, maybe runs
-        .then(prettyBenchmarkDown(md => {Deno.writeTextFileSync("./benchmarks/hmdx.md", md)}, {columns: [{title: 'Name', propertyKey: 'name'}, ...historicRow(historic), {title: 'Average (ms)', propertyKey: 'measuredRunsAvgMs', toFixed: 4}, historyColumn(historic)]})) // historicColumn
-        .then(prettyBenchmarkResult({extra: historicResultExtra(historic)}))
+        .then(prettyBenchmarkDown(md => {Deno.writeTextFileSync("./benchmarks/hmdx.md", md)}, {columns: [{title: 'Name', propertyKey: 'name'}, ...historyColumns(history), {title: 'Average (ms)', propertyKey: 'measuredRunsAvgMs', toFixed: 4}, deltaColumn(history)]})) // historicColumn
+        .then(prettyBenchmarkResult({infoCell: historicResultExtra(history)}))
         .then((results: BenchmarkRunResult) => {
 
 
             // console.log(historic.getDeltasFrom(results, "max"))
-            historic.addResults(results);
+            history.addResults(results);
             // console.log(historic.getDataString());
             
             // console.log(historic.getDeltasFrom(results));

@@ -39,9 +39,8 @@ export interface prettyBenchmarkCardResultOptions {
     /** Defines how many groups the distribution graph should use. */
     graphBars?: number;
   };
-
-  //TODO doc + name
-  extra?: (result: BenchmarkResult, options: prettyBenchmarkCardResultOptions) => string;
+  /** Add a cell with the generated content at the end of the header row of the result card. Overflowing text is cut. */
+  infoCell?: (result: BenchmarkResult, options: prettyBenchmarkCardResultOptions) => string;
 }
 
 const tab = "    ";
@@ -107,8 +106,8 @@ function prettyBenchmarkHeader(
 ) {
   const head = `${indPlaceholder}${`Benchmark name: ${c.cyan(r.name.padEnd(43))}`}`;
 
-  if(typeof options?.extra === "function") {
-    let infoCell = options.extra(r, options);
+  if(typeof options?.infoCell === "function") {
+    let infoCell = options.infoCell(r, options);
     infoCell = substrColored(infoCell, 27);
 
     tb.cellLine(head, infoCell);

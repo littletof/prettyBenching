@@ -26,9 +26,9 @@ export interface prettyBenchmarkProgressOptions {
   /** If provided, the indicators will be placed before the specific benches */
   indicators?: BenchIndicator[];
 
-  extra?: (
+  rowExtras?: (
     result: BenchmarkResult,
-    options?: prettyBenchmarkProgressOptions,
+    options: prettyBenchmarkProgressOptions,
   ) => string; // TODO doc + proper name
   /** Strips all default colors from the output. 
    * 
@@ -92,8 +92,8 @@ function _prettyBenchmarkProgress(
   // Bench run result
   if (progress.state === ProgressState.BenchResult) {
     const line = finishedBenchmarkLine(progress, options);
-    const appended = typeof options?.extra === "function"
-      ? options.extra([...progress.results].reverse()[0], options)
+    const appended = typeof options?.rowExtras === "function"
+      ? options.rowExtras([...progress.results].reverse()[0], options)
       : "";
     out(`${up1Line}\r${line}${appended}`);
     // out(`${up1Line}\r${line}`);
@@ -219,7 +219,7 @@ function startBenchingLine(
 ): string {
   const cyanHeader = `${c.cyan(headerPadding)}`;
   const fullQueued = `Benchmarks queued: [${
-    c.yellow(progress.queued!.length.toString().padStart(5)) // TODO queued being optional was introduced in std 0.67.0. It shouldnt be optional.
+    c.yellow(progress.queued!.length.toString().padStart(5))
   }]`;
   const fullFiltered = c.gray(
     ` filtered: [${progress.filtered.toString().padStart(5)}]`,
@@ -244,8 +244,7 @@ function benchNameFormatted(
     }
   }
 
-  // TODO options?.indicators ? 2 : 0 // instead of always 2
-  return `${getPaddedIndicator(name, 2, options?.indicators)}` +
+  return `${getPaddedIndicator(name, options?.indicators ? 2 : 0, options?.indicators)}` +
     `${ob}${c.cyan(name)} ${
       c.gray(padEndVisible("", 40 - name.length, "-"))
     }${clb}`;

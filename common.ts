@@ -107,11 +107,11 @@ export function stripColor(str: string) {
   return str.replace(/\x1b\[[0-9\;]*m/g, "");
 }
 
-export function substrColored(str: string, length: number) { // TODO add to tests
+export function substrColored(str: string, length: number) {
   let vl = 0;
   let cutStr = "";
   const sa = [...str];
-  
+
   for(let i = 0; i < sa.length-1; i++) {
     const cs = sa[i];
     if(cs === "\x1b") {
