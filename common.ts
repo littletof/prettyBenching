@@ -108,7 +108,7 @@ export function stripColor(str: string) {
 }
 
 export function substrColored(str: string, length: number) {
-  let vl = 0;
+  let visibleLength = 0;
   let cutStr = "";
   const sa = [...str];
 
@@ -120,9 +120,9 @@ export function substrColored(str: string, length: number) {
 
       i = sa.indexOf("m", i);
     } else {
-      if(vl < length) {        
+      if(visibleLength < length) {        
         cutStr += cs;
-        vl++;
+        visibleLength++;
       }
     }
   }

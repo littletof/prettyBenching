@@ -147,8 +147,8 @@ function prettyBenchmarkThresholdLine(
   if (threshold) {
     const sep = "=".repeat(10);
     tb.line(
-      `${tab}Thresholds:  ${c.green(`0 ${sep} ${threshold.green}`)} ${
-        c.yellow(`${sep} ${threshold.yellow}`)
+      `${tab}Thresholds:  ${c.green(`0 ${sep} ${threshold.green.toFixed(4)}`)} ${
+        c.yellow(`${sep} ${threshold.yellow.toFixed(4)}`)
       } ${c.red(`${sep} ∞`)}`,
     );
     tb.separator();

@@ -1,6 +1,6 @@
 import { BenchmarkResult, BenchmarkRunResult, bench, runBenchmarks, colors } from "./deps.ts";
 import { calculateExtraMetrics, calculateStdDeviation, stripColor } from "./common.ts";
-import { BenchIndicator, Thresholds } from "./types.ts";
+import { BenchIndicator, Thresholds, Threshold } from "./types.ts";
 import { rtime } from "./utils.ts";
 // TODO move these to separate file
 import { prettyBenchmarkProgress, prettyBenchmarkProgressOptions } from "./pretty_benchmark_progress.ts";
@@ -48,11 +48,11 @@ export interface Delta {
 
 type DeltaKey<T = unknown> = (keyof T | "measuredRunsAvgMs" | "totalMs");
 
-export class prettyBenchmarkHistory<T = unknown> {
-    private data!: BenchmarkHistory<T>;
-    private options?: prettyBenchmarkHistoryOptions<T>;
+export class prettyBenchmarkHistory<T = unknown, K=unknown> {
+    private data!: BenchmarkHistory<T, K>;
+    private options?: prettyBenchmarkHistoryOptions<T, K>;
 
-    constructor(options?: prettyBenchmarkHistoryOptions<T>, prev?: BenchmarkHistory<T>) {
+    constructor(options?: prettyBenchmarkHistoryOptions<T, K>, prev?: BenchmarkHistory<T, K>) {
         this.options = options;
  
         if(prev) {
@@ -66,7 +66,7 @@ export class prettyBenchmarkHistory<T = unknown> {
         this.data = {history: []};
     }
 
-    private load(prev: BenchmarkHistory<T>) {
+    private load(prev: BenchmarkHistory<T, K>) {
         // TODO consider validating prev with options too?!
         this.data = prev;
     }
@@ -228,18 +228,39 @@ export class prettyBenchmarkHistory<T = unknown> {
         return JSON.stringify(this.getData(), null, 2);
     }
 
-    getThresholds(): Thresholds {        
-        const benchmarkNames = this.getBenchmarkNames();
-        // TODO logic
-        return {};
-    }
-
     getBenchmarkNames() {
         return [...new Set(this.data.history.map(h => Object.keys(h.benchmarks)).flat())];
     }
 }
 
-export function historicProgressExtra(history: prettyBenchmarkHistory) { // TODO fn name
+// TODO export calcStd, calcExtraMetrics
+
+export function calculateThresholds<T, K>(history: prettyBenchmarkHistory<T, K>, options?: { minProceedingRuns?: number, calculate?: (runs: BenchmarkHistoryItem<T,K>[]) => Threshold}): Thresholds {
+    const benchmarkNames = history.getBenchmarkNames();
+    const data = history.getData();
+    const thresholds: Thresholds = {};
+
+    benchmarkNames.forEach(bn => {
+        const runs = data.history.filter(h => h.benchmarks[bn])
+
+        if(runs.length < (options?.minProceedingRuns ?? 5)) {
+            return;
+        }
+
+        if(typeof options?.calculate === "function") {
+            thresholds[bn] = options.calculate(runs);
+        } else {
+            const green = Math.min(...runs.map(r => r.benchmarks[bn].measuredRunsAvgMs)) * 1.1;
+            const yellow = Math.max(...runs.map(r => r.benchmarks[bn].measuredRunsAvgMs)) * 1.3;
+            
+            thresholds[bn] = {green, yellow};
+        }
+    });
+
+    return thresholds;
+}
+
+export function deltaProgressRowExtra(history: prettyBenchmarkHistory) { // TODO fn name
     return (result: BenchmarkResult, options?: prettyBenchmarkProgressOptions) => {
         let deltaString = getCliDeltaString(history, result);
 
@@ -403,9 +424,9 @@ function example() {
     const inds: BenchIndicator[] = [
         {benches: /historic/, modFn: _ => "👃"}
     ];
-    const thds = history.getThresholds();
+    const thds = calculateThresholds(history);
 
-    runBenchmarks({silent: true}, prettyBenchmarkProgress({rowExtras: historicProgressExtra(history),indicators: inds, nocolor: false, thresholds: thds}))
+    runBenchmarks({silent: true}, prettyBenchmarkProgress({rowExtras: deltaProgressRowExtra(history),indicators: inds, nocolor: false, thresholds: thds}))
         // TODO defaultColumns to func, dont get avg, total, just name, maybe runs
         .then(prettyBenchmarkDown(md => {Deno.writeTextFileSync("./benchmarks/hmdx.md", md)}, {columns: [{title: 'Name', propertyKey: 'name'}, ...historyColumns(history), {title: 'Average (ms)', propertyKey: 'measuredRunsAvgMs', toFixed: 4}, deltaColumn(history)]})) // historicColumn
         .then(prettyBenchmarkResult({infoCell: deltaResultInfoCell(history), nocolor: false, thresholds: thds, parts: {threshold: true, graph: true}}))

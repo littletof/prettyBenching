@@ -363,7 +363,7 @@ function example() {
         {benches: /historic/, modFn: _ => "👃"}
     ];
 
-    runBenchmarks({silent: true}, prettyBenchmarkProgress({extra: historicProgressExtra(historic), indicators: inds, nocolor: false}))
+    runBenchmarks({silent: true}, prettyBenchmarkProgress({rowExtras: historicProgressExtra(historic), indicators: inds, nocolor: false}))
         // TODO defaultColumns to func, dont get avg, total, just name, maybe runs
         .then(prettyBenchmarkDown(md => {Deno.writeTextFileSync("./benchmarks/hmd.md", md)}, {columns: [{title: 'Name', propertyKey: 'name'}, ...historicRow(historic),{title: 'Average (ms)', propertyKey: 'measuredRunsAvgMs', toFixed: 4}, historicColumn(historic)]})) // historicColumn
         .then((results: BenchmarkRunResult) => {

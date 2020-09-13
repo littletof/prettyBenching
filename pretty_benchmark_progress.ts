@@ -12,7 +12,6 @@ import {
   usingHrTime,
   padEndVisible,
   num,
-  padStartVisible,
 } from "./utils.ts";
 import { Colorer } from "./colorer.ts";
 
