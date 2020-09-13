@@ -107,6 +107,29 @@ export function stripColor(str: string) {
   return str.replace(/\x1b\[[0-9\;]*m/g, "");
 }
 
+export function substrColored(str: string, length: number) { // TODO add to tests
+  let vl = 0;
+  let cutStr = "";
+  const sa = [...str];
+  
+  for(let i = 0; i < sa.length-1; i++) {
+    const cs = sa[i];
+    if(cs === "\x1b") {
+      const colorMod = str.slice(i, sa.indexOf("m", i)+1);
+      cutStr += colorMod;
+
+      i = sa.indexOf("m", i);
+    } else {
+      if(vl < length) {
+        cutStr += cs;
+        vl++;
+      }
+    }
+  }
+
+  return cutStr;
+}
+
 export function intersect(a: unknown[], b: unknown[]) {
   return a.filter((value) => -1 !== b.indexOf(value));
 }

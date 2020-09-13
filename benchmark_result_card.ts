@@ -4,6 +4,7 @@ import {
   getTimeColor,
   calculateExtraMetrics,
   getPaddedIndicator,
+  substrColored,
 } from "./common.ts";
 
 import {
@@ -38,6 +39,9 @@ export interface prettyBenchmarkCardResultOptions {
     /** Defines how many groups the distribution graph should use. */
     graphBars?: number;
   };
+
+  //TODO doc + name
+  extra?: (result: BenchmarkResult, options: prettyBenchmarkCardResultOptions) => string;
 }
 
 const tab = "    ";
@@ -101,7 +105,17 @@ function prettyBenchmarkHeader(
   r: BenchmarkResult,
   options: prettyBenchmarkCardResultOptions,
 ) {
-  tb.line(`${indPlaceholder}${`Benchmark name: ${c.cyan(r.name)}`}`);
+  const head = `${indPlaceholder}${`Benchmark name: ${c.cyan(r.name.padEnd(43))}`}`;
+
+  if(typeof options?.extra === "function") {
+    let infoCell = options.extra(r, options);
+    infoCell = substrColored(infoCell, 27);
+
+    tb.cellLine(head, infoCell);
+  } else {
+    tb.line(head);
+  }
+
   tb.separator();
 }
 
