@@ -1,16 +1,23 @@
-export {
+export type {
   BenchIndicator,
   Threshold,
   Thresholds,
 } from "./types.ts";
+
 export {
   prettyBenchmarkResult,
+} from "./pretty_benchmark_result.ts";
+export type {
   prettyBenchmarkResultOptions,
 } from "./pretty_benchmark_result.ts";
+
 export {
   prettyBenchmarkProgress,
+} from "./pretty_benchmark_progress.ts";
+export type {
   prettyBenchmarkProgressOptions,
 } from "./pretty_benchmark_progress.ts";
+
 export {
   prettyBenchmarkDown,
   defaultColumns,
@@ -18,6 +25,8 @@ export {
   thresholdResultColumn,
   thresholdsColumn,
   extraMetricsColumns,
+} from "./pretty_benchmark_down.ts";
+export type {
   prettyBenchmarkDownOptions,
   ColumnDefinition,
   GroupDefinition,

@@ -1,7 +1,5 @@
 import { testEach } from "./test_helpers.ts";
 import { assertEquals } from "./test_deps.ts";
-import { colors } from "../deps.ts";
-
 import { TableBuilder } from "../table.ts";
 
 testEach<{ w: number; ops: (tb: TableBuilder) => void }, string>(
