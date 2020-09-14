@@ -7,9 +7,9 @@ import {
 import {
   runBenchmarks,
   bench,
-} from "https://deno.land/std@0.67.0/testing/bench.ts";
+} from "https://deno.land/std@0.69.0/testing/bench.ts";
 
-import * as colors from "https://deno.land/std@0.67.0/fmt/colors.ts";
+import * as colors from "https://deno.land/std@0.69.0/fmt/colors.ts";
 
 bench({
   name: "Sorting arrays",

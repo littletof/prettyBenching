@@ -3,7 +3,7 @@ import { assertThrows } from "./test_deps.ts";
 export interface TestCase<T = unknown, K = unknown> {
   input: T;
   result?: K;
-  // deno-lint-ignore-next-line no-explicit-any
+  // deno-lint-ignore no-explicit-any
   exception?: { error?: any; msg?: string };
   desc?: string;
 }
