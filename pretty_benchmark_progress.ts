@@ -1,18 +1,21 @@
-import {
-  BenchmarkRunProgress,
-  ProgressState,
-  BenchmarkRunResult,
-} from "./deps.ts";
-import { Thresholds, BenchIndicator } from "./types.ts";
 import { getTimeColor, getBenchIndicator } from "./common.ts";
-
+import {
+  ProgressState,
+} from "./deps.ts";
 import {
   getTimePadSize,
   usingHrTime,
   padEndVisible,
   num,
 } from "./utils.ts";
+
 import { Colorer } from "./colorer.ts";
+
+import type {
+  BenchmarkRunProgress,
+  BenchmarkRunResult,
+} from "./deps.ts";
+import type { Thresholds, BenchIndicator } from "./types.ts";
 
 const headerPadding = "▒▒▒▒▒▒▒▒";
 const lineLength = 130;
@@ -209,7 +212,7 @@ function startBenchingLine(
 ): string {
   const cyanHeader = `${c.cyan(headerPadding)}`;
   const fullQueued = `Benchmarks queued: [${
-    c.yellow(progress.queued!.length.toString().padStart(5)) // TODO queued being optional was introduced in std 0.67.0. It shouldnt be optional.
+    c.yellow(progress.queued!.length.toString().padStart(5))
   }]`;
   const fullFiltered = c.gray(
     ` filtered: [${progress.filtered.toString().padStart(5)}]`,

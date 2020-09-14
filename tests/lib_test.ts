@@ -3,18 +3,16 @@ import {
   bench,
   runBenchmarks,
   clearBenchmarks,
-  colors,
   BenchmarkResult,
   BenchmarkRunResult,
   BenchmarkRunProgress,
 } from "../deps.ts";
-import { test } from "./test_deps.ts";
 import {
   prettyBenchmarkDown,
   GroupDefinition,
 } from "../pretty_benchmark_down.ts";
 
-import { Thresholds, BenchIndicator } from "../types.ts";
+import type { Thresholds } from "../types.ts";
 
 import { benchmark_progress, benchmark_result } from "./test_data.ts";
 
@@ -24,7 +22,7 @@ const thresholds: Thresholds = {
   "Standing out": { green: 0.5, yellow: 0.74 },
 };
 
-test({
+Deno.test({
   name: "commandlineBenching",
   fn: async function (): Promise<void> {
     const progressFn = prettyBenchmarkProgress({ thresholds });
@@ -35,7 +33,7 @@ test({
   },
 });
 
-test({
+Deno.test({
   name: "without options",
   fn: async function (): Promise<void> {
     const progressFn = prettyBenchmarkProgress();
@@ -46,7 +44,7 @@ test({
   },
 });
 
-test({
+Deno.test({
   name: "nocolor",
   fn: async function (): Promise<void> {
     const progressFn = prettyBenchmarkProgress({ nocolor: true });
@@ -57,7 +55,7 @@ test({
   },
 });
 
-test({
+Deno.test({
   name: "prettyBenchmarkDown - issue #10 - Empty group results",
   fn: async function (): Promise<void> {
     clearBenchmarks();

@@ -1,14 +1,11 @@
 // deno-lint-ignore-file
 
 import { prettyBenchmarkProgress, prettyBenchmarkResult } from "../../mod.ts";
-import {
-  readJsonSync,
-} from "https://deno.land/std@0.67.0/fs/mod.ts";
-import { join } from "https://deno.land/std@0.67.0/path/mod.ts";
+import { join } from "https://deno.land/std@0.69.0/path/mod.ts";
 import {
   BenchmarkRunProgress,
   ProgressState,
-} from "https://deno.land/std@0.67.0/testing/bench.ts";
+} from "https://deno.land/std@0.69.0/testing/bench.ts";
 
 const pathBase = join(".", "docs", "showcase");
 
@@ -78,3 +75,7 @@ console.log(`\n${"-".repeat(60)}${"-".repeat(60)}\n\n`); // separator line
 console.log(resultLog);
 
 fid.close();
+
+function readJsonSync(path: string) {
+  return JSON.parse(Deno.readTextFileSync(path));
+}
