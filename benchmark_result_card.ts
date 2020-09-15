@@ -1,5 +1,3 @@
-import { BenchmarkResult } from "./deps.ts";
-import { BenchIndicator, Thresholds } from "./types.ts";
 import {
   getTimeColor,
   calculateExtraMetrics,
@@ -15,7 +13,9 @@ import {
 } from "./utils.ts";
 
 import { TableBuilder } from "./table.ts";
-import { Colorer } from "./colorer.ts";
+import type { Colorer } from "./colorer.ts";
+import type { BenchmarkResult } from "./deps.ts";
+import type { BenchIndicator, Thresholds } from "./types.ts";
 
 /** Defines the options for card formatted results */
 export interface prettyBenchmarkCardResultOptions {

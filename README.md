@@ -2,10 +2,10 @@
 
 A simple Deno library, that gives you pretty benchmarking progress and results in the commandline
 
-[![version](https://img.shields.io/badge/0.2.3-brightgreen?logo=v&logoColor=white&labelColor=gray)](https://deno.land/x/pretty_benching@v0.2.3)
+[![version](https://img.shields.io/badge/0.2.4-brightgreen?logo=v&logoColor=white&labelColor=gray)](https://deno.land/x/pretty_benching@v0.2.4)
 
-[![deno version](https://img.shields.io/badge/deno%201.3.2-success?logo=deno&logoColor=black&labelColor=white&color=black)](https://github.com/denoland/deno)
-[![deno/std version](https://img.shields.io/badge/deno/std%200.67.0-success?logo=deno&logoColor=black&labelColor=white&color=black)](https://deno.land/std@0.67.0)
+[![deno version](https://img.shields.io/badge/deno%201.4.0-success?logo=deno&logoColor=black&labelColor=white&color=black)](https://github.com/denoland/deno)
+[![deno/std version](https://img.shields.io/badge/deno/std%200.69.0-success?logo=deno&logoColor=black&labelColor=white&color=black)](https://deno.land/std@0.69.0)
 [![documentation](https://img.shields.io/badge/docs-blue?logo=deno&logoColor=black&labelColor=white&color=blue)](https://doc.deno.land/https/deno.land/x/pretty_benching/mod.ts)
 
 [![Build Status](https://github.com/littletof/prettyBenching/workflows/CI/badge.svg)](https://github.com/littletof/prettyBenching/actions?query=workflow%3ACI)
@@ -38,13 +38,13 @@ export {
   prettyBenchmarkResult,
   prettyBenchmarkProgress,
   prettyBenchmarkDown
-} from 'https://deno.land/x/pretty_benching@v0.2.3/mod.ts';
+} from 'https://deno.land/x/pretty_benching@v0.2.4/mod.ts';
 ```
 
 or just simply import it directly:
 
 ```ts
-import { prettyBenchmarkResult, prettyBenchmarkProgress, prettyBenchmarkDown } from 'https://deno.land/x/pretty_benching@v0.2.3/mod.ts';
+import { prettyBenchmarkResult, prettyBenchmarkProgress, prettyBenchmarkDown } from 'https://deno.land/x/pretty_benching@v0.2.4/mod.ts';
 ```
 
 ## Note
@@ -79,7 +79,7 @@ End when finished:
 You can define thresholds to specific benchmarks and than the times of the runs will be colored respectively
 
 ```ts
-const thresholds = {
+const thresholds: Thresholds = {
   "for100ForIncrementX1e6": {green: 0.85, yellow: 1},
   "for100ForIncrementX1e8": {green: 84, yellow: 93},
   "forIncrementX1e9": {green: 900, yellow: 800},
@@ -96,7 +96,7 @@ runBenchmarks({ silent: true }, prettyBenchmarkProgress({thresholds}))
 You can use indicators, which help you categorise your benchmarks. You can change the character which gets added before the benchmark. 
 
 ```ts
-const indicators = [
+const indicators: BenchIndicator[] = [
   { benches: /100/, modFn: colors.bgRed },
   { benches: /for/, modFn: colors.red },
   { benches: /custom/, modFn: () => colors.bgYellow(colors.black("%")) }, // changes indicator char
@@ -136,7 +136,7 @@ The output would look something like this:
 You can define thresholds to specific benchmarks and than related things, like times or graph bars will be colored respectively. This can use the same thresholds object as in `prettyBenchmarkProgress`.
 
 ```ts
-const thresholds = {
+const thresholds: Thresholds = {
       "multiple-runs": { green: 76, yellow: 82 },
       "benchmark-start": { green: 2, yellow: 3 },
 };
@@ -152,7 +152,7 @@ You can use indicators, which help you categorise your benchmarks besides just t
 You can pass this object to `prettyBenchmarkProgress` too.
 
 ```ts
-const indicators = [
+const indicators: BenchIndicator[] = [
   {
     benches: /multiple-runs/,
     color: colors.magenta,
