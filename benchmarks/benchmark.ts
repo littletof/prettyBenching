@@ -3,9 +3,8 @@
 import {
   bench,
   runBenchmarks,
-} from "https://deno.land/std@0.57.0/testing/bench.ts";
-import { readJsonSync } from "https://deno.land/std@0.57.0/fs/mod.ts";
-import { join } from "https://deno.land/std@0.57.0/path/mod.ts";
+} from "https://deno.land/std@0.69.0/testing/bench.ts";
+import { join } from "https://deno.land/std@0.69.0/path/mod.ts";
 import { prettyBenchmarkResult } from "../mod.ts";
 import { colors } from "../deps.ts";
 
@@ -15,9 +14,9 @@ console.log(
     import.meta.url,
   ).href,
 );
-const data = readJsonSync(
+const data = JSON.parse(Deno.readTextFileSync(
   join("docs", "showcase", "benchmark_result_input.json"),
-);
+));
 
 const resultFn = prettyBenchmarkResult(
   {
@@ -29,7 +28,7 @@ const resultFn = prettyBenchmarkResult(
     indicators: [
       {
         benches: /multiple-runs/,
-        tableColor: colors.magenta,
+        color: colors.magenta,
         modFn: (str) => "🚀",
       },
     ],

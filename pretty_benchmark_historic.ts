@@ -3,7 +3,7 @@ import { prettyBenchmarkProgress, prettyBenchmarkProgressOptions } from "./prett
 import { prettyBenchmarkResult } from "./pretty_benchmark_result.ts";
 import { prettyBenchmarkDown, ColumnDefinition } from "./pretty_benchmark_down.ts";
 import { colors } from "./deps.ts";
-import { BenchIndicator } from "./types.ts";
+import type { BenchIndicator } from "./types.ts";
 import { stripColor, calculateExtraMetrics, calculateStdDeviation } from "./common.ts";
 
 export interface prettyBenchmarkHistoryOptions<T = unknown> {
