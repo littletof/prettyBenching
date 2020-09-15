@@ -83,7 +83,7 @@ export interface BenchmarkHistoryRunItem<T = unknown> {
     extras?: T;
 }
 
-/** Represent the change in a variables value. */
+/** Represent the change in a variable's value. */
 export interface Delta {
     /** The change in percents. */
     percent: number;
@@ -93,15 +93,42 @@ export interface Delta {
 
 export type DeltaKey<T = unknown> = (keyof T | "measuredRunsAvgMs" | "totalMs");
 
+/** Handles and enforces the set rules on the historic benchmarking data.
+ * 
+ * Typical usage:
+ * ```ts
+ *  // add benches, then
+ * 
+ *  let historicData;
+ *  try {
+ *      historicData = JSON.parse(Deno.readTextFileSync("./benchmarks/history.json"));
+ *  } catch {
+ *      // Decide whether you want to proceed with no history
+ *      console.warn("⚠ cant read history file");
+ *  }
+ *
+ *  const history = new prettyBenchmarkHistory({
+ *      //options
+ *  }, historicData);
+ * 
+ *  runBenchmarks().then((results: BenchmarkRunResult) => {
+ *      history.addResults(results);
+ *      Deno.writeTextFileSync("./benchmarks/history.json", history.getDataString());
+ *  });
+ * ```
+ * 
+ * **Note**
+ * 
+ * The saving and loading of the generated data is the user's responsibility, this class is not doing any file handling. See examples for more info. */
 export class prettyBenchmarkHistory<T = unknown, K=unknown> {
     private data!: BenchmarkHistory<T, K>;
     private options?: prettyBenchmarkHistoryOptions<T, K>;
 
-    constructor(options?: prettyBenchmarkHistoryOptions<T, K>, prev?: BenchmarkHistory<T, K>) {
+    constructor(options?: prettyBenchmarkHistoryOptions<T, K>, /** The previously saved historic data. */previousData?: BenchmarkHistory<T, K>) {
         this.options = options;
  
-        if(prev) {
-            this.load(prev);
+        if(previousData) {
+            this.load(previousData);
         } else {
             this.init();
         }
@@ -111,11 +138,17 @@ export class prettyBenchmarkHistory<T = unknown, K=unknown> {
         this.data = {history: []};
     }
 
-    private load(prev: BenchmarkHistory<T, K>) {
-        this.data = prev;
+    private load(previousData: BenchmarkHistory<T, K>) {
+        this.data = previousData;
     }
 
-    addResults(runResults: BenchmarkRunResult, options?: {id?: string, date?: Date}) {
+    /** Stores the run's result into the historic data, enforces all set rules on the results. */
+    addResults(runResults: BenchmarkRunResult, options?: {
+        /** Helps to identify the specific run, besides the date.*/
+        id?: string,
+        /** Overrides the current date */
+        date?: Date
+    }) {
         const date = options?.date ?? new Date();
 
         const duplicateNames = runResults.results.filter(r => runResults.results.filter(rc => rc.name === r.name).length > 1);
@@ -205,6 +238,14 @@ export class prettyBenchmarkHistory<T = unknown, K=unknown> {
         return this;
     }
 
+    /** Calculates `deltas` for each benchmark in the provided `BenchmarkRunResult` for each provided property key. 
+     * 
+     * Keys are either `measuredRunsAvgMs`, `totalMs` or point to `number` properties of the calculated `extras`.
+     * Error is thrown, when a key points to a non number property.
+     * No delta is calculated for key's which are not present in the `extras`
+     * 
+     * Returns `false` for a given benchmark when there is no history for it.
+     */
     getDeltasFrom(results: BenchmarkRunResult, keys: DeltaKey<T>[] = ["measuredRunsAvgMs", "totalMs"]): {[key: string]: {[key: string]: Delta}} {
 
         const deltas: {[key: string]: {[key:string]: Delta}} = {};
@@ -219,6 +260,14 @@ export class prettyBenchmarkHistory<T = unknown, K=unknown> {
         return deltas;
     }
 
+    /** Calculates `deltas` for given `BenchmarkResult` for each provided property key. 
+     * 
+     * Keys are either `measuredRunsAvgMs`, `totalMs` or point to `number` properties of the calculated `extras`.
+     * Error is thrown, when a key points to a non number property.
+     * No delta is calculated for key's which are not present in the `extras`
+     * 
+     * Returns `false` when there is no history for the given benchmark.
+     */
     getDeltaForBenchmark(result: BenchmarkResult, keys: DeltaKey<T>[] = ["measuredRunsAvgMs", "totalMs"]) {
         const prevResults = this.data.history.filter(h => h.benchmarks[result.name]);
         const lastResult = prevResults.length > 0 ? prevResults[prevResults.length-1].benchmarks[result.name] : undefined;
@@ -251,7 +300,7 @@ export class prettyBenchmarkHistory<T = unknown, K=unknown> {
                 deltas[key as string] = calcDelta(result, lastResult, key);
             } else {
                 if(!currentResultExtras || typeof currentResultExtras[key] === undefined){ 
-                    throw new Error(`No property named "${key}" in calculated extras for currently measured benchmark named "${result.name}".`);
+                    throw new Error(`No property named "${key}" in calculated extras for the currently measured benchmark named "${result.name}".`);
                 }
     
                 if(!lastResult.extras || !lastResult.extras[key]) { // TODO consider throwing
@@ -265,20 +314,32 @@ export class prettyBenchmarkHistory<T = unknown, K=unknown> {
         return deltas;
     }
 
+    /** Returns a copy of the historic data. */
     getData(): BenchmarkHistory<T, K> {
         // no complex objects so should be enough
         return JSON.parse(JSON.stringify(this.data));
     }
 
+    /** Returns the historic data in a pretty-printed JSON string */
     getDataString() {
         return JSON.stringify(this.getData(), null, 2);
     }
 
+    /** Returns every benchmark's name that is in the historic data. */
     getBenchmarkNames() {
         return [...new Set(this.data.history.map(h => Object.keys(h.benchmarks)).flat())];
     }
 }
 
+/** Calculates `Thresholds` from the historic data for each benchmark.
+ * 
+ * The default way the thresholds are calculated:
+ * * only calculate threshold for benchmark, which has at least `5` previous runs
+ * * `green` is the (minimum of the measured `measuredRunsAvgMs`) * `1.1`
+ * * `yellow` is the (maximum of the measured `measuredRunsAvgMs`) * `1.2`
+ * 
+ * This can be overridden with the options.
+ */
 export function calculateThresholds<T, K>(history: prettyBenchmarkHistory<T, K>, options?: { minProceedingRuns?: number, calculate?: (runs: BenchmarkHistoryItem<T,K>[]) => Threshold}): Thresholds {
     const benchmarkNames = history.getBenchmarkNames();
     const data = history.getData();
@@ -295,7 +356,7 @@ export function calculateThresholds<T, K>(history: prettyBenchmarkHistory<T, K>,
             thresholds[bn] = options.calculate(runs);
         } else {
             const green = Math.min(...runs.map(r => r.benchmarks[bn].measuredRunsAvgMs)) * 1.1;
-            const yellow = Math.max(...runs.map(r => r.benchmarks[bn].measuredRunsAvgMs)) * 1.3;
+            const yellow = Math.max(...runs.map(r => r.benchmarks[bn].measuredRunsAvgMs)) * 1.2;
             
             thresholds[bn] = {green, yellow};
         }
