@@ -1,5 +1,5 @@
 import { Colorer } from "./colorer.ts";
-import { ProgressState } from "./deps.ts";
+import { ProgressState, BenchmarkResult } from "./deps.ts";
 import { getTimeColor, getPaddedIndicator } from "./common.ts";
 import {
   getTimePadSize,
