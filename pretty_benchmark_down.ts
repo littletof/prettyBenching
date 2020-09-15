@@ -1,5 +1,3 @@
-import { BenchmarkRunResult, BenchmarkResult } from "./deps.ts";
-import { BenchIndicator, Thresholds } from "./types.ts";
 import {
   stripColor,
   getInThresholdRange,
@@ -7,6 +5,8 @@ import {
   calculateStdDeviation,
   getPaddedIndicator,
 } from "./common.ts";
+import type { BenchmarkRunResult, BenchmarkResult } from "./deps.ts";
+import type { BenchIndicator, Thresholds } from "./types.ts";
 
 // TODO historic: better or worse by x percent to last value
 

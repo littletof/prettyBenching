@@ -7,16 +7,16 @@ import {
   extraMetricsColumns,
   GroupDefinition,
   ColumnDefinition,
-} from "https://deno.land/x/pretty_benching@v0.2.3/pretty_benchmark_down.ts";
+} from "https://deno.land/x/pretty_benching@v0.2.4/pretty_benchmark_down.ts";
 
 import {
   runBenchmarks,
   bench,
   BenchmarkResult,
   BenchmarkRunResult,
-} from "https://deno.land/std@0.67.0/testing/bench.ts";
+} from "https://deno.land/std@0.69.0/testing/bench.ts";
 
-import * as colors from "https://deno.land/std@0.67.0/fmt/colors.ts";
+import * as colors from "https://deno.land/std@0.69.0/fmt/colors.ts";
 
 bench({
   name: "Sorting arrays",

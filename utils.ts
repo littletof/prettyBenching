@@ -1,4 +1,3 @@
-import { BenchmarkResult } from "./deps.ts";
 import { stripColor } from "./common.ts";
 
 export function getTimePadSize() {
