@@ -13,7 +13,7 @@ export interface prettyBenchmarkHistoryOptions<T = unknown, K = unknown> {
     strict?: boolean | strictHistoryRules;
     /** Throw an error, when **any** benchmark has lower runsCount than the set value. */
     minRequiredRuns?: number;
-    /** Saves each `measuredRunsMs` array for each benchmark. 
+    /** Saves the `measuredRunsMs` array for each benchmark. 
      * 
      * **WARNING** this could result in a very big history file overtime. 
      * 

@@ -13,11 +13,13 @@ A simple Deno library, that gives you pretty benchmarking progress and results i
 
 ## Jump to
 
-[![prettyBenchmarkProgress](https://img.shields.io/badge/-%F0%9F%94%B5%20prettyBenchmarkProgress-4e4e4e)](#prettyBenchmarkProgress)
+[![prettyBenchmarkProgress](https://img.shields.io/badge/-%F0%9F%94%B5%20prettyBenchmarkProgress-4e4e4e)](#prettybenchmarkprogress)
 
-[![prettyBenchmarkResults](https://img.shields.io/badge/-%F0%9F%94%B5%20prettyBenchmarkResults-4e4e4e)](#prettyBenchmarkResults)
+[![prettyBenchmarkResults](https://img.shields.io/badge/-%F0%9F%94%B5%20prettyBenchmarkResults-4e4e4e)](#prettybenchmarkbesults)
 
-[![prettyBenchmarkDown](https://img.shields.io/badge/-%F0%9F%94%B5%20prettyBenchmarkDown-4e4e4e)](#prettyBenchmarkDown) [![deno version](https://img.shields.io/badge/Github_Action-4e4e4e?logo=github)](#as-a-github-action)
+[![prettyBenchmarkDown](https://img.shields.io/badge/-%F0%9F%94%B5%20prettyBenchmarkDown-4e4e4e)](#prettybenchmarkdown) [![deno version](https://img.shields.io/badge/Github_Action-4e4e4e?logo=github)](#as-a-github-action)
+
+[![prettyBenchmarkHistory](https://img.shields.io/badge/-%F0%9F%94%B5%20prettyBenchmarkHistory-4e4e4e)](#prettybenchmarkhistory)
 
 [![deno version](https://img.shields.io/badge/ROADMAP-4e4e4e?logo=discover)](#roadmap)
 
@@ -410,6 +412,99 @@ interface GroupDefinition {
 Use this in a github action, eg. comment benchmark results on PRs.
 
 You can see an example Github Action for this [here](https://github.com/littletof/prettyBenching/blob/master/docs/prettyBenchmarkDown/pr_benchmark.yml) or see it in use in a showcase [repo](https://github.com/littletof/pretty-benching-action/pull/2).
+
+# prettyBenchmarkHistory
+
+Helps to keep track of the results of the different `runBenchmarks()` runs historically.
+
+### Usage
+
+> **Note** this module doesn't handle the loading and saving of the data from/to the disk. See example.
+
+First, if you already have saved historic data, you need to load it from disk (or elsewhere).
+If no previous historicData is provided in the constructor, it starts a fresh, empty history.
+
+After it was initiated with the `options` and data, you can simply call `addResults` with the new results, and save them again into a file, using `getDataString()` which returns the historic data in a pretty printed JSON string.
+
+You are able to set some rules in the `options`, like to only allow to add a result, if every benchmark was run a minimum of x times, or if no benchmark was added or removed or had its `runsCount` changed since the previous run.
+
+By default it only allows to add results that were measured with `--allow-hrtime` flag, but this rule can be disabled.
+
+```ts
+// add benches, then
+
+let historicData;
+try {
+    historicData = JSON.parse(Deno.readTextFileSync("./benchmarks/history.json"));
+} catch {
+    // Decide whether you want to proceed with no history
+    console.warn("⚠ cant read history file");
+}
+
+const history = new prettyBenchmarkHistory({/*options*/}, historicData);
+
+runBenchmarks().then((results: BenchmarkRunResult) => {
+    history.addResults(results {id: "version_tag"});
+    Deno.writeTextFileSync("./benchmarks/history.json", history.getDataString());
+});
+```
+
+The resulting historic data would look something like this, based on the options:
+
+```json
+{
+  "history": [
+    {
+      "date": "2020-09-12T20:28:36.812Z",
+      "id": "v1.15.2",
+      "benchmarks": {
+        "RotateArrays": {
+          "measuredRunsAvgMs": 0.061707600000003596,
+          "runsCount": 500,
+          "totalMs": 30.853800000001797,
+          "extra": {
+            "max": 0.45420000000001437,
+            "min": 0.034700000000043474,
+            "mean": 0.24445000000002892,
+            "median": 0.04179999999996653,
+            "std": 0.04731720894389344
+          }
+        },
+        "x3#14": {
+          "measuredRunsAvgMs": 2.6682033000000036,
+          "runsCount": 1000,
+          "totalMs": 2668.2033000000038,
+          "extra": {
+            "max": 9.25019999999995,
+            "min": 1.983299999999872,
+...
+```
+
+### Rules and options
+
+* **`easeOnlyHrTime`**: Allows storing low precision measurements, which where measured without `--allow-hrtime` flag
+* **`strict`**: Contains a set of rules, which are all enforced, if boolean `true` is set, but can be individually controlled if an object is provided:
+  
+  * **`noRemoval`**:  Throw an error, when previously saved benchmark is missing from the current set when calling `addResults`. Ignored on the very first set of benchmarks.
+  * **`noAddition`**: Throw an error, when previously not saved benchmark is added to the current set when calling `addResults`. Ignored on the very first set of benchmarks.
+  * **`noRunsCountChange`**: Throw an error, when the `runsCount` changes for a benchmark from the previous run's `runsCount`. Ignored on new benchmarks.
+
+* **`minRequiredRuns`**: Throw an error, when **any** benchmark has lower runsCount than the set value.
+
+* **`saveIndividualRuns`**: Saves the `measuredRunsMs` array for each benchmark.
+  **WARNING** this could result in a very big history file overtime.
+  Consider calculating necessary values before save instead with `benchExtras` or `runExtras`.
+  
+    /** Saves the returned `object` for each benchmark into it's `extras` property. */
+* **`benchExtras`**(result: BenchmarkResult) => T : Saves the returned `object` for each benchmark into it's `extras` property.
+
+* **`runExtras`**(runResult: BenchmarkRunResult) => K : Saves the returned `object` for each run into it's `runExtras` property.
+
+### Methods
+
+* **`addResults`**(runResults: BenchmarkRunResult, options?): Stores the run's result into the historic data, enforces all set rules on the results. You can specify an `id` in the options to help identify the specific historic data besides the date. It useful for example to set it to the tested modules version number.
+
+### Usecases
 
 # Roadmap
 
