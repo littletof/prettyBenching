@@ -333,6 +333,8 @@ export class prettyBenchmarkHistory<T = unknown, K=unknown> {
 
 /** Calculates `Thresholds` from the historic data for each benchmark.
  * 
+ * **EXPERIMENTAL** The default way of calculating may change, if you relay on thresholds provide your calculation so it wont change unexpectedly
+ * 
  * The default way the thresholds are calculated:
  * * only calculate threshold for benchmark, which has at least `5` previous runs
  * * `green` is the (minimum of the measured `measuredRunsAvgMs`) * `1.1`
