@@ -131,7 +131,7 @@ runBenchmarks({silent: true})
 
 The output would look something like this:
 
-![<small>example</small>](docs/imgs/prettyBenchingResult_example.png)
+![example](docs/imgs/prettyBenchingResult_example.png)
 
 ### Thresholds
 
@@ -422,7 +422,7 @@ Helps to keep track of the results of the different `runBenchmarks()` runs histo
 
 ### Usage
 
-> **Note** this module doesn't handle the loading and saving of the data from/to the disk. See example.
+> **Note** this module doesn't handle the loading and saving of the data from/to the disk. See examples.
 
 First, if you already have saved historic data, you need to load it from disk (or elsewhere).
 If no previous historicData is provided in the constructor, it starts a fresh, empty history.
@@ -480,6 +480,7 @@ The resulting historic data would look something like this, based on the options
           "extra": {
             "max": 9.25019999999995,
             "min": 1.983299999999872,
+...
 ```
 
 ### Rules and options

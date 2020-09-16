@@ -93,8 +93,8 @@ function _prettyBenchmarkProgress(
     const appended = typeof options?.rowExtras === "function"
       ? options.rowExtras([...progress.results].reverse()[0], options)
       : "";
+      
     out(`${up1Line}\r${line}${appended}`);
-    // out(`${up1Line}\r${line}`);
     return;
   }
 

@@ -123,6 +123,7 @@ export function disjunct(base: unknown[], dis: unknown[]) {
   return base.filter((value) => -1 === dis.indexOf(value));
 }
 
+/** Calculates the `min`, `max`, `mean` (as (`max`+`min`)/2) and `median` from the `measuredRunsMs` array. */
 export function calculateExtraMetrics(result: BenchmarkResult) {
   const max = Math.max(...result.measuredRunsMs);
   const min = Math.min(...result.measuredRunsMs);
@@ -143,6 +144,7 @@ export function calculateExtraMetrics(result: BenchmarkResult) {
   };
 }
 
+/** Calculates the `standard deviation` from the `measuredRunsMs` array. */
 export function calculateStdDeviation(result: BenchmarkResult) {
   const sorted = [...result.measuredRunsMs].sort();
   const stdDeviation = Math.sqrt(
