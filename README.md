@@ -571,7 +571,7 @@ The resulting historic data would look something like this, based on the options
 * Show each previous measurement as a column in a markdown table
    
   >|Name|2020-09-12<br/>21:54:53.706|v0.5.6|v0.8.0|Current|Change in average|
-  >|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
+  >|:-:|:-:|:-:|:-:|:-:|:-:|
   >|historic|0.0704|0.0740|0.0904|0.0650|🟢   -28% (0.0254ms)|
   >|x3#14|6.1675|2.9979|4.2214|3.6275|🟢   -14% (0.5939ms)|
   >|MZ/X|-|3.3095|5.4405|7.4553|🔺  +37% (2.0147ms)|
