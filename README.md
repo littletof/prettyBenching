@@ -564,7 +564,7 @@ The resulting historic data would look something like this, based on the options
 
       runBenchmarks().then(prettyBenchmarkDown(console.log, {
         columns: [
-            // ...
+            ...defaultColumns(['name', 'measuredRunsAvgMs']),
             deltaColumn(history),
         ]
       }));
