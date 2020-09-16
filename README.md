@@ -290,13 +290,16 @@ You can customise, what columns you want to see in each table. To see what every
 * If `not defined`, the generator uses the default columns defined by the module
 * If `defined`, you take full control, of what columns you want to see. The default columns are exported, and there are other premade columns for you to use.
 
-##### defaultColumns [<small>example</small>](https://github.com/littletof/prettyBenching/blob/master/docs/prettyBenchmarkDown/pr_benchmark_output.md#default-columns-and-dynamic-text)
+##### defaultColumns(columns: string[]) [<small>example</small>](https://github.com/littletof/prettyBenching/blob/master/docs/prettyBenchmarkDown/pr_benchmark_output.md#default-columns-and-dynamic-text)
 
 ```ts
-columns: [...defaultColumns]
+columns: [
+  ...defaultColumns(),
+  ...defaultColumns(['name', 'measuredRunsAvgMs'])
+]
  ```
 
-It includes `Name`, `Runs`, `Total (ms)` and `Average (ms)` columns, these are the default values of the `BenchmarkRunResult`.
+It includes `Name`, `Runs`, `Total (ms)` and `Average (ms)` columns, these are the default values of the `BenchmarkRunResult`. Filter them with an array of propertyKeys.
 
 ##### indicatorColumn(indicators: BenchIndicator[]) [<small>example</small>](https://github.com/littletof/prettyBenching/blob/master/docs/prettyBenchmarkDown/pr_benchmark_output.md#predefiend-columns)
 

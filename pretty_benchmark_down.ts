@@ -202,9 +202,7 @@ function _prettyBenchmarkDown(
   return runResult;
 }
 
-// TODO deprecate and use function instead, like extraMetrics
-/** Contains the default `ColumnDefinitions`, which are `Name`, `Runs`, `Total (ms)` and `Average (ms)` */
-export const defaultColumns: ColumnDefinition[] = [
+const defaultColumnsArray: ColumnDefinition[] = [
   { title: "Name", propertyKey: "name", align: "left" },
   { title: "Runs", propertyKey: "runsCount", align: "right" },
   { title: "Total (ms)", propertyKey: "totalMs", align: "right", toFixed: 3 },
@@ -213,8 +211,17 @@ export const defaultColumns: ColumnDefinition[] = [
     propertyKey: "measuredRunsAvgMs",
     align: "right",
     toFixed: 3,
-  },
+  }
 ];
+
+/** Defines the default `ColumnDefinitions`, which are `Name`, `Runs`, `Total (ms)` and `Average (ms)` */
+export function defaultColumns(columns?: ("name" | "runsCount" | "totalMs" | "measuredRunsAvgMs")[]): ColumnDefinition[] {
+  if(columns) {
+    return [...defaultColumnsArray].filter(dc => (columns as string[]).indexOf(dc.propertyKey!) !== -1);
+  } else {
+    return [...defaultColumnsArray];
+  }
+};
 
 /** Defines a column which contains the indicators for the benchmarks, where provided.
  * 
@@ -368,7 +375,7 @@ function headerRow(
   let alignments = "|";
 
   const columns: ColumnDefinition[] = group?.columns || options?.columns ||
-    defaultColumns;
+    defaultColumns();
 
   columns.forEach((c) => {
     titles += `${c.title}|`;
@@ -386,7 +393,7 @@ function tableRow(
   let values = `|`;
 
   const columns: ColumnDefinition[] = group?.columns || options?.columns ||
-    defaultColumns;
+    defaultColumns();
 
   columns.forEach((c) => {
     let value = null;

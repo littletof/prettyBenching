@@ -159,7 +159,7 @@ runBenchmarks(
             rr: BenchmarkRunResult,
           ) =>
             `This is a group's \`afterTable\`.\nHere you can access eg. the group name: \`${g.name}\`, benchmarks in this group: \`${gr.length}\` of them here, or the whole \`BenchmarkRunResult\`: \`${rr.results.length}\` benchmarks total`,
-          columns: [...defaultColumns],
+          columns: [...defaultColumns()],
         },
         {
           include: /array/,
@@ -167,9 +167,7 @@ runBenchmarks(
           afterTable:
             "If you see `-`, that means the value there was `undefined`, if you see `*` it means that column is badly configured, no `formatter` or `propertyKey` was defined.",
           columns: [
-            defaultColumns[0],
-            defaultColumns[1],
-            defaultColumns[2],
+            ...defaultColumns(["name", "runsCount", "totalMs"]),
             {
               title: "CustomTotal",
               propertyKey: "totalMs",
@@ -199,7 +197,7 @@ runBenchmarks(
             "Here you can see, what the predefined columns are.\n\nYou can add the `indicators` and `thresholds` that you use in `prettyBenchmarkProgress` and `prettyBenchmarkResults`.\n\nYou can see, how you can rename columns like with `Thresholds+`",
           columns: [
             indicatorColumn(indicators),
-            ...defaultColumns,
+            ...defaultColumns(),
             thresholdsColumn(thresholds),
             { ...thresholdsColumn(thresholds, true), title: "Thresholds+" },
             thresholdResultColumn(thresholds),
@@ -211,7 +209,7 @@ runBenchmarks(
           description:
             "You can add `extraMetrics` columns too. In its `metrics` array you can define which columns you want. If you set `ignoreSingleRuns` to `true`, it wont show values on rows, where runCount is 1.",
           columns: [
-            ...defaultColumns,
+            ...defaultColumns(),
             ...extraMetricsColumns({ ignoreSingleRuns: true }),
           ],
         },

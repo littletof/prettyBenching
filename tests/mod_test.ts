@@ -13,7 +13,7 @@ Deno.test({
     assertEquals(typeof mod.thresholdsColumn, "function");
     assertEquals(typeof mod.thresholdResultColumn, "function");
     assertEquals(typeof mod.extraMetricsColumns, "function");
-    assertEquals(typeof mod.defaultColumns, "object");
+    assertEquals(typeof mod.defaultColumns, "function");
     assertEquals(Object.keys(mod).length, 8);
   },
 });

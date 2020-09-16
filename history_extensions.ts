@@ -87,7 +87,7 @@ export function historyColumns<T = unknown>(history: prettyBenchmarkHistory<T>, 
         const parsedDate = new Date(run.date);
         return {
             title: (typeof options?.titleFormatter === "function" ? options.titleFormatter(parsedDate, run.id) : run.id ?? dateFormatter(parsedDate)),
-            toFixed: 4,
+            toFixed: 3,
             formatter: (result: BenchmarkResult) => {
                 if(!run.benchmarks[result.name]) {
                     return "-";
