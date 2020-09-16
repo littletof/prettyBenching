@@ -518,7 +518,7 @@ The resulting historic data would look something like this, based on the options
 * Show `deltas` in the different formats:
 
   * **`prettyBenchmarkProgress`**: 
-  ![prettyBenchingHistory_progress_delta](../deno_prettyBenching/docs/imgs/prettyBenchingHistory_progress_delta.png)
+  ![prettyBenchingHistory_progress_delta](docs/imgs/prettyBenchingHistory_progress_delta.png)
     <details>
       <summary>code</summary>
 
@@ -532,7 +532,7 @@ The resulting historic data would look something like this, based on the options
     </details>
 
   * **`prettyBenchmarkResults`**: 
-  ![prettyBenchingHistory_result_card_delta](../deno_prettyBenching/docs/imgs/prettyBenchingHistory_result_card_delta.png)
+  ![prettyBenchingHistory_result_card_delta](docs/imgs/prettyBenchingHistory_result_card_delta.png)
     <details>
       <summary>code</summary>
 
