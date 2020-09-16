@@ -8,7 +8,6 @@ import {
   num,
 } from "./utils.ts";
 
-
 import type {
   BenchmarkRunProgress,
   BenchmarkRunResult,
@@ -243,7 +242,9 @@ function benchNameFormatted(
     }
   }
 
-  return `${getPaddedIndicator(name, options?.indicators ? 2 : 0, options?.indicators)}` +
+  return `${
+    getPaddedIndicator(name, options?.indicators ? 2 : 0, options?.indicators)
+  }` +
     `${ob}${c.cyan(name)} ${
       c.gray(padEndVisible("", 40 - name.length, "-"))
     }${clb}`;

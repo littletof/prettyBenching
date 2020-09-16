@@ -40,7 +40,10 @@ export interface prettyBenchmarkCardResultOptions {
     graphBars?: number;
   };
   /** Add a cell with the generated content at the end of the header row of the result card. Overflowing text is cut. */
-  infoCell?: (result: BenchmarkResult, options: prettyBenchmarkCardResultOptions) => string;
+  infoCell?: (
+    result: BenchmarkResult,
+    options: prettyBenchmarkCardResultOptions,
+  ) => string;
 }
 
 const tab = "    ";
@@ -104,9 +107,11 @@ function prettyBenchmarkHeader(
   r: BenchmarkResult,
   options: prettyBenchmarkCardResultOptions,
 ) {
-  const head = `${indPlaceholder}${`Benchmark name: ${c.cyan(r.name.padEnd(43))}`}`;
+  const head = `${indPlaceholder}${`Benchmark name: ${
+    c.cyan(r.name.padEnd(43))
+  }`}`;
 
-  if(typeof options?.infoCell === "function") {
+  if (typeof options?.infoCell === "function") {
     let infoCell = options.infoCell(r, options);
     infoCell = substrColored(infoCell, 27);
 

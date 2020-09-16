@@ -97,15 +97,15 @@ export function substrColored(str: string, length: number) {
   let cutStr = "";
   const sa = [...str];
 
-  for(let i = 0; i < sa.length; i++) {
+  for (let i = 0; i < sa.length; i++) {
     const cs = sa[i];
-    if(cs === "\x1b") {
-      const colorMod = str.slice(i, sa.indexOf("m", i)+1);
+    if (cs === "\x1b") {
+      const colorMod = str.slice(i, sa.indexOf("m", i) + 1);
       cutStr += colorMod;
 
       i = sa.indexOf("m", i);
     } else {
-      if(visibleLength < length) {        
+      if (visibleLength < length) {
         cutStr += cs;
         visibleLength++;
       }

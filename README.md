@@ -480,7 +480,6 @@ The resulting historic data would look something like this, based on the options
           "extra": {
             "max": 9.25019999999995,
             "min": 1.983299999999872,
-...
 ```
 
 ### Rules and options

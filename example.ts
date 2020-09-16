@@ -1,7 +1,7 @@
 import {
   prettyBenchmarkProgress,
   prettyBenchmarkResult,
-  BenchIndicator
+  BenchIndicator,
 } from "https://deno.land/x/pretty_benching@v0.2.4/mod.ts";
 
 import {
@@ -93,12 +93,6 @@ runBenchmarks(
     {
       indicators,
       thresholds,
-      extra: (result) =>
-        colors.brightBlack(
-          ` ${(Math.random() > 0.5
-            ? `${colors.red("▲ +3% (25ms)")}`
-            : `${colors.green("▼ -5% (50ms)")}`)}`,
-        ),
     },
   ),
 ).then(

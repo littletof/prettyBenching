@@ -26,7 +26,22 @@ export type {
   GroupDefinition,
 } from "./pretty_benchmark_down.ts";
 
-export {prettyBenchmarkHistory, calculateThresholds} from './pretty_benchmark_history.ts';
-export type {BenchmarkHistory, BenchmarkHistoryItem, BenchmarkHistoryRunItem, Delta, prettyBenchmarkHistoryOptions, strictHistoryRules} from './pretty_benchmark_history.ts';
+export {
+  prettyBenchmarkHistory,
+  calculateThresholds,
+} from "./pretty_benchmark_history.ts";
+export type {
+  BenchmarkHistory,
+  BenchmarkHistoryItem,
+  BenchmarkHistoryRunItem,
+  Delta,
+  prettyBenchmarkHistoryOptions,
+  strictHistoryRules,
+} from "./pretty_benchmark_history.ts";
 
-export {deltaColumn, deltaProgressRowExtra, deltaResultInfoCell, historyColumns} from './history_extensions.ts';
+export {
+  deltaColumn,
+  deltaProgressRowExtra,
+  deltaResultInfoCell,
+  historyColumns,
+} from "./history_extensions.ts";

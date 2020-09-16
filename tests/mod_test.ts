@@ -18,7 +18,7 @@ Deno.test({
     assertEquals(typeof mod.calculateExtraMetrics, "function");
     assertEquals(typeof mod.calculateStdDeviation, "function");
     assertEquals(typeof mod.calculateThresholds, "function");
-    
+
     assertEquals(typeof mod.prettyBenchmarkHistory, "function");
     assertEquals(typeof mod.deltaResultInfoCell, "function");
     assertEquals(typeof mod.deltaProgressRowExtra, "function");

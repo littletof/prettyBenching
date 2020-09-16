@@ -211,17 +211,21 @@ const defaultColumnsArray: ColumnDefinition[] = [
     propertyKey: "measuredRunsAvgMs",
     align: "right",
     toFixed: 3,
-  }
+  },
 ];
 
 /** Defines the default `ColumnDefinitions`, which are `Name`, `Runs`, `Total (ms)` and `Average (ms)` */
-export function defaultColumns(columns?: ("name" | "runsCount" | "totalMs" | "measuredRunsAvgMs")[]): ColumnDefinition[] {
-  if(columns) {
-    return [...defaultColumnsArray].filter(dc => (columns as string[]).indexOf(dc.propertyKey!) !== -1);
+export function defaultColumns(
+  columns?: ("name" | "runsCount" | "totalMs" | "measuredRunsAvgMs")[],
+): ColumnDefinition[] {
+  if (columns) {
+    return [...defaultColumnsArray].filter((dc) =>
+      (columns as string[]).indexOf(dc.propertyKey!) !== -1
+    );
   } else {
     return [...defaultColumnsArray];
   }
-};
+}
 
 /** Defines a column which contains the indicators for the benchmarks, where provided.
  * 
