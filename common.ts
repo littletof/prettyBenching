@@ -1,6 +1,7 @@
-import { colors, BenchmarkResult } from "./deps.ts";
+import { colors } from "./deps.ts";
 import { padStartVisible } from "./utils.ts";
 import type { Thresholds, BenchIndicator } from "./types.ts";
+import type { BenchmarkResult, BenchmarkRunResult } from "./deps.ts";
 
 const { green, yellow, red, white } = colors;
 
@@ -155,4 +156,22 @@ export function calculateStdDeviation(result: BenchmarkResult) {
   );
 
   return stdDeviation;
+}
+
+/** Returns the range into which the benchmarks with had a threshold set fell. */
+export function getThresholdResultsFrom(
+  runResult: BenchmarkRunResult,
+  thresholds: Thresholds,
+) {
+  const thResults: { [key: string]: "red" | "yellow" | "green" } = {};
+  runResult.results.forEach((r) => {
+    const t = thresholds[r.name];
+    if (t) {
+      thResults[r.name] = r.measuredRunsAvgMs > t.green
+        ? (r.measuredRunsAvgMs > t.yellow ? "red" : "yellow")
+        : "green";
+    }
+  });
+
+  return thResults;
 }

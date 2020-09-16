@@ -4,7 +4,11 @@ export type {
   Thresholds,
 } from "./types.ts";
 
-export { calculateExtraMetrics, calculateStdDeviation } from "./common.ts";
+export {
+  calculateExtraMetrics,
+  calculateStdDeviation,
+  getThresholdResultsFrom,
+} from "./common.ts";
 
 export { prettyBenchmarkResult } from "./pretty_benchmark_result.ts";
 export type { prettyBenchmarkResultOptions } from "./pretty_benchmark_result.ts";

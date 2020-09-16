@@ -18,6 +18,7 @@ Deno.test({
     assertEquals(typeof mod.calculateExtraMetrics, "function");
     assertEquals(typeof mod.calculateStdDeviation, "function");
     assertEquals(typeof mod.calculateThresholds, "function");
+    assertEquals(typeof mod.getThresholdResultsFrom, "function");
 
     assertEquals(typeof mod.prettyBenchmarkHistory, "function");
     assertEquals(typeof mod.deltaResultInfoCell, "function");
@@ -25,6 +26,6 @@ Deno.test({
     assertEquals(typeof mod.deltaColumn, "function");
     assertEquals(typeof mod.historyColumns, "function");
 
-    assertEquals(Object.keys(mod).length, 16);
+    assertEquals(Object.keys(mod).length, 17);
   },
 });
