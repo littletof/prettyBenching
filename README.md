@@ -622,9 +622,9 @@ The resulting historic data would look something like this, based on the options
   
 #### Historic data
 
-- [ ] Add module to enable historic data save/read inside repo
-- [ ] Make use of historic module, enable automatic calculating of thresholds from previous runs
-- [ ] Option to use historic data, to tell if benchmarks got better or worse from previous runs.
+- [x] Add module to enable historic data save/read inside repo
+- [x] Make use of historic module, enable automatic calculating of thresholds from previous runs
+- [x] Option to use historic data, to tell if benchmarks got better or worse from previous runs.
 
 #### Operational
 
