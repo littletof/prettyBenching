@@ -595,7 +595,8 @@ The resulting historic data would look something like this, based on the options
   </details>
 
 * Calculate thresholds from the previous results: `calculateThresholds` [docs](https://doc.deno.land/https/deno.land/x/pretty_benching/mod.ts#calculateThresholds)
-* Fail/warn in CI on a PR if the `delta` is too big.
+* Github Actions: Save results on version tags, report benchmark results as a comment on PR-s.
+* Fail/warn in CI on a PR if the `delta` is too big or benchmark is in red `threshold`.
 
 # Roadmap
 
