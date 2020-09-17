@@ -154,9 +154,9 @@ export class prettyBenchmarkHistory<T = unknown, K = unknown> {
     /** Helps to identify the specific run, besides the date.*/
     id?: string;
     /** Overrides the current date */
-    date?: Date;
+    date?: Date | string;
   }) {
-    const date = options?.date ?? new Date();
+    const date: string = options?.date ? (typeof options.date === "string" ? options.date : options.date.toString()): new Date().toString();
 
     const duplicateNames = runResults.results.filter((r) =>
       runResults.results.filter((rc) => rc.name === r.name).length > 1
@@ -274,12 +274,13 @@ export class prettyBenchmarkHistory<T = unknown, K = unknown> {
     });
 
     this.data.history.push({
-      date: date.toString(),
+      date: date,
       id: options?.id,
       runExtras: this.options?.runExtras && this.options.runExtras(runResults),
       benchmarks: benchmarks,
     });
 
+    // TODO! cant initiate date if a different dateformat is used in the string
     this.data.history = this.data.history.sort((a, b) => {
       return new Date(a.date).getTime() - new Date(b.date).getTime();
     });
