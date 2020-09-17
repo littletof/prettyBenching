@@ -439,12 +439,12 @@ By default it only allows to add results that were measured with `--allow-hrtime
 let historicData;
 try {
     historicData = JSON.parse(Deno.readTextFileSync("./benchmarks/history.json"));
-} catch {
-    // Decide whether you want to proceed with no history
-    console.warn("⚠ cant read history file");
+} catch(e) {
+  // Decide whether you want to proceed with no history
+  console.warn(`⚠ cant read history file. (${e.message})`);
 }
 
-const history = new prettyBenchmarkHistory({/*options*/}, historicData);
+const history = new prettyBenchmarkHistory(historicData, {/*options*/});
 
 runBenchmarks().then((results: BenchmarkRunResult) => {
     history.addResults(results {id: "version_tag"});
@@ -526,7 +526,7 @@ The resulting historic data would look something like this, based on the options
       <summary>code</summary>
 
       ```ts
-      const history = new prettyBenchmarkHistory({/*options*/}, historicData);
+      const history = new prettyBenchmarkHistory(historicData, {/*options*/});
 
       runBenchmarks({ silent: true }, prettyBenchmarkProgress(
         { rowExtras: deltaProgressRowExtra(history) }
@@ -534,13 +534,13 @@ The resulting historic data would look something like this, based on the options
       ```
     </details>
 
-  * **`prettyBenchmarkResults`**: 
+  * **`prettyBenchmarkResults`**:
   ![prettyBenchingHistory_result_card_delta](docs/imgs/prettyBenchingHistory_result_card_delta.png)
     <details>
       <summary>code</summary>
 
       ```ts
-      const history = new prettyBenchmarkHistory({/*options*/}, historicData);
+      const history = new prettyBenchmarkHistory(historicData, {/*options*/});
 
       runBenchmarks().then(prettyBenchmarkResult(
           { infoCell: deltaResultInfoCell(history) }
@@ -560,7 +560,7 @@ The resulting historic data would look something like this, based on the options
       <summary>code</summary>
 
       ```ts
-      const history = new prettyBenchmarkHistory({/*options*/}, historicData);
+      const history = new prettyBenchmarkHistory(historicData, {/*options*/});
 
       runBenchmarks().then(prettyBenchmarkDown(console.log, {
         columns: [
@@ -574,7 +574,7 @@ The resulting historic data would look something like this, based on the options
 * Show each previous measurement as a column in a markdown table
    
   >|Name|2020-09-12<br/>21:54:53.706|v0.5.6|v0.8.0|Current|Change in average|
-  >|:-:|:-:|:-:|:-:|:-:|:-:|
+  >|:-:|--:|--:|--:|:-:|:-:|
   >|historic|0.0704|0.0740|0.0904|0.0650|🟢   -28% (0.0254ms)|
   >|x3#14|6.1675|2.9979|4.2214|3.6275|🟢   -14% (0.5939ms)|
   >|MZ/X|-|3.3095|5.4405|7.4553|🔺  +37% (2.0147ms)|
@@ -584,7 +584,7 @@ The resulting historic data would look something like this, based on the options
     <summary>code</summary>
 
     ```ts
-      const history = new prettyBenchmarkHistory({/*options*/}, historicData);
+      const history = new prettyBenchmarkHistory(historicData, {/*options*/});
 
       runBenchmarks().then(prettyBenchmarkDown(console.log, {
         columns: [

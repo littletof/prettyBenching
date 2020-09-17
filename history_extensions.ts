@@ -94,24 +94,25 @@ export function historyColumns<T = unknown>(
   history: prettyBenchmarkHistory<T>,
   options?: {
     key?: DeltaKey<T>;
-    titleFormatter?: (date: Date, id?: string) => string;
+    titleFormatter?: (dateString: string, id?: string) => string;
   },
 ): ColumnDefinition[] {
   if (history.getData().history.length === 0) {
     return [];
   }
 
-  const dateFormatter = (d: Date) => {
-    return d.toISOString().split("T").join("<br/>").replace(/Z/, "");
+  const dateFormatter = (dateString: string) => {
+    const parsedDate = new Date(dateString);
+    return parsedDate.toISOString().split("T").join("<br/>").replace(/Z/, "");
   };
 
   return history.getData().history.map((run) => {
-    const parsedDate = new Date(run.date);
     return {
       title: (typeof options?.titleFormatter === "function"
-        ? options.titleFormatter(parsedDate, run.id)
-        : run.id ?? dateFormatter(parsedDate)),
+        ? options.titleFormatter(run.date, run.id)
+        : run.id ?? dateFormatter(run.date)),
       toFixed: 3,
+      align: "right",
       formatter: (result: BenchmarkResult) => {
         if (!run.benchmarks[result.name]) {
           return "-";

@@ -107,9 +107,9 @@ export type DeltaKey<T = unknown> = (keyof T | "measuredRunsAvgMs" | "totalMs");
  *      console.warn("⚠ cant read history file");
  *  }
  *
- *  const history = new prettyBenchmarkHistory({
+ *  const history = new prettyBenchmarkHistory(historicData, {
  *      //options
- *  }, historicData);
+ *  });
  * 
  *  runBenchmarks().then((results: BenchmarkRunResult) => {
  *      history.addResults(results);
@@ -125,11 +125,12 @@ export class prettyBenchmarkHistory<T = unknown, K = unknown> {
   private options?: prettyBenchmarkHistoryOptions<T, K>;
 
   constructor(
+    /** The previously saved historic data. */
+    previousData?: BenchmarkHistory<T, K>,
     options?: prettyBenchmarkHistoryOptions<
       T,
       K
-    >, /** The previously saved historic data. */
-    previousData?: BenchmarkHistory<T, K>,
+    >,
   ) {
     this.options = options;
 
