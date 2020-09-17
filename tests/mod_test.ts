@@ -13,7 +13,19 @@ Deno.test({
     assertEquals(typeof mod.thresholdsColumn, "function");
     assertEquals(typeof mod.thresholdResultColumn, "function");
     assertEquals(typeof mod.extraMetricsColumns, "function");
-    assertEquals(typeof mod.defaultColumns, "object");
-    assertEquals(Object.keys(mod).length, 8);
+    assertEquals(typeof mod.defaultColumns, "function");
+
+    assertEquals(typeof mod.calculateExtraMetrics, "function");
+    assertEquals(typeof mod.calculateStdDeviation, "function");
+    assertEquals(typeof mod.calculateThresholds, "function");
+    assertEquals(typeof mod.getThresholdResultsFrom, "function");
+
+    assertEquals(typeof mod.prettyBenchmarkHistory, "function");
+    assertEquals(typeof mod.deltaResultInfoCell, "function");
+    assertEquals(typeof mod.deltaProgressRowExtra, "function");
+    assertEquals(typeof mod.deltaColumn, "function");
+    assertEquals(typeof mod.historyColumns, "function");
+
+    assertEquals(Object.keys(mod).length, 17);
   },
 });

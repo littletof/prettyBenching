@@ -1,6 +1,7 @@
-import { colors, BenchmarkResult } from "./deps.ts";
+import { colors } from "./deps.ts";
 import { padStartVisible } from "./utils.ts";
 import type { Thresholds, BenchIndicator } from "./types.ts";
+import type { BenchmarkResult, BenchmarkRunResult } from "./deps.ts";
 
 const { green, yellow, red, white } = colors;
 
@@ -34,21 +35,6 @@ export function getInThresholdRange(
   }
   return null;
 }
-
-/* export function getBenchIndicator(
-  name: string,
-  indicators?: BenchIndicator[],
-) {
-  if (indicators && indicators.length > 0) {
-    const indChar = "#"; // TODO should be ▒ but doesnt work with stdout https://github.com/denoland/deno/issues/6001
-    const indicator = indicators.find(({ benches }) => benches.test(name));
-    return (!!indicator && typeof indicator.modFn == "function")
-      ? indicator.modFn(indChar)
-      : " "; // there are indicators defined, but not for this bench
-  }
-
-  return ""; // no indicators were defined
-} */
 
 /** Gets the correct indicator for the named bench */
 export function getIndicator(
@@ -107,6 +93,29 @@ export function stripColor(str: string) {
   return str.replace(/\x1b\[[0-9\;]*m/g, "");
 }
 
+export function substrColored(str: string, length: number) {
+  let visibleLength = 0;
+  let cutStr = "";
+  const sa = [...str];
+
+  for (let i = 0; i < sa.length; i++) {
+    const cs = sa[i];
+    if (cs === "\x1b") {
+      const colorMod = str.slice(i, sa.indexOf("m", i) + 1);
+      cutStr += colorMod;
+
+      i = sa.indexOf("m", i);
+    } else {
+      if (visibleLength < length) {
+        cutStr += cs;
+        visibleLength++;
+      }
+    }
+  }
+
+  return cutStr;
+}
+
 export function intersect(a: unknown[], b: unknown[]) {
   return a.filter((value) => -1 !== b.indexOf(value));
 }
@@ -115,6 +124,7 @@ export function disjunct(base: unknown[], dis: unknown[]) {
   return base.filter((value) => -1 === dis.indexOf(value));
 }
 
+/** Calculates the `min`, `max`, `mean` (as (`max`+`min`)/2) and `median` from the `measuredRunsMs` array. */
 export function calculateExtraMetrics(result: BenchmarkResult) {
   const max = Math.max(...result.measuredRunsMs);
   const min = Math.min(...result.measuredRunsMs);
@@ -135,6 +145,7 @@ export function calculateExtraMetrics(result: BenchmarkResult) {
   };
 }
 
+/** Calculates the `standard deviation` from the `measuredRunsMs` array. */
 export function calculateStdDeviation(result: BenchmarkResult) {
   const sorted = [...result.measuredRunsMs].sort();
   const stdDeviation = Math.sqrt(
@@ -145,4 +156,22 @@ export function calculateStdDeviation(result: BenchmarkResult) {
   );
 
   return stdDeviation;
+}
+
+/** Returns the range into which the benchmarks with had a threshold set fell. */
+export function getThresholdResultsFrom(
+  runResult: BenchmarkRunResult,
+  thresholds: Thresholds,
+) {
+  const thResults: { [key: string]: "red" | "yellow" | "green" } = {};
+  runResult.results.forEach((r) => {
+    const t = thresholds[r.name];
+    if (t) {
+      thResults[r.name] = r.measuredRunsAvgMs > t.green
+        ? (r.measuredRunsAvgMs > t.yellow ? "red" : "yellow")
+        : "green";
+    }
+  });
+
+  return thResults;
 }

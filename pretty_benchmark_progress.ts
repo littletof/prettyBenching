@@ -1,5 +1,5 @@
 import { Colorer } from "./colorer.ts";
-import { ProgressState } from "./deps.ts";
+import { ProgressState, BenchmarkResult } from "./deps.ts";
 import { getTimeColor, getPaddedIndicator } from "./common.ts";
 import {
   getTimePadSize,
@@ -7,7 +7,6 @@ import {
   padEndVisible,
   num,
 } from "./utils.ts";
-
 
 import type {
   BenchmarkRunProgress,
@@ -24,6 +23,11 @@ export interface prettyBenchmarkProgressOptions {
   thresholds?: Thresholds;
   /** If provided, the indicators will be placed before the specific benches */
   indicators?: BenchIndicator[];
+  /** Adds the returned string at the end of each finished benchmark row */
+  rowExtras?: (
+    result: BenchmarkResult,
+    options: prettyBenchmarkProgressOptions,
+  ) => string;
   /** Strips all default colors from the output. 
    * 
    * *Note*: it doesnt strip the colors that come through user defined `thresholds` and `indicators`  */
@@ -86,7 +90,11 @@ function _prettyBenchmarkProgress(
   // Bench run result
   if (progress.state === ProgressState.BenchResult) {
     const line = finishedBenchmarkLine(progress, options);
-    out(`${up1Line}\r${line}`);
+    const appended = typeof options?.rowExtras === "function"
+      ? options.rowExtras([...progress.results].reverse()[0], options)
+      : "";
+
+    out(`${up1Line}\r${line}${appended}`);
     return;
   }
 
@@ -234,7 +242,9 @@ function benchNameFormatted(
     }
   }
 
-  return `${getPaddedIndicator(name, 2, options?.indicators)}` +
+  return `${
+    getPaddedIndicator(name, options?.indicators ? 2 : 0, options?.indicators)
+  }` +
     `${ob}${c.cyan(name)} ${
       c.gray(padEndVisible("", 40 - name.length, "-"))
     }${clb}`;

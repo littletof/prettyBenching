@@ -1,7 +1,7 @@
 import {
   prettyBenchmarkProgress,
   prettyBenchmarkResult,
-  BenchIndicator
+  BenchIndicator,
 } from "https://deno.land/x/pretty_benching@v0.2.4/mod.ts";
 
 import {
@@ -81,11 +81,20 @@ const indicators: BenchIndicator[] = [
     modFn: () => colors.bgRed("%"),
     color: colors.magenta,
   },
+  {
+    benches: /Sorting arrays/,
+    modFn: () => "🚀",
+  },
 ];
 
 runBenchmarks(
   { silent: true, skip: /_long/ },
-  prettyBenchmarkProgress({ indicators, thresholds }),
+  prettyBenchmarkProgress(
+    {
+      indicators,
+      thresholds,
+    },
+  ),
 ).then(
   prettyBenchmarkResult(
     {

@@ -2,6 +2,7 @@ import {
   getTimeColor,
   calculateExtraMetrics,
   getPaddedIndicator,
+  substrColored,
 } from "./common.ts";
 
 import {
@@ -38,6 +39,11 @@ export interface prettyBenchmarkCardResultOptions {
     /** Defines how many groups the distribution graph should use. */
     graphBars?: number;
   };
+  /** Add a cell with the generated content at the end of the header row of the result card. Overflowing text is cut. */
+  infoCell?: (
+    result: BenchmarkResult,
+    options: prettyBenchmarkCardResultOptions,
+  ) => string;
 }
 
 const tab = "    ";
@@ -101,7 +107,19 @@ function prettyBenchmarkHeader(
   r: BenchmarkResult,
   options: prettyBenchmarkCardResultOptions,
 ) {
-  tb.line(`${indPlaceholder}${`Benchmark name: ${c.cyan(r.name)}`}`);
+  const head = `${indPlaceholder}${`Benchmark name: ${
+    c.cyan(r.name.padEnd(43))
+  }`}`;
+
+  if (typeof options?.infoCell === "function") {
+    let infoCell = options.infoCell(r, options);
+    infoCell = substrColored(infoCell, 27);
+
+    tb.cellLine(head, infoCell);
+  } else {
+    tb.line(head);
+  }
+
   tb.separator();
 }
 
@@ -134,8 +152,8 @@ function prettyBenchmarkThresholdLine(
   if (threshold) {
     const sep = "=".repeat(10);
     tb.line(
-      `${tab}Thresholds:  ${c.green(`0 ${sep} ${threshold.green}`)} ${
-        c.yellow(`${sep} ${threshold.yellow}`)
+      `${tab}Thresholds:  ${c.green(`0 ${sep} ${rtime(threshold.green)}`)} ${
+        c.yellow(`${sep} ${rtime(threshold.yellow)}`)
       } ${c.red(`${sep} ∞`)}`,
     );
     tb.separator();
