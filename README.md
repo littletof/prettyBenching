@@ -427,7 +427,7 @@ Helps to keep track of the results of the different `runBenchmarks()` runs histo
 First, if you already have saved historic data, you need to load it from disk (or elsewhere).
 If no previous historicData is provided in the constructor, it starts a fresh, empty history.
 
-After it was initiated with the `options` and data, you can simply call `addResults` with the new results, and save them again into a file, using `getDataString()` which returns the historic data in a pretty printed JSON string.
+After it was initiated with the `options` and data, you can simply call `addResults` with the new results, and save them again into a file, using `getDataString()` which returns the historic data in a pretty printed JSON string. If you want to work on the data itself, call `getData()`.
 
 You are able to set some rules in the `options`, like to only allow to add a result, if every benchmark was run a minimum of x times, or if no benchmark was added or removed or had its `runsCount` changed since the previous run.
 
@@ -465,7 +465,7 @@ The resulting historic data would look something like this, based on the options
           "measuredRunsAvgMs": 0.061707600000003596,
           "runsCount": 500,
           "totalMs": 30.853800000001797,
-          "extra": {
+          "extras": {
             "max": 0.45420000000001437,
             "min": 0.034700000000043474,
             "mean": 0.24445000000002892,
@@ -477,7 +477,7 @@ The resulting historic data would look something like this, based on the options
           "measuredRunsAvgMs": 2.6682033000000036,
           "runsCount": 1000,
           "totalMs": 2668.2033000000038,
-          "extra": {
+          "extras": {
             "max": 9.25019999999995,
             "min": 1.983299999999872,
 ...
@@ -504,9 +504,9 @@ The resulting historic data would look something like this, based on the options
 
 ### Methods
 
-* **`addResults`**: Stores the run's result into the historic data, enforces all set rules on the results. You can specify an `id` in the options to help identify the specific historic data besides the date. It useful for example to set it to the tested modules version number.
+* **`addResults`**: Stores the run's result into the historic data, enforces all set rules on the results. You can specify an `id` in the options to help identify the specific historic data besides the date. It useful for example to set it to the benchmarked module's version number.
 
-* **`getDeltasFrom`**: Calls `getDeltaForBenchmark` for each benchmark in the provided `BenchmarkRunResults` and return the values as one object.
+* **`getDeltasFrom`**: Calls `getDeltaForBenchmark` for each benchmark in the provided `BenchmarkRunResults` and returns the values as one object.
 
 * **`getDeltaForBenchmark`**: Calculates `deltas` for given `BenchmarkResult` for each provided property key.
 
@@ -514,7 +514,7 @@ The resulting historic data would look something like this, based on the options
 
 * **`getDataString`**: Returns the historic data in a pretty-printed JSON string.
 
-* **`getBenchmarkNames`**: Returns an array of each benchmarks name, which result is present in the historic data.
+* **`getBenchmarkNames`**: Returns an array of each benchmark's name, which result is present in the historic data.
 
 ### Usecases
 
@@ -598,7 +598,7 @@ The resulting historic data would look something like this, based on the options
   </details>
 
 * Calculate thresholds from the previous results: `calculateThresholds` [docs](https://doc.deno.land/https/deno.land/x/pretty_benching/mod.ts#calculateThresholds)
-* Github Actions: Save results on version tags, report benchmark results as a comment on PR-s.
+* Github Actions: Save results on version tags, report benchmarking results as a comment on PR-s.
 * Fail/warn in CI on a PR if the `delta` is too big or benchmark is in red `threshold` with: `getDeltasFrom` and `getThresholdResultsFrom`
 
 # Roadmap
