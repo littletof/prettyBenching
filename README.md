@@ -2,7 +2,7 @@
 
 A simple Deno library, that gives you pretty benchmarking progress and results in the commandline
 
-[![version](https://img.shields.io/badge/0.2.4-brightgreen?logo=v&logoColor=white&labelColor=gray)](https://deno.land/x/pretty_benching@v0.2.4)
+[![version](https://img.shields.io/badge/0.3.0-brightgreen?logo=v&logoColor=white&labelColor=gray)](https://deno.land/x/pretty_benching@v0.3.0)
 
 [![deno version](https://img.shields.io/badge/deno%201.4.0-success?logo=deno&logoColor=black&labelColor=white&color=black)](https://github.com/denoland/deno)
 [![deno/std version](https://img.shields.io/badge/deno/std%200.69.0-success?logo=deno&logoColor=black&labelColor=white&color=black)](https://deno.land/std@0.69.0)
@@ -40,13 +40,13 @@ export {
   prettyBenchmarkResult,
   prettyBenchmarkProgress,
   prettyBenchmarkDown
-} from 'https://deno.land/x/pretty_benching@v0.2.4/mod.ts';
+} from 'https://deno.land/x/pretty_benching@v0.3.0/mod.ts';
 ```
 
 or just simply import it directly:
 
 ```ts
-import { prettyBenchmarkResult, prettyBenchmarkProgress, prettyBenchmarkDown } from 'https://deno.land/x/pretty_benching@v0.2.4/mod.ts';
+import { prettyBenchmarkResult, prettyBenchmarkProgress, prettyBenchmarkDown } from 'https://deno.land/x/pretty_benching@v0.3.0/mod.ts';
 ```
 
 ## Note
