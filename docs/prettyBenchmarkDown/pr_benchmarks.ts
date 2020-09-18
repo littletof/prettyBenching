@@ -7,7 +7,7 @@ import {
   extraMetricsColumns,
   GroupDefinition,
   ColumnDefinition,
-} from "https://deno.land/x/pretty_benching@v0.2.4/pretty_benchmark_down.ts";
+} from "https://deno.land/x/pretty_benching@v0.3.0/pretty_benchmark_down.ts";
 
 import {
   runBenchmarks,
@@ -17,6 +17,7 @@ import {
 } from "https://deno.land/std@0.69.0/testing/bench.ts";
 
 import * as colors from "https://deno.land/std@0.69.0/fmt/colors.ts";
+import type { BenchIndicator, Thresholds } from "../../types.ts";
 
 bench({
   name: "Sorting arrays",
@@ -119,20 +120,20 @@ bench({
   },
 });
 
-const thresholds = {
+const thresholds: Thresholds = {
   "Rotating arrays": { green: 3.5, yellow: 4.4 },
   "Sorting arrays": { green: 0.5, yellow: 2 },
   "Proving NP==P": { green: 4141, yellow: 6000 },
   "Standing out": { green: 0.300, yellow: 0.330 },
 };
 
-const indicators = [
+const indicators: BenchIndicator[] = [
   { benches: /NP/, modFn: () => colors.magenta("%") },
   { benches: /array/, modFn: () => "🎹" },
   {
     benches: /Standing/,
     modFn: () => "🚀",
-    tableColor: colors.magenta,
+    color: colors.magenta,
   },
 ];
 
@@ -159,7 +160,7 @@ runBenchmarks(
             rr: BenchmarkRunResult,
           ) =>
             `This is a group's \`afterTable\`.\nHere you can access eg. the group name: \`${g.name}\`, benchmarks in this group: \`${gr.length}\` of them here, or the whole \`BenchmarkRunResult\`: \`${rr.results.length}\` benchmarks total`,
-          columns: [...defaultColumns],
+          columns: [...defaultColumns()],
         },
         {
           include: /array/,
@@ -167,9 +168,7 @@ runBenchmarks(
           afterTable:
             "If you see `-`, that means the value there was `undefined`, if you see `*` it means that column is badly configured, no `formatter` or `propertyKey` was defined.",
           columns: [
-            defaultColumns[0],
-            defaultColumns[1],
-            defaultColumns[2],
+            ...defaultColumns(["name", "runsCount", "totalMs"]),
             {
               title: "CustomTotal",
               propertyKey: "totalMs",
@@ -199,7 +198,7 @@ runBenchmarks(
             "Here you can see, what the predefined columns are.\n\nYou can add the `indicators` and `thresholds` that you use in `prettyBenchmarkProgress` and `prettyBenchmarkResults`.\n\nYou can see, how you can rename columns like with `Thresholds+`",
           columns: [
             indicatorColumn(indicators),
-            ...defaultColumns,
+            ...defaultColumns(),
             thresholdsColumn(thresholds),
             { ...thresholdsColumn(thresholds, true), title: "Thresholds+" },
             thresholdResultColumn(thresholds),
@@ -211,7 +210,7 @@ runBenchmarks(
           description:
             "You can add `extraMetrics` columns too. In its `metrics` array you can define which columns you want. If you set `ignoreSingleRuns` to `true`, it wont show values on rows, where runCount is 1.",
           columns: [
-            ...defaultColumns,
+            ...defaultColumns(),
             ...extraMetricsColumns({ ignoreSingleRuns: true }),
           ],
         },

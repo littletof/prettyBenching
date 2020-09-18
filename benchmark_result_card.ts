@@ -1,7 +1,8 @@
 import {
   getTimeColor,
-  getBenchIndicator,
   calculateExtraMetrics,
+  getPaddedIndicator,
+  substrColored,
 } from "./common.ts";
 
 import {
@@ -38,9 +39,15 @@ export interface prettyBenchmarkCardResultOptions {
     /** Defines how many groups the distribution graph should use. */
     graphBars?: number;
   };
+  /** Add a cell with the generated content at the end of the header row of the result card. Overflowing text is cut. */
+  infoCell?: (
+    result: BenchmarkResult,
+    options: prettyBenchmarkCardResultOptions,
+  ) => string;
 }
 
 const tab = "    ";
+const indPlaceholder = "˘˘˘˘";
 let c: Colorer;
 
 export function getResultCard(
@@ -80,7 +87,19 @@ export function getResultCard(
     }
   }
 
-  return tb.build();
+  let table = tb.build();
+
+  // replace the indicator placeholder with the correct indicator
+  table = table.replace(
+    indPlaceholder,
+    getPaddedIndicator(
+      result.name,
+      indPlaceholder.length - 1,
+      options?.indicators,
+    ) + " ",
+  );
+
+  return table;
 }
 
 function prettyBenchmarkHeader(
@@ -88,11 +107,19 @@ function prettyBenchmarkHeader(
   r: BenchmarkResult,
   options: prettyBenchmarkCardResultOptions,
 ) {
-  const indicator = getBenchIndicator(r.name, options.indicators);
-  const indTab = indicator == ""
-    ? tab
-    : padStartVisible(`${indicator} `, tab.length);
-  tb.line(`${indTab}${`Benchmark name: ${c.cyan(r.name)}`}`);
+  const head = `${indPlaceholder}${`Benchmark name: ${
+    c.cyan(r.name.padEnd(43))
+  }`}`;
+
+  if (typeof options?.infoCell === "function") {
+    let infoCell = options.infoCell(r, options);
+    infoCell = substrColored(infoCell, 27);
+
+    tb.cellLine(head, infoCell);
+  } else {
+    tb.line(head);
+  }
+
   tb.separator();
 }
 
@@ -125,8 +152,8 @@ function prettyBenchmarkThresholdLine(
   if (threshold) {
     const sep = "=".repeat(10);
     tb.line(
-      `${tab}Thresholds:  ${c.green(`0 ${sep} ${threshold.green}`)} ${
-        c.yellow(`${sep} ${threshold.yellow}`)
+      `${tab}Thresholds:  ${c.green(`0 ${sep} ${rtime(threshold.green)}`)} ${
+        c.yellow(`${sep} ${rtime(threshold.yellow)}`)
       } ${c.red(`${sep} ∞`)}`,
     );
     tb.separator();

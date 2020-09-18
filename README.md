@@ -2,7 +2,7 @@
 
 A simple Deno library, that gives you pretty benchmarking progress and results in the commandline
 
-[![version](https://img.shields.io/badge/0.2.4-brightgreen?logo=v&logoColor=white&labelColor=gray)](https://deno.land/x/pretty_benching@v0.2.4)
+[![version](https://img.shields.io/badge/0.3.0-brightgreen?logo=v&logoColor=white&labelColor=gray)](https://deno.land/x/pretty_benching@v0.3.0)
 
 [![deno version](https://img.shields.io/badge/deno%201.4.0-success?logo=deno&logoColor=black&labelColor=white&color=black)](https://github.com/denoland/deno)
 [![deno/std version](https://img.shields.io/badge/deno/std%200.69.0-success?logo=deno&logoColor=black&labelColor=white&color=black)](https://deno.land/std@0.69.0)
@@ -13,11 +13,13 @@ A simple Deno library, that gives you pretty benchmarking progress and results i
 
 ## Jump to
 
-[![prettyBenchmarkProgress](https://img.shields.io/badge/-%F0%9F%94%B5%20prettyBenchmarkProgress-4e4e4e)](#prettyBenchmarkProgress)
+[![prettyBenchmarkProgress](https://img.shields.io/badge/-%F0%9F%94%B5%20prettyBenchmarkProgress-4e4e4e)](#prettybenchmarkprogress)
 
-[![prettyBenchmarkResults](https://img.shields.io/badge/-%F0%9F%94%B5%20prettyBenchmarkResults-4e4e4e)](#prettyBenchmarkResults)
+[![prettyBenchmarkResults](https://img.shields.io/badge/-%F0%9F%94%B5%20prettyBenchmarkResults-4e4e4e)](#prettybenchmarkbesults)
 
-[![prettyBenchmarkDown](https://img.shields.io/badge/-%F0%9F%94%B5%20prettyBenchmarkDown-4e4e4e)](#prettyBenchmarkDown) [![deno version](https://img.shields.io/badge/Github_Action-4e4e4e?logo=github)](#as-a-github-action)
+[![prettyBenchmarkDown](https://img.shields.io/badge/-%F0%9F%94%B5%20prettyBenchmarkDown-4e4e4e)](#prettybenchmarkdown) [![deno version](https://img.shields.io/badge/Github_Action-4e4e4e?logo=github)](#as-a-github-action)
+
+[![prettyBenchmarkHistory](https://img.shields.io/badge/-%F0%9F%94%B5%20prettyBenchmarkHistory-4e4e4e)](#prettybenchmarkhistory)
 
 [![deno version](https://img.shields.io/badge/ROADMAP-4e4e4e?logo=discover)](#roadmap)
 
@@ -38,13 +40,13 @@ export {
   prettyBenchmarkResult,
   prettyBenchmarkProgress,
   prettyBenchmarkDown
-} from 'https://deno.land/x/pretty_benching@v0.2.4/mod.ts';
+} from 'https://deno.land/x/pretty_benching@v0.3.0/mod.ts';
 ```
 
 or just simply import it directly:
 
 ```ts
-import { prettyBenchmarkResult, prettyBenchmarkProgress, prettyBenchmarkDown } from 'https://deno.land/x/pretty_benching@v0.2.4/mod.ts';
+import { prettyBenchmarkResult, prettyBenchmarkProgress, prettyBenchmarkDown } from 'https://deno.land/x/pretty_benching@v0.3.0/mod.ts';
 ```
 
 ## Note
@@ -68,11 +70,11 @@ await runBenchmarks({ silent: true }, prettyBenchmarkProgress())
 
 The output would look something like this during running:
 
-![running](https://raw.githubusercontent.com/littletof/prettyBenching/master/docs/imgs/prettyBenchingProgress_example_running.png)
+![running](docs/imgs/prettyBenchingProgress_example_running.png)
 
 End when finished:
 
-![finished](https://raw.githubusercontent.com/littletof/prettyBenching/master/docs/imgs/prettyBenchingProgress_example_finished.png)
+![finished](docs/imgs/prettyBenchingProgress_example_finished.png)
 
 ### Thresholds
 
@@ -89,7 +91,7 @@ const thresholds: Thresholds = {
 runBenchmarks({ silent: true }, prettyBenchmarkProgress({thresholds}))
 ```
 
-![threshold](https://raw.githubusercontent.com/littletof/prettyBenching/master/docs/imgs/prettyBenchingProgress_example_threshold.png)
+![threshold](docs/imgs/prettyBenchingProgress_example_threshold.png)
 
 ### Indicators
 
@@ -103,7 +105,7 @@ const indicators: BenchIndicator[] = [
 ];
 ```
 
-![indicator](https://raw.githubusercontent.com/littletof/prettyBenching/master/docs/imgs/prettyBenchingProgress_example_indicators.png)
+![indicator](docs/imgs/prettyBenchingProgress_example_indicators.png)
 
 # prettyBenchmarkResults
 
@@ -129,7 +131,7 @@ runBenchmarks({silent: true})
 
 The output would look something like this:
 
-![<small>example</small>](https://raw.githubusercontent.com/littletof/prettyBenching/master/docs/imgs/prettyBenchingResult_example.png)
+![example](docs/imgs/prettyBenchingResult_example.png)
 
 ### Thresholds
 
@@ -144,7 +146,7 @@ const thresholds: Thresholds = {
 runBenchmarks().then(prettyBenchmarkResult({ thresholds }));
 ```
 
-![threshold](https://raw.githubusercontent.com/littletof/prettyBenching/master/docs/imgs/prettyBenchingResult_example_threshold.png)
+![threshold](docs/imgs/prettyBenchingResult_example_threshold.png)
 
 ### Indicators
 
@@ -163,7 +165,7 @@ const indicators: BenchIndicator[] = [
 runBenchmarks().then(prettyBenchmarkResult({ indicators }));
 ```
 
-![indicator](https://raw.githubusercontent.com/littletof/prettyBenching/master/docs/imgs/prettyBenchingResult_example_indicators.png)
+![indicator](docs/imgs/prettyBenchingResult_example_indicators.png)
 
 ### Parts
 
@@ -189,13 +191,13 @@ prettyBenchmarkResult(
 
 Using all options:
 
-![thresholdLine](https://raw.githubusercontent.com/littletof/prettyBenching/master/docs/imgs/prettyBenchingResult_example_full_extra.png)
+![thresholdLine](docs/imgs/prettyBenchingResult_example_full_extra.png)
 
 ##### Extra metrics `{ extraMetrics: true }`
 
 Setting this will give you an extra row, which adds extra calculated values like `min`, `max`, `mean as ((min+max)/2)` , `median`.
 
-![extraMetrics](https://raw.githubusercontent.com/littletof/prettyBenching/master/docs/imgs/prettyBenchingResult_example_extrametrics_line.png)
+![extraMetrics](docs/imgs/prettyBenchingResult_example_extrametrics_line.png)
 
 ##### Threshold `{ threshold: true }`
 
@@ -203,7 +205,7 @@ Setting this will give you an extra row, which adds extra calculated values like
 
 It simply show what the set thresholds for the benchmark. Can be usefull if `nocolor` is set to true.
 
-![thresholdLine](https://raw.githubusercontent.com/littletof/prettyBenching/master/docs/imgs/prettyBenchingResult_example_threshold_line.png)
+![thresholdLine](docs/imgs/prettyBenchingResult_example_threshold_line.png)
 
 ##### Graph `{ graph: true, graphBars: 5 }`
 
@@ -288,13 +290,16 @@ You can customise, what columns you want to see in each table. To see what every
 * If `not defined`, the generator uses the default columns defined by the module
 * If `defined`, you take full control, of what columns you want to see. The default columns are exported, and there are other premade columns for you to use.
 
-##### defaultColumns [<small>example</small>](https://github.com/littletof/prettyBenching/blob/master/docs/prettyBenchmarkDown/pr_benchmark_output.md#default-columns-and-dynamic-text)
+##### defaultColumns(columns: string[]) [<small>example</small>](https://github.com/littletof/prettyBenching/blob/master/docs/prettyBenchmarkDown/pr_benchmark_output.md#default-columns-and-dynamic-text)
 
 ```ts
-columns: [...defaultColumns]
+columns: [
+  ...defaultColumns(),
+  ...defaultColumns(['name', 'measuredRunsAvgMs'])
+]
  ```
 
-It includes `Name`, `Runs`, `Total (ms)` and `Average (ms)` columns, these are the default values of the `BenchmarkRunResult`.
+It includes `Name`, `Runs`, `Total (ms)` and `Average (ms)` columns, these are the default values of the `BenchmarkRunResult`. Filter them with an array of propertyKeys.
 
 ##### indicatorColumn(indicators: BenchIndicator[]) [<small>example</small>](https://github.com/littletof/prettyBenching/blob/master/docs/prettyBenchmarkDown/pr_benchmark_output.md#predefiend-columns)
 
@@ -411,14 +416,199 @@ Use this in a github action, eg. comment benchmark results on PRs.
 
 You can see an example Github Action for this [here](https://github.com/littletof/prettyBenching/blob/master/docs/prettyBenchmarkDown/pr_benchmark.yml) or see it in use in a showcase [repo](https://github.com/littletof/pretty-benching-action/pull/2).
 
+# prettyBenchmarkHistory
+
+Helps to keep track of the results of the different `runBenchmarks()` runs historically.
+
+### Usage
+
+> **Note** this module doesn't handle the loading and saving of the data from/to the disk. See examples.
+
+First, if you already have saved historic data, you need to load it from disk (or elsewhere).
+If no previous historicData is provided in the constructor, it starts a fresh, empty history.
+
+After it was initiated with the `options` and data, you can simply call `addResults` with the new results, and save them again into a file, using `getDataString()` which returns the historic data in a pretty printed JSON string. If you want to work on the data itself, call `getData()`.
+
+You are able to set some rules in the `options`, like to only allow to add a result, if every benchmark was run a minimum of x times, or if no benchmark was added or removed or had its `runsCount` changed since the previous run.
+
+By default it only allows to add results that were measured with `--allow-hrtime` flag, but this rule can be disabled.
+
+```ts
+// add benches, then
+
+let historicData;
+try {
+    historicData = JSON.parse(Deno.readTextFileSync("./benchmarks/history.json"));
+} catch(e) {
+  // Decide whether you want to proceed with no history
+  console.warn(`⚠ cant read history file. (${e.message})`);
+}
+
+const history = new prettyBenchmarkHistory(historicData, {/*options*/});
+
+runBenchmarks().then((results: BenchmarkRunResult) => {
+    history.addResults(results {id: "version_tag"});
+    Deno.writeTextFileSync("./benchmarks/history.json", history.getDataString());
+});
+```
+
+The resulting historic data would look something like this, based on the options:
+
+```json
+{
+  "history": [
+    {
+      "date": "2020-09-12T20:28:36.812Z",
+      "id": "v1.15.2",
+      "benchmarks": {
+        "RotateArrays": {
+          "measuredRunsAvgMs": 0.061707600000003596,
+          "runsCount": 500,
+          "totalMs": 30.853800000001797,
+          "extras": {
+            "max": 0.45420000000001437,
+            "min": 0.034700000000043474,
+            "mean": 0.24445000000002892,
+            "median": 0.04179999999996653,
+            "std": 0.04731720894389344
+          }
+        },
+        "x3#14": {
+          "measuredRunsAvgMs": 2.6682033000000036,
+          "runsCount": 1000,
+          "totalMs": 2668.2033000000038,
+          "extras": {
+            "max": 9.25019999999995,
+            "min": 1.983299999999872,
+...
+```
+
+### Rules and options
+
+* **`easeOnlyHrTime`**: Allows storing low precision measurements, which where measured without `--allow-hrtime` flag
+* **`strict`**: Contains a set of rules, which are all enforced, if boolean `true` is set, but can be individually controlled if an object is provided:
+  
+  * **`noRemoval`**:  Throw an error, when previously saved benchmark is missing from the current set when calling `addResults`. Ignored on the very first set of benchmarks.
+  * **`noAddition`**: Throw an error, when previously not saved benchmark is added to the current set when calling `addResults`. Ignored on the very first set of benchmarks.
+  * **`noRunsCountChange`**: Throw an error, when the `runsCount` changes for a benchmark from the previous run's `runsCount`. Ignored on new benchmarks.
+
+* **`minRequiredRuns`**: Throw an error, when **any** benchmark has lower runsCount than the set value.
+
+* **`saveIndividualRuns`**: Saves the `measuredRunsMs` array for each benchmark.
+  **WARNING** this could result in a very big history file overtime.
+  Consider calculating necessary values before save instead with `benchExtras` or `runExtras`.
+  
+* **`benchExtras`**(result: BenchmarkResult) => T : Saves the returned `object` for each benchmark into it's `extras` property.
+
+* **`runExtras`**(runResult: BenchmarkRunResult) => K : Saves the returned `object` for each run into it's `runExtras` property.
+
+### Methods
+
+* **`addResults`**: Stores the run's result into the historic data, enforces all set rules on the results. You can specify an `id` in the options to help identify the specific historic data besides the date. It useful for example to set it to the benchmarked module's version number.
+
+* **`getDeltasFrom`**: Calls `getDeltaForBenchmark` for each benchmark in the provided `BenchmarkRunResults` and returns the values as one object.
+
+* **`getDeltaForBenchmark`**: Calculates `deltas` for given `BenchmarkResult` for each provided property key.
+
+* **`getData`**: Returns a copy of the historic data.
+
+* **`getDataString`**: Returns the historic data in a pretty-printed JSON string.
+
+* **`getBenchmarkNames`**: Returns an array of each benchmark's name, which result is present in the historic data.
+
+### Usecases
+
+* Show `deltas` in the different formats:
+
+  * **`prettyBenchmarkProgress`**: 
+  ![prettyBenchingHistory_progress_delta](docs/imgs/prettyBenchingHistory_progress_delta.png)
+    <details>
+      <summary>code</summary>
+
+      ```ts
+      const history = new prettyBenchmarkHistory(historicData, {/*options*/});
+
+      runBenchmarks({ silent: true }, prettyBenchmarkProgress(
+        { rowExtras: deltaProgressRowExtra(history) }
+      ));
+      ```
+    </details>
+
+  * **`prettyBenchmarkResults`**:
+  ![prettyBenchingHistory_result_card_delta](docs/imgs/prettyBenchingHistory_result_card_delta.png)
+    <details>
+      <summary>code</summary>
+
+      ```ts
+      const history = new prettyBenchmarkHistory(historicData, {/*options*/});
+
+      runBenchmarks().then(prettyBenchmarkResult(
+          { infoCell: deltaResultInfoCell(history) }
+      ));
+      ```
+    </details>
+  
+  * **`prettyBenchmarkDown`**:
+  
+    |Name|Average (ms)|Change in average|
+    |:-:|:-:|:-:|
+    |x3#14|2.8319|🟢   -33% (1.3895ms)|
+    |MZ/X|5.6873|🔺   +5% (0.2468ms)|
+    |MZ/T|2.7544|-|
+
+    <details>
+      <summary>code</summary>
+
+      ```ts
+      const history = new prettyBenchmarkHistory(historicData, {/*options*/});
+
+      runBenchmarks().then(prettyBenchmarkDown(console.log, {
+        columns: [
+            ...defaultColumns(['name', 'measuredRunsAvgMs']),
+            deltaColumn(history),
+        ]
+      }));
+      ```
+    </details>
+
+* Show each previous measurement as a column in a markdown table
+   
+  >|Name|2020-09-12<br/>21:54:53.706|v0.5.6|v0.8.0|Current|Change in average|
+  >|:-:|--:|--:|--:|:-:|:-:|
+  >|historic|0.0704|0.0740|0.0904|0.0650|🟢   -28% (0.0254ms)|
+  >|x3#14|6.1675|2.9979|4.2214|3.6275|🟢   -14% (0.5939ms)|
+  >|MZ/X|-|3.3095|5.4405|7.4553|🔺  +37% (2.0147ms)|
+  >|MZ/T|-|-|-|3.7763|-|
+
+  <details>
+    <summary>code</summary>
+
+    ```ts
+      const history = new prettyBenchmarkHistory(historicData, {/*options*/});
+
+      runBenchmarks().then(prettyBenchmarkDown(console.log, {
+        columns: [
+            { title: "Name", propertyKey: "name" },
+            ...historyColumns(history),
+            { title: "Current", propertyKey: "measuredRunsAvgMs", toFixed: 4 },
+            deltaColumn(history),
+        ]
+      }));
+    ```
+  </details>
+
+* Calculate thresholds from the previous results: `calculateThresholds` [docs](https://doc.deno.land/https/deno.land/x/pretty_benching/mod.ts#calculateThresholds)
+* Github Actions: Save results on version tags, report benchmarking results as a comment on PR-s.
+* Fail/warn in CI on a PR if the `delta` is too big or benchmark is in red `threshold` with: `getDeltasFrom` and `getThresholdResultsFrom`
+
 # Roadmap
 
 #### BenchmarkProgress
 
 - [x] Add `indicator` options
 - [x] Add `nocolor` option
-- [ ] Unify `indicator` option types, use `color`
-- [ ] Add overridable output function like in benchmark results
+- [x] Unify `indicator` option types, use `color`
+- [x] Add overridable output function like in benchmark results
 
 #### BenchmarkResults
 
@@ -435,9 +625,9 @@ You can see an example Github Action for this [here](https://github.com/littleto
   
 #### Historic data
 
-- [ ] Add module to enable historic data save/read inside repo
-- [ ] Make use of historic module, enable automatic calculating of thresholds from previous runs
-- [ ] Option to use historic data, to tell if benchmarks got better or worse from previous runs.
+- [x] Add module to enable historic data save/read inside repo
+- [x] Make use of historic module, enable automatic calculating of thresholds from previous runs
+- [x] Option to use historic data, to tell if benchmarks got better or worse from previous runs.
 
 #### Operational
 

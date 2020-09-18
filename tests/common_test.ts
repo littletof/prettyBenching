@@ -74,3 +74,4 @@ testEach<string, string>("common.stripColor", [
 // TODO getBenchIndicator
 // TODO getInThresholdRange
 // TODO getTimeColor
+// TODO substrColored

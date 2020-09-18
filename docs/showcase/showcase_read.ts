@@ -15,26 +15,31 @@ const progressData: any[] = readJsonSync(
 const resultData = readJsonSync(join(pathBase, "benchmark_result_input.json"));
 
 const nocolor = true;
-const pg = prettyBenchmarkProgress({
-  nocolor,
-  thresholds: { "multiple-runs": { green: 76, yellow: 82 } },
-  indicators: [{ benches: /multiple-runs/, modFn: (str) => "%" }],
-});
 
 const fid = await Deno.open(
   join(pathBase, "showcase.txt"),
   { create: true, write: true },
 );
+
+const pg = prettyBenchmarkProgress({
+  nocolor,
+  thresholds: { "multiple-runs": { green: 76, yellow: 82 } },
+  indicators: [{ benches: /multiple-runs/, modFn: (str) => "%" }],
+  outputFn: (str: string) =>
+    Deno.writeSync(fid.rid, new TextEncoder().encode(`${str}\n`)),
+});
+
 const originalSTD = Deno.stdout.writeSync;
 const originalLog = globalThis.console.log;
 
-globalThis.console.log = (...args: unknown[]) =>
-  Deno.writeSync(fid.rid, new TextEncoder().encode(`${args[0] || "\n"}`));
+/*globalThis.console.log = (...args: unknown[]) =>
+  Deno.writeSync(fid.rid, new TextEncoder().encode(`${args[0] ? args[0] + "\n" : "\n"}`));
 
 Deno.stdout.writeSync = (p: Uint8Array): number => {
   Deno.writeSync(fid.rid, p);
   return 0;
-};
+};*/
+
 progressData.forEach((pd: BenchmarkRunProgress) => {
   if (
     (pd.state === ProgressState.BenchmarkingStart ||
@@ -53,7 +58,7 @@ progressData.forEach((pd: BenchmarkRunProgress) => {
       pd.state === ProgressState.BenchResult &&
       [...pd.results].reverse()[0].name != "benchmark-start"
     ) {
-      Deno.stdout.writeSync(new TextEncoder().encode("\n"));
+      // Deno.stdout.writeSync(new TextEncoder().encode("\n"));
     }
   }
 });
@@ -70,9 +75,12 @@ const resultFn = prettyBenchmarkResult(
 );
 resultFn(resultData as any);
 
-console.log(`\n${"-".repeat(60)}${"-".repeat(60)}\n\n`); // separator line
+Deno.writeSync(
+  fid.rid,
+  new TextEncoder().encode(`${"-".repeat(60)}${"-".repeat(60)}\n\n`),
+); // separator line
 
-console.log(resultLog);
+Deno.writeSync(fid.rid, new TextEncoder().encode(`${resultLog}`));
 
 fid.close();
 
