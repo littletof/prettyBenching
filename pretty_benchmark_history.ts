@@ -159,8 +159,8 @@ export class prettyBenchmarkHistory<T = unknown, K = unknown> {
     const date: string = options?.date
       ? (typeof options.date === "string"
         ? options.date
-        : options.date.toString())
-      : new Date().toString();
+        : options.date.toISOString())
+      : new Date().toISOString();
 
     const duplicateNames = runResults.results.filter((r) =>
       runResults.results.filter((rc) => rc.name === r.name).length > 1

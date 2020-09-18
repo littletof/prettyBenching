@@ -607,8 +607,8 @@ The resulting historic data would look something like this, based on the options
 
 - [x] Add `indicator` options
 - [x] Add `nocolor` option
-- [ ] Unify `indicator` option types, use `color`
-- [ ] Add overridable output function like in benchmark results
+- [x] Unify `indicator` option types, use `color`
+- [x] Add overridable output function like in benchmark results
 
 #### BenchmarkResults
 
