@@ -2,7 +2,8 @@ import {
   prettyBenchmarkProgress,
   prettyBenchmarkResult,
   BenchIndicator,
-} from "https://deno.land/x/pretty_benching@v0.2.4/mod.ts";
+  prettyBenchmarkHistory,
+} from "https://deno.land/x/pretty_benching@v0.3.0/mod.ts";
 
 import {
   runBenchmarks,
@@ -10,6 +11,10 @@ import {
 } from "https://deno.land/std@0.69.0/testing/bench.ts";
 
 import * as colors from "https://deno.land/std@0.69.0/fmt/colors.ts";
+import {
+  deltaResultInfoCell,
+  deltaProgressRowExtra,
+} from "./history_extensions.ts";
 
 bench({
   name: "Sorting arrays",
@@ -70,20 +75,25 @@ bench({
   },
 });
 
+const historicData =
+  '{"history":[{"date":"2020-09-18T10:43:57.695Z","benchmarks":{"Sorting arrays":{"measuredRunsAvgMs":0.4617750250000041,"runsCount":4000,"totalMs":1847.1001000000165},"Rotating arrays":{"measuredRunsAvgMs":2.2363983999999726,"runsCount":1000,"totalMs":2236.3983999999728},"Proving NP==P":{"measuredRunsAvgMs":5763.3927,"runsCount":1,"totalMs":5763.3927}}}]}';
+const history = new prettyBenchmarkHistory(JSON.parse(historicData));
+
 const thresholds = {
   "Rotating arrays": { green: 2.5, yellow: 3.4 },
+  "Proving NP==P": { green: 4600, yellow: 5500 },
 };
 
 const indicators: BenchIndicator[] = [
-  { benches: /NP/, modFn: colors.white, color: colors.blue },
+  {
+    benches: /Rotating arrays/,
+    modFn: () => "🚀",
+  },
+  { benches: /NP/, modFn: colors.yellow, color: colors.blue },
   {
     benches: /Standing/,
     modFn: () => colors.bgRed("%"),
     color: colors.magenta,
-  },
-  {
-    benches: /Sorting arrays/,
-    modFn: () => "🚀",
   },
 ];
 
@@ -93,6 +103,7 @@ runBenchmarks(
     {
       indicators,
       thresholds,
+      rowExtras: deltaProgressRowExtra(history),
     },
   ),
 ).then(
@@ -100,6 +111,7 @@ runBenchmarks(
     {
       thresholds,
       indicators,
+      infoCell: deltaResultInfoCell(history),
       parts: {
         extraMetrics: true,
         threshold: true,

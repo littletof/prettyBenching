@@ -7,7 +7,7 @@ import {
   extraMetricsColumns,
   GroupDefinition,
   ColumnDefinition,
-} from "https://deno.land/x/pretty_benching@v0.2.4/pretty_benchmark_down.ts";
+} from "https://deno.land/x/pretty_benching@v0.3.0/pretty_benchmark_down.ts";
 
 import {
   runBenchmarks,
@@ -17,6 +17,7 @@ import {
 } from "https://deno.land/std@0.69.0/testing/bench.ts";
 
 import * as colors from "https://deno.land/std@0.69.0/fmt/colors.ts";
+import type { BenchIndicator, Thresholds } from "../../types.ts";
 
 bench({
   name: "Sorting arrays",
@@ -119,20 +120,20 @@ bench({
   },
 });
 
-const thresholds = {
+const thresholds: Thresholds = {
   "Rotating arrays": { green: 3.5, yellow: 4.4 },
   "Sorting arrays": { green: 0.5, yellow: 2 },
   "Proving NP==P": { green: 4141, yellow: 6000 },
   "Standing out": { green: 0.300, yellow: 0.330 },
 };
 
-const indicators = [
+const indicators: BenchIndicator[] = [
   { benches: /NP/, modFn: () => colors.magenta("%") },
   { benches: /array/, modFn: () => "🎹" },
   {
     benches: /Standing/,
     modFn: () => "🚀",
-    tableColor: colors.magenta,
+    color: colors.magenta,
   },
 ];
 
