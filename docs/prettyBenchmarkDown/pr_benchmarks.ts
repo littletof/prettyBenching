@@ -102,7 +102,7 @@ bench({
   runs: 1000,
   func(b): void {
     b.start();
-    let a = new Array();
+    const a = [];
     for (let i = 0; i < 1e12; i++) {
       a.push(i);
     }

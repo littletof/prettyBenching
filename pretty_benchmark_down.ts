@@ -113,7 +113,7 @@ function _prettyBenchmarkDown(
   markdown += stringOrFunction(options?.description, runResult) + "\n";
 
   if (options?.groups && options.groups.length > 0) {
-    let grouppedResults: {
+    const grouppedResults: {
       [key: string]: GroupDefinition & { items: BenchmarkResult[] };
     } = {};
     const unmatched: GroupDefinition & { items: BenchmarkResult[] } = {
