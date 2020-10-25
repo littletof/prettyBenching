@@ -3,14 +3,14 @@ import {
   prettyBenchmarkResult,
   BenchIndicator,
   prettyBenchmarkHistory,
-} from "https://deno.land/x/pretty_benching@v0.3.0/mod.ts";
+} from "https://deno.land/x/pretty_benching@v0.3.1/mod.ts";
 
 import {
   runBenchmarks,
   bench,
-} from "https://deno.land/std@0.69.0/testing/bench.ts";
+} from "https://deno.land/std@0.74.0/testing/bench.ts";
 
-import * as colors from "https://deno.land/std@0.69.0/fmt/colors.ts";
+import * as colors from "https://deno.land/std@0.74.0/fmt/colors.ts";
 import {
   deltaResultInfoCell,
   deltaProgressRowExtra,
