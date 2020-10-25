@@ -1,19 +1,19 @@
 import {
-  prettyBenchmarkProgress,
-  prettyBenchmarkResult,
   BenchIndicator,
   prettyBenchmarkHistory,
+  prettyBenchmarkProgress,
+  prettyBenchmarkResult,
 } from "https://deno.land/x/pretty_benching@v0.3.1/mod.ts";
 
 import {
-  runBenchmarks,
   bench,
+  runBenchmarks,
 } from "https://deno.land/std@0.74.0/testing/bench.ts";
 
 import * as colors from "https://deno.land/std@0.74.0/fmt/colors.ts";
 import {
-  deltaResultInfoCell,
   deltaProgressRowExtra,
+  deltaResultInfoCell,
 } from "./history_extensions.ts";
 
 bench({

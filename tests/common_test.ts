@@ -1,7 +1,7 @@
 import { testEach } from "./test_helpers.ts";
 import { assertEquals } from "./test_deps.ts";
 
-import { intersect, disjunct, stripColor } from "../common.ts";
+import { disjunct, intersect, stripColor } from "../common.ts";
 import { colors } from "../deps.ts";
 
 testEach<{ a: unknown[]; b: unknown[] }, unknown[]>("common.intersect", [

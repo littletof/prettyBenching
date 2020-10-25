@@ -1,6 +1,6 @@
 import { colors } from "./deps.ts";
 import { padStartVisible } from "./utils.ts";
-import type { Thresholds, BenchIndicator } from "./types.ts";
+import type { BenchIndicator, Thresholds } from "./types.ts";
 import type { BenchmarkResult, BenchmarkRunResult } from "./deps.ts";
 
 const { green, yellow, red, white } = colors;

@@ -1,18 +1,10 @@
 import { Colorer } from "./colorer.ts";
-import { ProgressState, BenchmarkResult } from "./deps.ts";
-import { getTimeColor, getPaddedIndicator } from "./common.ts";
-import {
-  getTimePadSize,
-  usingHrTime,
-  padEndVisible,
-  num,
-} from "./utils.ts";
+import { BenchmarkResult, ProgressState } from "./deps.ts";
+import { getPaddedIndicator, getTimeColor } from "./common.ts";
+import { getTimePadSize, num, padEndVisible, usingHrTime } from "./utils.ts";
 
-import type {
-  BenchmarkRunProgress,
-  BenchmarkRunResult,
-} from "./deps.ts";
-import type { Thresholds, BenchIndicator } from "./types.ts";
+import type { BenchmarkRunProgress, BenchmarkRunResult } from "./deps.ts";
+import type { BenchIndicator, Thresholds } from "./types.ts";
 
 const headerPadding = "▒▒▒▒▒▒▒▒";
 const c: Colorer = new Colorer();

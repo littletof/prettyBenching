@@ -1,16 +1,11 @@
 import {
-  getTimeColor,
   calculateExtraMetrics,
   getPaddedIndicator,
+  getTimeColor,
   substrColored,
 } from "./common.ts";
 
-import {
-  padEndVisible,
-  padStartVisible,
-  perc,
-  rtime,
-} from "./utils.ts";
+import { padEndVisible, padStartVisible, perc, rtime } from "./utils.ts";
 
 import { TableBuilder } from "./table.ts";
 import type { Colorer } from "./colorer.ts";

@@ -6,8 +6,8 @@ import type { prettyBenchmarkProgressOptions } from "./pretty_benchmark_progress
 import type { prettyBenchmarkResultOptions } from "./pretty_benchmark_result.ts";
 import type { ColumnDefinition } from "./pretty_benchmark_down.ts";
 import type {
-  prettyBenchmarkHistory,
   DeltaKey,
+  prettyBenchmarkHistory,
 } from "./pretty_benchmark_history.ts";
 
 /** Returns the calculated delta for the specific benchmark in a formatted string. 

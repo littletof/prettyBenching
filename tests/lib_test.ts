@@ -1,15 +1,15 @@
 import { prettyBenchmarkProgress, prettyBenchmarkResult } from "../mod.ts";
 import {
   bench,
-  runBenchmarks,
-  clearBenchmarks,
   BenchmarkResult,
-  BenchmarkRunResult,
   BenchmarkRunProgress,
+  BenchmarkRunResult,
+  clearBenchmarks,
+  runBenchmarks,
 } from "../deps.ts";
 import {
-  prettyBenchmarkDown,
   GroupDefinition,
+  prettyBenchmarkDown,
 } from "../pretty_benchmark_down.ts";
 
 import type { Thresholds } from "../types.ts";

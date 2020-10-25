@@ -1,19 +1,19 @@
 import {
-  prettyBenchmarkDown,
+  ColumnDefinition,
   defaultColumns,
-  indicatorColumn,
-  thresholdResultColumn,
-  thresholdsColumn,
   extraMetricsColumns,
   GroupDefinition,
-  ColumnDefinition,
+  indicatorColumn,
+  prettyBenchmarkDown,
+  thresholdResultColumn,
+  thresholdsColumn,
 } from "https://deno.land/x/pretty_benching@v0.3.1/pretty_benchmark_down.ts";
 
 import {
-  runBenchmarks,
   bench,
   BenchmarkResult,
   BenchmarkRunResult,
+  runBenchmarks,
 } from "https://deno.land/std@0.74.0/testing/bench.ts";
 
 import * as colors from "https://deno.land/std@0.74.0/fmt/colors.ts";

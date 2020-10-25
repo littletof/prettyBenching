@@ -1,11 +1,11 @@
 import {
-  stripColor,
-  getInThresholdRange,
   calculateExtraMetrics,
   calculateStdDeviation,
+  getInThresholdRange,
   getPaddedIndicator,
+  stripColor,
 } from "./common.ts";
-import type { BenchmarkRunResult, BenchmarkResult } from "./deps.ts";
+import type { BenchmarkResult, BenchmarkRunResult } from "./deps.ts";
 import type { BenchIndicator, Thresholds } from "./types.ts";
 
 /** Defines how the generated markdown should look like. */
