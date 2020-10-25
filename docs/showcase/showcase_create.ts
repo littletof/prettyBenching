@@ -2,11 +2,7 @@
 
 import { prettyBenchmarkProgress } from "../../mod.ts";
 
-import {
-  bench,
-  runBenchmarks,
-  BenchmarkRunProgress,
-} from "../../deps.ts";
+import { bench, BenchmarkRunProgress, runBenchmarks } from "../../deps.ts";
 
 bench({
   name: "finished",

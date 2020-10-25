@@ -1,16 +1,11 @@
 import {
-  getTimeColor,
   calculateExtraMetrics,
   getPaddedIndicator,
+  getTimeColor,
   substrColored,
 } from "./common.ts";
 
-import {
-  padEndVisible,
-  padStartVisible,
-  perc,
-  rtime,
-} from "./utils.ts";
+import { padEndVisible, padStartVisible, perc, rtime } from "./utils.ts";
 
 import { TableBuilder } from "./table.ts";
 import type { Colorer } from "./colorer.ts";
@@ -237,7 +232,7 @@ function prettyBenchmarkMultipleRunGraph(
   const max = Math.max(...result.measuredRunsMs);
   const min = Math.min(...result.measuredRunsMs);
   const unit = (max - min) / barsCount;
-  let r = result.measuredRunsMs.reduce((prev, runMs, i, a) => {
+  const r = result.measuredRunsMs.reduce((prev, runMs, i, a) => {
     prev[Math.min(Math.floor(((runMs - min) / unit)), barsCount - 1)]++;
 
     return prev;

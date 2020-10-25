@@ -1,8 +1,4 @@
-export type {
-  BenchIndicator,
-  Threshold,
-  Thresholds,
-} from "./types.ts";
+export type { BenchIndicator, Threshold, Thresholds } from "./types.ts";
 
 export {
   calculateExtraMetrics,
@@ -17,22 +13,22 @@ export { prettyBenchmarkProgress } from "./pretty_benchmark_progress.ts";
 export type { prettyBenchmarkProgressOptions } from "./pretty_benchmark_progress.ts";
 
 export {
-  prettyBenchmarkDown,
   defaultColumns,
+  extraMetricsColumns,
   indicatorColumn,
+  prettyBenchmarkDown,
   thresholdResultColumn,
   thresholdsColumn,
-  extraMetricsColumns,
 } from "./pretty_benchmark_down.ts";
 export type {
-  prettyBenchmarkDownOptions,
   ColumnDefinition,
   GroupDefinition,
+  prettyBenchmarkDownOptions,
 } from "./pretty_benchmark_down.ts";
 
 export {
-  prettyBenchmarkHistory,
   calculateThresholds,
+  prettyBenchmarkHistory,
 } from "./pretty_benchmark_history.ts";
 export type {
   BenchmarkHistory,

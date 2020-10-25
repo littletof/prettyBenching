@@ -1,13 +1,5 @@
-import {
-  intersect,
-  stripColor,
-  disjunct,
-} from "./common.ts";
-import {
-  padEndVisible,
-  lDiff,
-  matchWithIndex,
-} from "./utils.ts";
+import { disjunct, intersect, stripColor } from "./common.ts";
+import { lDiff, matchWithIndex, padEndVisible } from "./utils.ts";
 
 const separatorToken = "#&imaseparator&#";
 

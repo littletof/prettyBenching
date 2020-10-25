@@ -3,9 +3,7 @@ import {
   getResultCard,
   prettyBenchmarkCardResultOptions,
 } from "./benchmark_result_card.ts";
-import type {
-  BenchmarkRunResult,
-} from "./deps.ts";
+import type { BenchmarkRunResult } from "./deps.ts";
 
 interface CommonOptions {
   /** Overrides the default output function, which is `console.log`. */

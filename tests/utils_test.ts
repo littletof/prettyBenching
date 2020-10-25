@@ -2,14 +2,14 @@ import { testEach } from "./test_helpers.ts";
 import { assertEquals } from "./test_deps.ts";
 
 import {
-  perc,
   isFloat,
-  rtime,
+  lDiff,
   matchWithIndex,
   num,
-  lDiff,
-  padStartVisible,
   padEndVisible,
+  padStartVisible,
+  perc,
+  rtime,
 } from "../utils.ts";
 import { colors } from "../deps.ts";
 

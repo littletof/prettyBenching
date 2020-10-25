@@ -1,11 +1,11 @@
 import {
-  stripColor,
-  getInThresholdRange,
   calculateExtraMetrics,
   calculateStdDeviation,
+  getInThresholdRange,
   getPaddedIndicator,
+  stripColor,
 } from "./common.ts";
-import type { BenchmarkRunResult, BenchmarkResult } from "./deps.ts";
+import type { BenchmarkResult, BenchmarkRunResult } from "./deps.ts";
 import type { BenchIndicator, Thresholds } from "./types.ts";
 
 /** Defines how the generated markdown should look like. */
@@ -113,7 +113,7 @@ function _prettyBenchmarkDown(
   markdown += stringOrFunction(options?.description, runResult) + "\n";
 
   if (options?.groups && options.groups.length > 0) {
-    let grouppedResults: {
+    const grouppedResults: {
       [key: string]: GroupDefinition & { items: BenchmarkResult[] };
     } = {};
     const unmatched: GroupDefinition & { items: BenchmarkResult[] } = {

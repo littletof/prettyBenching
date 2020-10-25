@@ -1,5 +1,5 @@
 import type { BenchmarkResult, BenchmarkRunResult } from "./deps.ts";
-import type { Thresholds, Threshold } from "./types.ts";
+import type { Threshold, Thresholds } from "./types.ts";
 
 /** Defines the rules on what and how the history should contain.
  *

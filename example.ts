@@ -1,19 +1,19 @@
 import {
-  prettyBenchmarkProgress,
-  prettyBenchmarkResult,
   BenchIndicator,
   prettyBenchmarkHistory,
-} from "https://deno.land/x/pretty_benching@v0.3.0/mod.ts";
+  prettyBenchmarkProgress,
+  prettyBenchmarkResult,
+} from "https://deno.land/x/pretty_benching@v0.3.1/mod.ts";
 
 import {
-  runBenchmarks,
   bench,
-} from "https://deno.land/std@0.69.0/testing/bench.ts";
+  runBenchmarks,
+} from "https://deno.land/std@0.74.0/testing/bench.ts";
 
-import * as colors from "https://deno.land/std@0.69.0/fmt/colors.ts";
+import * as colors from "https://deno.land/std@0.74.0/fmt/colors.ts";
 import {
-  deltaResultInfoCell,
   deltaProgressRowExtra,
+  deltaResultInfoCell,
 } from "./history_extensions.ts";
 
 bench({
@@ -57,7 +57,7 @@ bench({
   runs: 1000,
   func(b): void {
     b.start();
-    let a = new Array();
+    const a = [];
     for (let i = 0; i < 1e12; i++) {
       a.push(i);
     }

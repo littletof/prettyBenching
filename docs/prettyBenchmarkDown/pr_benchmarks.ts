@@ -1,22 +1,22 @@
 import {
-  prettyBenchmarkDown,
+  ColumnDefinition,
   defaultColumns,
-  indicatorColumn,
-  thresholdResultColumn,
-  thresholdsColumn,
   extraMetricsColumns,
   GroupDefinition,
-  ColumnDefinition,
-} from "https://deno.land/x/pretty_benching@v0.3.0/pretty_benchmark_down.ts";
+  indicatorColumn,
+  prettyBenchmarkDown,
+  thresholdResultColumn,
+  thresholdsColumn,
+} from "https://deno.land/x/pretty_benching@v0.3.1/pretty_benchmark_down.ts";
 
 import {
-  runBenchmarks,
   bench,
   BenchmarkResult,
   BenchmarkRunResult,
-} from "https://deno.land/std@0.69.0/testing/bench.ts";
+  runBenchmarks,
+} from "https://deno.land/std@0.74.0/testing/bench.ts";
 
-import * as colors from "https://deno.land/std@0.69.0/fmt/colors.ts";
+import * as colors from "https://deno.land/std@0.74.0/fmt/colors.ts";
 import type { BenchIndicator, Thresholds } from "../../types.ts";
 
 bench({
@@ -102,7 +102,7 @@ bench({
   runs: 1000,
   func(b): void {
     b.start();
-    let a = new Array();
+    const a = [];
     for (let i = 0; i < 1e12; i++) {
       a.push(i);
     }
