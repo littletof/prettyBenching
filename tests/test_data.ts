@@ -1,3 +1,5 @@
+// deno-lint-ignore-file
+
 export const benchmark_result = {
   "filtered": 0,
   "results": [

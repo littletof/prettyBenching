@@ -14,6 +14,7 @@ import {
 
 import type { Thresholds } from "../types.ts";
 
+// deno-lint-ignore camelcase
 import { benchmark_progress, benchmark_result } from "./test_data.ts";
 
 const thresholds: Thresholds = {
@@ -24,7 +25,7 @@ const thresholds: Thresholds = {
 
 Deno.test({
   name: "commandlineBenching",
-  fn: async function (): Promise<void> {
+  fn: function (): void {
     const progressFn = prettyBenchmarkProgress({ thresholds });
     const resultFn = prettyBenchmarkResult({ thresholds });
 
@@ -35,7 +36,7 @@ Deno.test({
 
 Deno.test({
   name: "without options",
-  fn: async function (): Promise<void> {
+  fn: function (): void {
     const progressFn = prettyBenchmarkProgress();
     const resultFn = prettyBenchmarkResult();
 
@@ -46,7 +47,7 @@ Deno.test({
 
 Deno.test({
   name: "nocolor",
-  fn: async function (): Promise<void> {
+  fn: function (): void {
     const progressFn = prettyBenchmarkProgress({ nocolor: true });
     const resultFn = prettyBenchmarkResult({ nocolor: true });
 
@@ -57,7 +58,7 @@ Deno.test({
 
 Deno.test({
   name: "prettyBenchmarkDown - issue #10 - Empty group results",
-  fn: async function (): Promise<void> {
+  fn: function (): void {
     clearBenchmarks();
 
     dummyBench("Bench1");
