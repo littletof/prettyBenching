@@ -126,13 +126,13 @@ function _prettyBenchmarkDown(
       let matched = false;
       options.groups?.forEach((g, i) => {
         if (r.name.match(g.include)) {
-          const group_prop = `${g.name}_${i}`;
+          const groupProp = `${g.name}_${i}`;
 
-          if (!grouppedResults[group_prop]) {
-            grouppedResults[group_prop] = { ...g, items: [] };
+          if (!grouppedResults[groupProp]) {
+            grouppedResults[groupProp] = { ...g, items: [] };
           }
 
-          grouppedResults[group_prop].items.push(r);
+          grouppedResults[groupProp].items.push(r);
 
           matched = true;
         }

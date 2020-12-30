@@ -7,16 +7,16 @@ import {
   prettyBenchmarkDown,
   thresholdResultColumn,
   thresholdsColumn,
-} from "https://deno.land/x/pretty_benching@v0.3.1/pretty_benchmark_down.ts";
+} from "https://deno.land/x/pretty_benching@v0.3.2/pretty_benchmark_down.ts";
 
 import {
   bench,
   BenchmarkResult,
   BenchmarkRunResult,
   runBenchmarks,
-} from "https://deno.land/std@0.74.0/testing/bench.ts";
+} from "https://deno.land/std@0.82.0/testing/bench.ts";
 
-import * as colors from "https://deno.land/std@0.74.0/fmt/colors.ts";
+import * as colors from "https://deno.land/std@0.82.0/fmt/colors.ts";
 import type { BenchIndicator, Thresholds } from "../../types.ts";
 
 bench({
