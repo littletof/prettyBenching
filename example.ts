@@ -3,7 +3,7 @@ import {
   prettyBenchmarkHistory,
   prettyBenchmarkProgress,
   prettyBenchmarkResult,
-} from "https://deno.land/x/pretty_benching@v0.3.1/mod.ts";
+} from "https://deno.land/x/pretty_benching@v0.3.2/mod.ts";
 
 import {
   bench,
