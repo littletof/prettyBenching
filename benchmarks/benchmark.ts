@@ -3,8 +3,8 @@
 import {
   bench,
   runBenchmarks,
-} from "https://deno.land/std@0.74.0/testing/bench.ts";
-import { join } from "https://deno.land/std@0.74.0/path/mod.ts";
+} from "https://deno.land/std@0.82.0/testing/bench.ts";
+import { join } from "https://deno.land/std@0.82.0/path/mod.ts";
 import { prettyBenchmarkResult } from "../mod.ts";
 import { colors } from "../deps.ts";
 
