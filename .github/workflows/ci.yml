@@ -33,7 +33,7 @@ jobs:
       - name: Check formatting
         if: matrix.config.kind == 'lint'
         run: deno fmt --check
-        
+
       - name: Test ${{matrix.config.cov && '(with coverage)' || ''}}
         if: matrix.config.kind == 'test'
         run: deno test ${{matrix.config.cov && '--coverage=./cov --unstable' || ''}}
@@ -44,7 +44,7 @@ jobs:
         if: matrix.config.cov
         uses: coverallsapp/github-action@v1.1.2
           with:
-            github-token: ${{ secrets.github_token }}
+            github-token: ${{ secrets.GITHUB_TOKEN }}
             path-to-lcov: ./cov.lcov
 
       - name: Release
