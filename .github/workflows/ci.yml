@@ -39,7 +39,7 @@ jobs:
         run: deno test ${{matrix.config.cov && '--coverage=./cov --unstable' || ''}}
       - name: Generate lcov
         if: matrix.config.cov
-        run: deno coverage --unstable --lcov ./cov > cov.lcov
+        run: deno coverage --exclude=test --unstable --lcov ./cov > cov.lcov
       - name: Upload lcov
         if: matrix.config.cov
         uses: coverallsapp/github-action@v1.1.2
