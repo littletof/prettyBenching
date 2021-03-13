@@ -43,9 +43,9 @@ jobs:
       - name: Upload lcov
         if: matrix.config.cov
         uses: coverallsapp/github-action@v1.1.2
-          with:
-            github-token: ${{ secrets.GITHUB_TOKEN }}
-            path-to-lcov: ./cov.lcov
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: ./cov.lcov
 
       - name: Release
         uses: softprops/action-gh-release@v1
