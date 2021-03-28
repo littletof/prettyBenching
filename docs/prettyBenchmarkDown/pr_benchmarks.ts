@@ -14,9 +14,9 @@ import {
   BenchmarkResult,
   BenchmarkRunResult,
   runBenchmarks,
-} from "https://deno.land/std@0.82.0/testing/bench.ts";
+} from "https://deno.land/std@0.91.0/testing/bench.ts";
 
-import * as colors from "https://deno.land/std@0.82.0/fmt/colors.ts";
+import * as colors from "https://deno.land/std@0.91.0/fmt/colors.ts";
 import type { BenchIndicator, Thresholds } from "../../types.ts";
 
 bench({

@@ -1,11 +1,11 @@
 // deno-lint-ignore-file
 
 import { prettyBenchmarkProgress, prettyBenchmarkResult } from "../../mod.ts";
-import { join } from "https://deno.land/std@0.82.0/path/mod.ts";
+import { join } from "https://deno.land/std@0.91.0/path/mod.ts";
 import {
   BenchmarkRunProgress,
   ProgressState,
-} from "https://deno.land/std@0.82.0/testing/bench.ts";
+} from "https://deno.land/std@0.91.0/testing/bench.ts";
 
 const pathBase = join(".", "docs", "showcase");
 

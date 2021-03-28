@@ -11,7 +11,7 @@ jobs:
       - name: Install deno
         uses: denolib/setup-deno@master
         with:
-          deno-version: 1.6.2
+          deno-version: 1.8.2
       - name: Bench It
         run: deno run --allow-hrtime ./benchmarks/pr_benchmarks.ts | tee ./benchmarks/pr_benchmark.md
       # Feel free to remove this 'Add link' step
