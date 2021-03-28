@@ -15,12 +15,17 @@ console.log(
   ).href,
 );
 
-await Deno.permissions.request({name: 'hrtime'});
+await Deno.permissions.request({ name: "hrtime" });
 
 const inputJSONPath = join("docs", "showcase", "benchmark_result_input.json");
-const result = await Deno.permissions.request({name: 'read', path: inputJSONPath});
-if(result.state !== 'granted') {
-  console.error(colors.red('Can\'t run without input data for the benchmark. Exiting...'));
+const result = await Deno.permissions.request({
+  name: "read",
+  path: inputJSONPath,
+});
+if (result.state !== "granted") {
+  console.error(
+    colors.red("Can't run without input data for the benchmark. Exiting..."),
+  );
   Deno.exit(1);
 }
 
