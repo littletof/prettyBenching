@@ -9,6 +9,18 @@ import {
 
 const pathBase = join(".", "docs", "showcase");
 
+await Deno.permissions.request({name: 'hrtime'});
+const readResult = await Deno.permissions.request({name: 'read', path: pathBase});
+if(readResult.state !== 'granted') {
+  console.error('Can\'t run without input data for the benchmark. Exiting...');
+  Deno.exit(1);
+}
+const writeResult = await Deno.permissions.request({name: 'write', path: pathBase});
+if(writeResult.state !== 'granted') {
+  console.error('Can\'t save result without write permission. Exiting...');
+  Deno.exit(1);
+}
+
 const progressData: any[] = readJsonSync(
   join(pathBase, "benchmark_progress_inputs.json"),
 ) as any;

@@ -4,6 +4,15 @@ import { prettyBenchmarkProgress } from "../../mod.ts";
 
 import { bench, BenchmarkRunProgress, runBenchmarks } from "../../deps.ts";
 
+await Deno.permissions.request({name: 'hrtime'});
+
+const result = await Deno.permissions.request({name: 'write', path: './docs/showcase/'});
+
+if(result.state !== 'granted') {
+  console.error('Write permission is needed to write results to json. Exiting...');
+  Deno.exit(1);
+}
+
 bench({
   name: "finished",
   runs: 100,
