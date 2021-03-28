@@ -10,28 +10,43 @@ jobs:
         config:
           - os: macOS-latest
             kind: test
+            cov: false
           - os: windows-latest
             kind: test
+            cov: false
           - os: ubuntu-latest
             kind: test
+            cov: true
           - os: ubuntu-latest
             kind: lint
+            cov: false
     steps:
       - name: Clone repository
         uses: actions/checkout@v2
       - name: Install deno
         uses: denolib/setup-deno@master
         with:
-          deno-version: 1.6.2
+          deno-version: 1.8.2
       - name: Check lint
         if: matrix.config.kind == 'lint'
         run: deno lint --unstable
       - name: Check formatting
         if: matrix.config.kind == 'lint'
-        run: deno fmt --check
-      - name: Test
+        run: deno fmt --check --ignore='./README.md,./docs'
+
+      - name: Test ${{matrix.config.cov && '(with coverage)' || ''}}
         if: matrix.config.kind == 'test'
-        run: deno test
+        run: deno test ${{matrix.config.cov && '--coverage=./cov --unstable' || ''}}
+      - name: Generate lcov
+        if: matrix.config.cov
+        run: deno coverage --exclude=test --unstable --lcov ./cov > cov.lcov
+      - name: Upload lcov
+        if: matrix.config.cov
+        uses: coverallsapp/github-action@v1.1.2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: ./cov.lcov
+
       - name: Release
         uses: softprops/action-gh-release@v1
         if: |
