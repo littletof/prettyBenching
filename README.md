@@ -14,15 +14,11 @@ A simple Deno library, that gives you pretty benchmarking progress and results i
 
 ## Jump to
 
-[![prettyBenchmarkProgress](https://img.shields.io/badge/-%F0%9F%94%B5%20prettyBenchmarkProgress-4e4e4e)](#prettybenchmarkprogress)
-
-[![prettyBenchmarkResults](https://img.shields.io/badge/-%F0%9F%94%B5%20prettyBenchmarkResults-4e4e4e)](#prettybenchmarkbesults)
-
-[![prettyBenchmarkDown](https://img.shields.io/badge/-%F0%9F%94%B5%20prettyBenchmarkDown-4e4e4e)](#prettybenchmarkdown) [![deno version](https://img.shields.io/badge/Github_Action-4e4e4e?logo=github)](#as-a-github-action)
-
-[![prettyBenchmarkHistory](https://img.shields.io/badge/-%F0%9F%94%B5%20prettyBenchmarkHistory-4e4e4e)](#prettybenchmarkhistory)
-
-[![deno version](https://img.shields.io/badge/ROADMAP-4e4e4e?logo=discover)](#roadmap)
+- [prettyBenchmarkProgress](#prettybenchmarkprogress)
+- [prettyBenchmarkResults](#prettybenchmarkresults)
+- [prettyBenchmarkDown](#prettybenchmarkdown) [![deno version](https://img.shields.io/badge/Github_Action-4e4e4e?logo=github)](#as-a-github-action)
+- [prettyBenchmarkHistory](#prettybenchmarkhistory)
+- [Roadmap](#roadmap)
 
 ## Try it out
 
@@ -40,14 +36,15 @@ Add the following to your `deps.ts`
 export {
   prettyBenchmarkResult,
   prettyBenchmarkProgress,
-  prettyBenchmarkDown
+  prettyBenchmarkDown,
+  prettyBenchingHistory
 } from 'https://deno.land/x/pretty_benching@v0.3.2/mod.ts';
 ```
 
 or just simply import it directly:
 
 ```ts
-import { prettyBenchmarkResult, prettyBenchmarkProgress, prettyBenchmarkDown } from 'https://deno.land/x/pretty_benching@v0.3.2/mod.ts';
+import { prettyBenchmarkResult, prettyBenchmarkProgress, prettyBenchmarkDown, prettyBenchingHistory } from 'https://deno.land/x/pretty_benching@v0.3.2/mod.ts';
 ```
 
 ## Note
