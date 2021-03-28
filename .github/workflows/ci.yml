@@ -32,7 +32,7 @@ jobs:
         run: deno lint --unstable
       - name: Check formatting
         if: matrix.config.kind == 'lint'
-        run: deno fmt --check
+        run: deno fmt --check --ignore='./README.md,./docs'
 
       - name: Test ${{matrix.config.cov && '(with coverage)' || ''}}
         if: matrix.config.kind == 'test'
