@@ -7,7 +7,7 @@ import {
   prettyBenchmarkDown,
   thresholdResultColumn,
   thresholdsColumn,
-} from "https://deno.land/x/pretty_benching@v0.3.2/pretty_benchmark_down.ts";
+} from "https://deno.land/x/pretty_benching@v0.3.3/pretty_benchmark_down.ts";
 
 import {
   bench,
