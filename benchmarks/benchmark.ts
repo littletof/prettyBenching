@@ -3,8 +3,8 @@
 import {
   bench,
   runBenchmarks,
-} from "https://deno.land/std@0.82.0/testing/bench.ts";
-import { join } from "https://deno.land/std@0.82.0/path/mod.ts";
+} from "https://deno.land/std@0.91.0/testing/bench.ts";
+import { join } from "https://deno.land/std@0.91.0/path/mod.ts";
 import { prettyBenchmarkResult } from "../mod.ts";
 import { colors } from "../deps.ts";
 
@@ -14,9 +14,22 @@ console.log(
     import.meta.url,
   ).href,
 );
-const data = JSON.parse(Deno.readTextFileSync(
-  join("docs", "showcase", "benchmark_result_input.json"),
-));
+
+await Deno.permissions.request({ name: "hrtime" });
+
+const inputJSONPath = join("docs", "showcase", "benchmark_result_input.json");
+const result = await Deno.permissions.request({
+  name: "read",
+  path: inputJSONPath,
+});
+if (result.state !== "granted") {
+  console.error(
+    colors.red("Can't run without input data for the benchmark. Exiting..."),
+  );
+  Deno.exit(1);
+}
+
+const data = JSON.parse(Deno.readTextFileSync(inputJSONPath));
 
 const resultFn = prettyBenchmarkResult(
   {

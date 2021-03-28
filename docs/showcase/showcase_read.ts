@@ -1,13 +1,25 @@
 // deno-lint-ignore-file
 
 import { prettyBenchmarkProgress, prettyBenchmarkResult } from "../../mod.ts";
-import { join } from "https://deno.land/std@0.82.0/path/mod.ts";
+import { join } from "https://deno.land/std@0.91.0/path/mod.ts";
 import {
   BenchmarkRunProgress,
   ProgressState,
-} from "https://deno.land/std@0.82.0/testing/bench.ts";
+} from "https://deno.land/std@0.91.0/testing/bench.ts";
 
 const pathBase = join(".", "docs", "showcase");
+
+await Deno.permissions.request({name: 'hrtime'});
+const readResult = await Deno.permissions.request({name: 'read', path: pathBase});
+if(readResult.state !== 'granted') {
+  console.error('Can\'t run without input data for the benchmark. Exiting...');
+  Deno.exit(1);
+}
+const writeResult = await Deno.permissions.request({name: 'write', path: pathBase});
+if(writeResult.state !== 'granted') {
+  console.error('Can\'t save result without write permission. Exiting...');
+  Deno.exit(1);
+}
 
 const progressData: any[] = readJsonSync(
   join(pathBase, "benchmark_progress_inputs.json"),

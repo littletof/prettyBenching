@@ -2,10 +2,10 @@
 
 A simple Deno library, that gives you pretty benchmarking progress and results in the commandline
 
-[![version](https://img.shields.io/badge/0.3.2-brightgreen?logo=v&logoColor=white&labelColor=gray)](https://deno.land/x/pretty_benching@v0.3.2)
+[![version](https://img.shields.io/badge/0.3.3-brightgreen?logo=v&logoColor=white&labelColor=gray)](https://deno.land/x/pretty_benching@v0.3.3)
 
-[![deno version](https://img.shields.io/badge/deno%201.6.2-success?logo=deno&logoColor=black&labelColor=white&color=black)](https://github.com/denoland/deno)
-[![deno/std version](https://img.shields.io/badge/deno/std%200.82.0-success?logo=deno&logoColor=black&labelColor=white&color=black)](https://deno.land/std@0.82.0)
+[![deno version](https://img.shields.io/badge/deno%201.8.2-success?logo=deno&logoColor=black&labelColor=white&color=black)](https://github.com/denoland/deno)
+[![deno/std version](https://img.shields.io/badge/deno/std%200.91.0-success?logo=deno&logoColor=black&labelColor=white&color=black)](https://deno.land/std@0.91.0)
 [![documentation](https://img.shields.io/badge/docs-blue?logo=deno&logoColor=black&labelColor=white&color=blue)](https://doc.deno.land/https/deno.land/x/pretty_benching/mod.ts)
 
 [![Build Status](https://github.com/littletof/prettyBenching/workflows/CI/badge.svg)](https://github.com/littletof/prettyBenching/actions?query=workflow%3ACI)
@@ -14,15 +14,11 @@ A simple Deno library, that gives you pretty benchmarking progress and results i
 
 ## Jump to
 
-[![prettyBenchmarkProgress](https://img.shields.io/badge/-%F0%9F%94%B5%20prettyBenchmarkProgress-4e4e4e)](#prettybenchmarkprogress)
-
-[![prettyBenchmarkResults](https://img.shields.io/badge/-%F0%9F%94%B5%20prettyBenchmarkResults-4e4e4e)](#prettybenchmarkbesults)
-
-[![prettyBenchmarkDown](https://img.shields.io/badge/-%F0%9F%94%B5%20prettyBenchmarkDown-4e4e4e)](#prettybenchmarkdown) [![deno version](https://img.shields.io/badge/Github_Action-4e4e4e?logo=github)](#as-a-github-action)
-
-[![prettyBenchmarkHistory](https://img.shields.io/badge/-%F0%9F%94%B5%20prettyBenchmarkHistory-4e4e4e)](#prettybenchmarkhistory)
-
-[![deno version](https://img.shields.io/badge/ROADMAP-4e4e4e?logo=discover)](#roadmap)
+- [prettyBenchmarkProgress](#prettybenchmarkprogress)
+- [prettyBenchmarkResults](#prettybenchmarkresults)
+- [prettyBenchmarkDown](#prettybenchmarkdown) [![deno version](https://img.shields.io/badge/Github_Action-4e4e4e?logo=github)](#as-a-github-action)
+- [prettyBenchmarkHistory](#prettybenchmarkhistory)
+- [Roadmap](#roadmap)
 
 ## Try it out
 
@@ -40,14 +36,15 @@ Add the following to your `deps.ts`
 export {
   prettyBenchmarkResult,
   prettyBenchmarkProgress,
-  prettyBenchmarkDown
-} from 'https://deno.land/x/pretty_benching@v0.3.2/mod.ts';
+  prettyBenchmarkDown,
+  prettyBenchingHistory
+} from 'https://deno.land/x/pretty_benching@v0.3.3/mod.ts';
 ```
 
 or just simply import it directly:
 
 ```ts
-import { prettyBenchmarkResult, prettyBenchmarkProgress, prettyBenchmarkDown } from 'https://deno.land/x/pretty_benching@v0.3.2/mod.ts';
+import { prettyBenchmarkResult, prettyBenchmarkProgress, prettyBenchmarkDown, prettyBenchingHistory } from 'https://deno.land/x/pretty_benching@v0.3.3/mod.ts';
 ```
 
 ## Note
