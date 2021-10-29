@@ -1,3 +1,5 @@
+// deno-lint-ignore-file
+
 import { snap } from 'https://deno.land/x/snapper@v0.0.5/mod.ts';
 import type { SnapParams } from 'https://deno.land/x/snapper@v0.0.5/mod.ts';
 import { join } from "https://deno.land/std@0.91.0/path/win32.ts";
