@@ -21,7 +21,7 @@ async function generateDocsImages() {
 
     const resultData = readJsonSync(join(pathBase, "benchmark_result_input.json"));
 
-    const postFix = '_snap.png';
+    const postFix = '.png';
 
     const thresholds = {"multiple-runs": { green: 76, yellow: 82 }};
     const indicators = [{benches: /multiple-runs/, color: colors.magenta,modFn: () => ({indicator: "🚀 ", visibleLength: 2})}];
@@ -33,6 +33,8 @@ async function generateDocsImages() {
                 "multiple-runs": {measuredRunsAvgMs: 133.2134, totalMs: 13321.34, runsCount: 100}
         }}]
     });
+
+    /* Result cards */
 
     const optionsSet: {name: string, options: prettyBenchmarkResultOptions}[] = [ // TODO remove "snap" postfix
         {name: 'docs/imgs/prettyBenchingResult_example_threshold', options: {thresholds}},
@@ -55,9 +57,9 @@ async function generateDocsImages() {
 
     let result = "";
     prettyBenchmarkResult({outputFn: (res) => result += res})(resultData);
-    snaps.push({content: result, imageSavePath: "docs/imgs/prettyBenchingResult_example", viewport: {deviceScaleFactor: 1, width: 780, height: 595}});
+    snaps.push({content: result.replace(/\n$/, ''), imageSavePath: "docs/imgs/prettyBenchingResult_example", viewport: {width: 780}});
 
-    /** Progress */
+    /* Progress */
 
     const progressCases = [
         {name: 'docs/imgs/prettyBenchingProgress_example_running', state: buildProgressState([
@@ -127,13 +129,13 @@ async function generateDocsImages() {
         const states = buildProgressState(c.state);
         states.forEach(state => progressFnc(state));
 
-        result = result.replace(/^\x1B\[1A\r/, ''); //replace first up1Cl causing empty line
+        result = result.replace(/^\x1B\[1A\r/, '').replace(/^\n/, '').replace(/\n$/, ''); //replace first up1Cl causing empty line
 
         return {content: result, imageSavePath: c.name,viewport:{width: 1000, ...c.viewport}} as SnapParams;
     }) as any)
 
 
-    await snap(snaps.map(s => ({...s, imageSavePath: s.imageSavePath + postFix})), {verbose: true, theme: {background: '#000'}});
+    await snap(snaps.map(s => ({...s, imageSavePath: s.imageSavePath + postFix})), {verbose: true, viewport: {deviceScaleFactor: 1}});
 }
 
 function readJsonSync(path: string) {
