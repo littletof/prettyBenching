@@ -11,6 +11,7 @@ A simple Deno library, that gives you pretty benchmarking progress and results i
 [![Build Status](https://github.com/littletof/prettyBenching/workflows/CI/badge.svg)](https://github.com/littletof/prettyBenching/actions?query=workflow%3ACI)
 [![Coverage Status](https://coveralls.io/repos/github/littletof/prettyBenching/badge.svg)](https://coveralls.io/github/littletof/prettyBenching)
 ![maintained](https://img.shields.io/maintenance/yes/2021)
+[![snapper_deno](https://img.shields.io/badge/-snapper%20%F0%9F%93%B7-%230DBC79)](https://github.com/littletof/snapper)
 
 ## Jump to
 
